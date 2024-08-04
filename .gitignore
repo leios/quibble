@@ -59,4 +59,8 @@ CMake*
 cmake*
 *.bak
 
+# Julia docs
+docs/build/*
+docs/Manifest.toml
+
 quibble
