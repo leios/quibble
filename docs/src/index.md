@@ -1,11 +1,5 @@
-# Quibble
-
-[![Developer Documentation][docs-latest-img]][docs-url]
-
-[docs-url]: https://www.leioslabs.com/quibble/dev/
-[docs-latest-img]: https://img.shields.io/badge/docs-dev-blue.svg
-
-An experimental meshless rendering engine that uses a variation on splatting with user-defined function systems.
+# What is Quibble?
+Quibble is an experimental meshless rendering engine that uses a variation on splatting with user-defined function systems.
 
 This project has a few overarching goals:
 
