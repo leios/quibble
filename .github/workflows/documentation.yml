@@ -1,4 +1,4 @@
-name: CI
+name: Documentation
 
 on:
   pull_request:
@@ -14,7 +14,8 @@ on:
       - main
     tags: '*'
 
-  docs:
+jobs:
+  build:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
     steps:
