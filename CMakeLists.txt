@@ -7,8 +7,11 @@ add_executable(
     quibble
     include/macros.h
 
-    src/demo_functions.c
+    include/errors.h
+    src/errors.c
+
     include/demo_functions.h
+    src/demo_functions.c
 
     src/demo.c
 )

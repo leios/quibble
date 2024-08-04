@@ -5,11 +5,22 @@ Purpose: This file defines a few functions to create an OpenCL kernel by
 
   Notes: `define functions` should be made to read functions in at runtime
 //----------------------------------------------------------------------------*/
-#include <string.h>
-#include <stdlib.h>
 #include "../include/macros.h"
+#include "../include/demo_functions.h"
+
+void define_add(char *final_fx){
+    const char *kernel_str =                                              "\n" \
+    "float add(float a, float b){                                          \n" \
+    "    return a + b;                                                     \n" \
+    "}                                                                     \n";
+    strcat(final_fx, kernel_str);
+}
+float add(float a, float b){
+    return a + b;
+}
 
 void define_preamble(char *final_fx){
+    define_add(final_fx);
     const char *kernel_str =                                              "\n" \
     "__kernel void demo(__global float *a, int N){                         \n" \
     "    int idx = get_global_id(0);                                       \n" \
@@ -27,7 +38,7 @@ void define_postamble(char *final_fx){
 void define_functions(char *final_fx, int n){
     char *all_fxs = (char*)malloc(MAX_SOURCE_SIZE);
 
-    char f_1[50] = "    x += 1;\n";
+    char f_1[50] = "    x = add(x, 1);\n";
     char f_2[50] = "    x += 2;\n";
     char f_3[50] = "    x += 3;\n";
     char f_4[50] = "    x += 4;\n";

@@ -8,11 +8,11 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include <string.h>
 #include <stdlib.h>
 
-#define CL_TARGET_OPENCL_VERSION 300
+#include "../include/macros.h"
 #include <CL/cl.h>
 
 #include "../include/demo_functions.h"
-#include "../include/macros.h"
+#include "../include/errors.h"
 
 int main(){
     int array_size = 10;
@@ -53,91 +53,108 @@ int main(){
     cl_uint num_platforms;
 
     // For error propagation
-    cl_int ret;
-    ret = clGetPlatformIDs(1, &platform_id, &num_platforms);
-    ret = clGetDeviceIDs(platform_id,
-                         CL_DEVICE_TYPE_DEFAULT,
-                         1,
-                         &device_id,
-                         &num_devices);
+    cl_int err;
+    cl_check(
+        clGetPlatformIDs(1, &platform_id, &num_platforms)
+    );
+    cl_check(
+        clGetDeviceIDs(platform_id,
+                       CL_DEVICE_TYPE_DEFAULT,
+                       1,
+                       &device_id,
+                       &num_devices)
+    );
 
-    cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
+    cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &err);
+    cl_check(err);
 
     cl_command_queue command_queue = clCreateCommandQueueWithProperties(
         context,
         device_id,
         0,
-        &ret
+        &err
     );
+    cl_check(err);
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(context,
                                 CL_MEM_READ_WRITE,
                                 array_size * sizeof(float),
                                 NULL,
-                                &ret);
+                                &err);
+    cl_check(err);
 
-    ret = clEnqueueWriteBuffer(command_queue,
-                               d_a,
-                               CL_TRUE,
-                               0,
-                               array_size * sizeof(float),
-                               a,
-                               0,
-                               NULL,
-                               NULL);
+    cl_check(
+        clEnqueueWriteBuffer(command_queue,
+                             d_a,
+                             CL_TRUE,
+                             0,
+                             array_size * sizeof(float),
+                             a,
+                             0,
+                             NULL,
+                             NULL)
+    );
 
     // Create program
     cl_program program = clCreateProgramWithSource(context,
                                                    1,
                                                    (const char**)&kernel_source,
                                                    (const size_t *)&kernel_size,
-                                                   &ret);
-    //printf("%d\n", ret);
+                                                   &err);
+    cl_check(err);
 
-    // Build program
-    ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-    printf("%d\n", ret);
+    err = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+    cl_check_program(err, program, device_id);
 
-    cl_kernel kernel = clCreateKernel(program, "demo", &ret);
+    cl_kernel kernel = clCreateKernel(program, "demo", &err);
+    cl_check(err);
 
-    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_a);
-    ret = clSetKernelArg(kernel, 1, sizeof(int), &array_size);
+    cl_check(
+        clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_a)
+    );
+    cl_check(
+        clSetKernelArg(kernel, 1, sizeof(int), &array_size)
+    );
 
     size_t global_item_size = array_size;
     size_t local_item_size = array_size;
 
-    ret = clEnqueueNDRangeKernel(command_queue,
-                                 kernel,
-                                 1,
-                                 NULL,
-                                 &global_item_size,
-                                 &local_item_size,
-                                 0,
-                                 NULL,
-                                 NULL);
+    cl_check(
+        clEnqueueNDRangeKernel(command_queue,
+                               kernel,
+                               1,
+                               NULL,
+                               &global_item_size,
+                               &local_item_size,
+                               0,
+                               NULL,
+                               NULL)
+    );
 
-    ret = clEnqueueReadBuffer(command_queue,
-                              d_a,
-                              CL_TRUE,
-                              0,
-                              array_size * sizeof(float),
-                              a,
-                              0,
-                              NULL,
-                              NULL);
+    cl_check(
+        clEnqueueReadBuffer(command_queue,
+                            d_a,
+                            CL_TRUE,
+                            0,
+                            array_size * sizeof(float),
+                            a,
+                            0,
+                            NULL,
+                            NULL)
+    );
 
     for (int i = 0; i < array_size; ++i){
         printf("%f\n", a[i]);
     }
 
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(d_a);
-    ret = clReleaseContext(context);
+    cl_check(clFlush(command_queue));
+    cl_check(clFinish(command_queue));
+    cl_check(clReleaseCommandQueue(command_queue));
+    cl_check(clReleaseKernel(kernel));
+    cl_check(clReleaseProgram(program));
+    cl_check(clReleaseMemObject(d_a));
+    cl_check(clReleaseContext(context));
 
     free(a);
 

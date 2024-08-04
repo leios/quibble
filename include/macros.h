@@ -4,4 +4,6 @@
 //#define MAX_SOURCE_SIZE (0x100000)
 #define MAX_SOURCE_SIZE (0x999999)
 
+#define CL_TARGET_OPENCL_VERSION 300
+
 #endif
