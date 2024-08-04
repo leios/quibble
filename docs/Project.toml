@@ -1,2 +1,8 @@
+name = "QuibbleDocs"
+uuid = "c336f913-6d23-40cb-a0b2-ff1c6ea79d97"
+authors = ["James Schloss <jrs.schloss@gmail.com>"]
+version = "0.1.0"
+
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
