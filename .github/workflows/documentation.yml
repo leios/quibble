@@ -29,6 +29,5 @@ jobs:
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- SSH deploy key
         run: julia --project=docs/ docs/make.jl
 
