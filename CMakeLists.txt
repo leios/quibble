@@ -10,6 +10,12 @@ add_executable(
     include/errors.h
     src/errors.c
 
+    include/quibble_context.h
+    src/quibble_context.c
+
+    include/quibble_buffers.h
+    src/quibble_buffers.c
+
     include/demo_functions.h
     src/demo_functions.c
 
