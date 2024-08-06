@@ -4,6 +4,9 @@ Purpose: This file defines the quibble_context and associate functions.
          A quibble_context holds all the necessary information for quibble
          and OpenCL
 
+  Notes: There are a few random numbers and NULLs in the OpenCL API that I 
+         don't fully understand at this point
+
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_context.h"
@@ -49,8 +52,13 @@ void free_quibble_context(struct quibble_context qc){
 
 }
 
+void create_kernel(struct quibble_context *qc){
+}
+
 /*
-void list_devices(...);
+void list_devices(...){
+    something with clGetDeviceInfo
+};
 void choose_device(...);
 struct quibble_context create_context(int device, ...);
 */

@@ -30,8 +30,6 @@ int main(){
     define_postamble(kernel_source);
 
     size_t kernel_size = strlen(kernel_source);
-    //printf("%s \n %d\n", kernel_source, kernel_size);
-
 
     cl_int err;
     struct quibble_context qc = create_default_context();
