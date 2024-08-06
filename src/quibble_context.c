@@ -39,6 +39,16 @@ struct quibble_context create_default_context(){
     return qbc;
 }
 
+void free_quibble_context(struct quibble_context qc){
+    cl_check(clFlush(qc.command_queue));
+    cl_check(clFinish(qc.command_queue));
+    cl_check(clReleaseCommandQueue(qc.command_queue));
+    cl_check(clReleaseKernel(qc.kernel));
+    cl_check(clReleaseProgram(qc.program));
+    cl_check(clReleaseContext(qc.context));
+
+}
+
 /*
 void list_devices(...);
 void choose_device(...);
