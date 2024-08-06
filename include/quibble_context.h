@@ -19,6 +19,7 @@ struct quibble_context{
 };
 
 struct quibble_context create_default_context();
+void free_quibble_context(struct quibble_context qc);
 /*
 void list_devices(...);
 void choose_device(...);

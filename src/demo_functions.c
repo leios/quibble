@@ -3,7 +3,21 @@
 Purpose: This file defines a few functions to create an OpenCL kernel by 
          reading in a set of functions with the `define_functions` function.
 
-  Notes: `define functions` should be made to read functions in at runtime
+  Notes: `define functions` should be made to read functions in at runtime:
+    ```
+    char filename[50] = "demo.cl";
+    FILE *kernel_file = fopen(filename, "r");
+
+    if (!kernel_file){
+        fprintf(stderr, "No file %s found!\n", filename);
+        exit(-1);
+    }
+
+    char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
+    size_t kernel_size = fread(kernel_source, 1, MAX_SOURCE_SIZE, kernel_file);
+    fclose(kernel_file);
+    ```
+
 //----------------------------------------------------------------------------*/
 #include "../include/macros.h"
 #include "../include/demo_functions.h"
