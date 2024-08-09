@@ -30,8 +30,15 @@ struct quibble_canvas{
     int stage;
 };
 
+char *get_device_name(cl_device_id device_id);
+char *get_platform_name(cl_platform_id platform_id);
+struct quibble_canvas create_simple_canvas();
+void qb_find_platforms(struct quibble_canvas *qc, bool verbose);
+void qb_list_devices();
+
 struct quibble_canvas create_default_canvas(bool verbose);
 void free_quibble_canvas(struct quibble_canvas qc);
+
 /*
 void list_devices(...);
 void choose_device(...);
