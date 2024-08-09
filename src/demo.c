@@ -13,7 +13,7 @@ Purpose: This file is a quick example of how we might read function fragments in
 
 #include "../include/demo_functions.h"
 #include "../include/errors.h"
-#include "../include/quibble_context.h"
+#include "../include/quibble_canvas.h"
 
 int main(){
     int array_size = 10;
@@ -32,7 +32,7 @@ int main(){
     size_t kernel_size = strlen(kernel_source);
 
     cl_int err;
-    struct quibble_context qc = create_default_context();
+    struct quibble_canvas qc = create_default_canvas();
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(qc.context,
@@ -62,8 +62,8 @@ int main(){
                                            &err);
     cl_check(err);
 
-    err = clBuildProgram(qc.program, 1, &qc.device_id, NULL, NULL, NULL);
-    cl_check_program(err, qc.program, qc.device_id);
+    err = clBuildProgram(qc.program, 1, &qc.device_ids[0], NULL, NULL, NULL);
+    cl_check_program(err, qc.program, qc.device_ids[0]);
 
     qc.kernel = clCreateKernel(qc.program, "demo", &err);
     cl_check(err);
@@ -106,7 +106,7 @@ int main(){
         printf("%f\n", a[i]);
     }
 
-    free_quibble_context(qc);
+    free_quibble_canvas(qc);
     cl_check(clReleaseMemObject(d_a));
 
     free(a);
