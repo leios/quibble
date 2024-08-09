@@ -6,6 +6,7 @@
 #include <CL/cl.h>
 
 #include "quibble_buffers.h"
+#include <stdbool.h>
 
 struct quibble_canvas{
     // Quibble stuff
@@ -29,7 +30,7 @@ struct quibble_canvas{
     int stage;
 };
 
-struct quibble_canvas create_default_canvas();
+struct quibble_canvas create_default_canvas(bool verbose);
 void free_quibble_canvas(struct quibble_canvas qc);
 /*
 void list_devices(...);
