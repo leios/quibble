@@ -5,9 +5,19 @@
 #include "macros.h"
 #include <CL/cl.h>
 
-struct quibble_context{
-    cl_platform_id platform_id;
-    cl_device_id device_id;
+#include "quibble_buffers.h"
+
+struct quibble_canvas{
+    // Quibble stuff
+    struct quibble_buffer input_buffer;
+    int res_x;
+    int res_y;
+    unsigned int **framebuffers;
+    
+
+    // CL stuff
+    cl_platform_id *platform_ids;
+    cl_device_id *device_ids;
     cl_uint num_devices;
     cl_uint num_platforms;
     cl_context context;
@@ -16,10 +26,11 @@ struct quibble_context{
     cl_kernel kernel;
     size_t global_item_size;
     size_t local_item_size;
+    int stage;
 };
 
-struct quibble_context create_default_context();
-void free_quibble_context(struct quibble_context qc);
+struct quibble_canvas create_default_canvas();
+void free_quibble_canvas(struct quibble_canvas qc);
 /*
 void list_devices(...);
 void choose_device(...);
