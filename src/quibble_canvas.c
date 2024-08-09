@@ -23,7 +23,14 @@ Purpose: This file defines the quibble_canvas and associate functions.
 
 #include "../include/quibble_canvas.h"
 
-struct quibble_canvas create_simple_context(){
+/*----------------------------------------------------------------------------//
+    HEADER
+//----------------------------------------------------------------------------*/
+
+char *get_device_name(cl_device_id device_id);
+char *get_platform_name(cl_platform_id platform_id);
+
+struct quibble_canvas create_simple_canvas(){
 
     struct quibble_canvas qc;
 
@@ -32,7 +39,29 @@ struct quibble_canvas create_simple_context(){
     return qc;
 }
 
-void qb_find_platforms(struct quibble_canvas *qc){
+void qb_find_platforms(struct quibble_canvas *qc, bool verbose){
+    // 10 is arbitrary, but should be high enough for almost any task
+    cl_check(
+        clGetPlatformIDs(10, NULL, &qc->num_platforms)
+    );
+
+    qc->platform_ids = (cl_platform_id *)malloc(qc->num_platforms *
+                                                sizeof(cl_platform_id));
+    cl_check(
+        clGetPlatformIDs(qc->num_platforms, qc->platform_ids, NULL)
+    );
+
+    qc->stage = 1;
+
+    if (verbose){
+        printf("Stage 1 complete: %d platforms found:\n", qc->num_platforms);
+        for (int i = 0; i < qc->num_platforms; ++i){
+            char *platform_name = get_platform_name(qc->platform_ids[i]);
+            printf("%d\t%s\n", i, platform_name);
+            free(platform_name);
+        }
+        printf("\n");
+    }
 }
 
 void qb_find_devices(struct quibble_canvas *qc){
@@ -64,6 +93,9 @@ void qb_set_kernel_args(struct quibble_canvas *qc, int arg_num, ...){
 void qb_launch(struct quibble_canvas *qc){
 }
 
+/*----------------------------------------------------------------------------//
+    FX DEFINITIONS
+//----------------------------------------------------------------------------*/
 
 char *get_device_name(cl_device_id device_id){
     size_t size;
@@ -81,43 +113,43 @@ char *get_platform_name(cl_platform_id platform_id){
     return str;
 }
 
-struct quibble_canvas create_default_canvas(){
-    struct quibble_canvas qbc;
-    qbc.platform_ids = (cl_platform_id *)malloc(2*sizeof(cl_platform_id));
-    qbc.device_ids = (cl_device_id *)malloc(sizeof(cl_device_id));
+struct quibble_canvas create_default_canvas(bool verbose){
+    struct quibble_canvas qc = create_simple_canvas();
+    qb_find_platforms(&qc, verbose);
+    qc.device_ids = (cl_device_id *)malloc(sizeof(cl_device_id));
 
     cl_int err;
     cl_check(
-        clGetPlatformIDs(2, qbc.platform_ids, &qbc.num_platforms)
+        clGetPlatformIDs(2, qc.platform_ids, &qc.num_platforms)
     );
     cl_check(
-        clGetDeviceIDs(qbc.platform_ids[1],
+        clGetDeviceIDs(qc.platform_ids[1],
                        CL_DEVICE_TYPE_DEFAULT,
                        //CL_DEVICE_TYPE_GPU,
                        1,
-                       &qbc.device_ids[0],
-                       &qbc.num_devices)
+                       &qc.device_ids[0],
+                       &qc.num_devices)
     );
 
-    char *platform_name = get_platform_name(qbc.platform_ids[1]);
+    char *platform_name = get_platform_name(qc.platform_ids[1]);
     printf("CL_PLATFORM_NAME: %s\n", platform_name);
     free(platform_name);
-    char *dev_name = get_device_name(qbc.device_ids[0]);
+    char *dev_name = get_device_name(qc.device_ids[0]);
     printf("CL_DEVICE_NAME: %s\n", dev_name);
     free(dev_name);
 
-    qbc.context = clCreateContext(NULL, 1, &qbc.device_ids[0], NULL, NULL, &err);
+    qc.context = clCreateContext(NULL, 1, &qc.device_ids[0], NULL, NULL, &err);
     cl_check(err);
 
-    qbc.command_queue = clCreateCommandQueueWithProperties(
-        qbc.context,
-        qbc.device_ids[0],
+    qc.command_queue = clCreateCommandQueueWithProperties(
+        qc.context,
+        qc.device_ids[0],
         0,
         &err
     );
     cl_check(err);
 
-    return qbc;
+    return qc;
 }
 
 void free_quibble_canvas(struct quibble_canvas qc){
