@@ -10,7 +10,7 @@
 
 struct quibble_canvas{
     // Quibble stuff
-    struct quibble_buffer input_buffer;
+    struct quibble_buffer buffer;
     int res_x;
     int res_y;
     unsigned int **framebuffers;

@@ -10,7 +10,7 @@ struct quibble_buffer{
     cl_mem gpu;
 };
 
-struct quibble_buffer create_quibble_buffer(cl_context context, int n);
-void free_quibble_buffer(struct quibble_buffer qb);
+struct quibble_buffer qb_create_buffer(cl_context context, int n);
+void qb_free_buffer(struct quibble_buffer qb);
 
 #endif
