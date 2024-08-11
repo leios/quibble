@@ -17,7 +17,9 @@ Purpose: This file defines the quibble_canvas and associate functions.
              7: CL Kernel Created
              8: CL Args set
          There is also a separate launch function for Quibble Contexts
-         ALL != DEFAULT Listing
+         "demo" is hardcoded as kernel name.
+             remember that most of this will be determined by quibble, not
+             by the user.
 
   Plans: It might be nice to create different functions to more easily create
              quibble canvases, like `create_gpu_canvas` or `create_cpu_canvas`.
@@ -204,10 +206,13 @@ void qb_list_devices(){
     }
 }
 
-struct quibble_canvas create_default_canvas(bool verbose){
-    return create_canvas(0,0,verbose);
+struct quibble_canvas create_default_canvas(char *kernel, bool verbose){
+    return create_canvas(kernel, 0,0,verbose);
 }
-struct quibble_canvas create_canvas(int platform, int device, bool verbose){
+struct quibble_canvas create_canvas(char *kernel,
+                                    int platform,
+                                    int device,
+                                    bool verbose){
     struct quibble_canvas qc = create_blank_canvas();
 
     qc.chosen_platform = platform;
@@ -231,6 +236,26 @@ struct quibble_canvas create_canvas(int platform, int device, bool verbose){
         0,
         &err
     );
+    cl_check(err);
+
+    // Create program
+    size_t kernel_size = strlen(kernel);
+    qc.program = clCreateProgramWithSource(qc.context,
+                                           1,
+                                           (const char**)&kernel,
+                                           (const size_t *)&kernel_size,
+                                           &err);
+    cl_check(err);
+
+    err = clBuildProgram(qc.program,
+                         1,
+                         &qc.device_ids[qc.chosen_device],
+                         NULL,
+                         NULL,
+                         NULL);
+    cl_check_program(err, qc.program, qc.device_ids[0]);
+
+    qc.kernel = clCreateKernel(qc.program, "demo", &err);
     cl_check(err);
 
     return qc;
