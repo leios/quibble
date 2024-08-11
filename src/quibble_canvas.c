@@ -36,10 +36,6 @@ Purpose: This file defines the quibble_canvas and associate functions.
 
 #include "../include/quibble_canvas.h"
 
-/*----------------------------------------------------------------------------//
-    FX DEFINITIONS
-//----------------------------------------------------------------------------*/
-
 char *get_device_name(cl_device_id device_id){
     size_t size;
     clGetDeviceInfo(device_id, CL_DEVICE_NAME, 0, NULL, &size);
@@ -95,7 +91,6 @@ void qb_find_platforms(struct quibble_canvas *qc, bool verbose){
 
 void qb_find_devices(struct quibble_canvas *qc, bool verbose){
 
-    // As in `qb_find_platforms` and `qb_list devices`, 10 is arbitrary
     cl_check(
         clGetDeviceIDs(qc->platform_ids[qc->chosen_platform],
                        CL_DEVICE_TYPE_ALL,
@@ -179,6 +174,7 @@ void qb_list_devices(){
 struct quibble_canvas create_default_canvas(char *kernel, bool verbose){
     return create_canvas(kernel, 0,0,verbose);
 }
+
 struct quibble_canvas create_canvas(char *kernel,
                                     int platform,
                                     int device,
@@ -236,6 +232,7 @@ struct quibble_canvas create_canvas(char *kernel,
 void free_quibble_canvas(struct quibble_canvas qc){
     free(qc.platform_ids);
     free(qc.device_ids);
+    qb_free_buffer(qc.buffer);
     cl_check(clFlush(qc.command_queue));
     cl_check(clFinish(qc.command_queue));
     cl_check(clReleaseCommandQueue(qc.command_queue));
