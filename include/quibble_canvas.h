@@ -21,6 +21,8 @@ struct quibble_canvas{
     cl_device_id *device_ids;
     cl_uint num_devices;
     cl_uint num_platforms;
+    int chosen_platform;
+    int chosen_device;
     cl_context context;
     cl_command_queue command_queue;
     cl_program program;
@@ -32,10 +34,12 @@ struct quibble_canvas{
 
 char *get_device_name(cl_device_id device_id);
 char *get_platform_name(cl_platform_id platform_id);
-struct quibble_canvas create_simple_canvas();
+struct quibble_canvas create_blank_canvas();
 void qb_find_platforms(struct quibble_canvas *qc, bool verbose);
 void qb_list_devices();
 
+// I'll need to add `char *kernel` and `res_x`, `res_y`
+struct quibble_canvas create_canvas(int platform, int device, bool verbose);
 struct quibble_canvas create_default_canvas(bool verbose);
 void free_quibble_canvas(struct quibble_canvas qc);
 

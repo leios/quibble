@@ -32,7 +32,7 @@ int main(){
     size_t kernel_size = strlen(kernel_source);
 
     cl_int err;
-    struct quibble_canvas qc = create_default_canvas(1);
+    struct quibble_canvas qc = create_canvas(1, 0, 1);
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(qc.context,

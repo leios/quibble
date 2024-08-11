@@ -11,7 +11,7 @@ Because this project does not use the traditional mesh machinery that is common 
 It is also possible to use Vulkan's compute shaders for the same purpose and it might be interesting to consider doing that in the future, especially if OpenCL JIT compilation ends up becoming a problem.
 In that case, it could be possible to spin up our own SPIRV compiler to send to Vulkan for the "fastest compilation performance possible."
 
-## Immediate Plan
+## Immediate plan
 
 Right now, the project is in its infancy.
 My plan is to do the following:
