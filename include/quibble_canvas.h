@@ -39,8 +39,11 @@ void qb_find_platforms(struct quibble_canvas *qc, bool verbose);
 void qb_list_devices();
 
 // I'll need to add `char *kernel` and `res_x`, `res_y`
-struct quibble_canvas create_canvas(int platform, int device, bool verbose);
-struct quibble_canvas create_default_canvas(bool verbose);
+struct quibble_canvas create_canvas(char * kernel,
+                                    int platform,
+                                    int device,
+                                    bool verbose);
+struct quibble_canvas create_default_canvas(char *kernel, bool verbose);
 void free_quibble_canvas(struct quibble_canvas qc);
 
 /*

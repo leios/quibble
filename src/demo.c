@@ -16,12 +16,6 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/quibble_canvas.h"
 
 int main(){
-    int array_size = 10;
-    float *a = (float*)malloc(sizeof(float)*array_size);
-
-    for (size_t i = 0; i < array_size; ++i){
-        a[i] = 0;
-    }
 
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
@@ -31,8 +25,16 @@ int main(){
 
     size_t kernel_size = strlen(kernel_source);
 
+    // Array creation
+    int array_size = 10;
+    float *a = (float*)malloc(sizeof(float)*array_size);
+
+    for (size_t i = 0; i < array_size; ++i){
+        a[i] = 0;
+    }
+
     cl_int err;
-    struct quibble_canvas qc = create_canvas(1, 0, 1);
+    struct quibble_canvas qc = create_canvas(kernel_source, 1, 0, 1);
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(qc.context,
@@ -53,20 +55,6 @@ int main(){
                              NULL,
                              NULL)
     );
-
-    // Create program
-    qc.program = clCreateProgramWithSource(qc.context,
-                                           1,
-                                           (const char**)&kernel_source,
-                                           (const size_t *)&kernel_size,
-                                           &err);
-    cl_check(err);
-
-    err = clBuildProgram(qc.program, 1, &qc.device_ids[0], NULL, NULL, NULL);
-    cl_check_program(err, qc.program, qc.device_ids[0]);
-
-    qc.kernel = clCreateKernel(qc.program, "demo", &err);
-    cl_check(err);
 
     cl_check(
         clSetKernelArg(qc.kernel, 0, sizeof(cl_mem), (void *)&d_a)
