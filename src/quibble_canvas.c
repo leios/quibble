@@ -10,12 +10,13 @@ Purpose: This file defines the quibble_canvas and associate functions.
              0: Nothing
              1: platforms found
              2: device selected
-             3: CL context created
-             4: CL command_queue generated
-             5: CL program created
-             6: CL Program built
-             7: CL Kernel Created
-             8: CL Args set
+             3: Ready to launch:
+                CL context created
+                CL command_queue generated
+                CL program created
+                CL Program built
+                CL Kernel Created
+                CL Args set
          There is also a separate launch function for Quibble Contexts
          "demo" is hardcoded as kernel name.
              remember that most of this will be determined by quibble, not
@@ -34,37 +35,6 @@ Purpose: This file defines the quibble_canvas and associate functions.
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_canvas.h"
-
-/*----------------------------------------------------------------------------//
-    HEADER
-//----------------------------------------------------------------------------*/
-
-// I'll need to add `char *kernel` and `res_x`, `res_y`
-// This selects and then sets the device in the context
-void qb_select_device(struct quibble_canvas *qc,
-                      int platform_id,
-                      int device_id){
-}
-
-void qb_create_command_queue(struct quibble_canvas *qc){
-}
-
-// This creates and builds the program
-void qb_build_program(struct quibble_canvas *qc,
-                      const char **kernel_source,
-                      const size_t *kernel_size){
-}
-
-void qb_create_kernel(struct quibble_canvas *qc, char *kernel_name){
-}
-
-/*
-void qb_set_kernel_args(struct quibble_canvas *qc, int arg_num, ...){
-} 
-*/
-
-void qb_launch(struct quibble_canvas *qc){
-}
 
 /*----------------------------------------------------------------------------//
     FX DEFINITIONS
@@ -258,6 +228,8 @@ struct quibble_canvas create_canvas(char *kernel,
     qc.kernel = clCreateKernel(qc.program, "demo", &err);
     cl_check(err);
 
+    qc.stage = 3;
+
     return qc;
 }
 
@@ -273,13 +245,20 @@ void free_quibble_canvas(struct quibble_canvas qc){
 
 }
 
-void create_kernel(struct quibble_canvas *qc){
-}
+void qb_run(struct quibble_canvas qc,
+            size_t global_item_size,
+            size_t local_item_size){
 
-/*
-void list_devices(...){
-    something with clGetDeviceInfo
-};
-void choose_device(...);
-struct quibble_canvas create_context(int device, ...);
-*/
+    cl_check(
+        clEnqueueNDRangeKernel(qc.command_queue,
+                               qc.kernel,
+                               1,
+                               NULL,
+                               &global_item_size,
+                               &local_item_size,
+                               0,
+                               NULL,
+                               NULL)
+    );
+
+}

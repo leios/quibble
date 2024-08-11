@@ -46,10 +46,8 @@ struct quibble_canvas create_canvas(char * kernel,
 struct quibble_canvas create_default_canvas(char *kernel, bool verbose);
 void free_quibble_canvas(struct quibble_canvas qc);
 
-/*
-void list_devices(...);
-void choose_device(...);
-struct quibble_context create_context(int device, ...);
-*/
+void qb_run(struct quibble_canvas qc,
+            size_t global_item_size,
+            size_t local_item_size);
 
 #endif
