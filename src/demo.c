@@ -66,17 +66,7 @@ int main(){
     size_t global_item_size = array_size;
     size_t local_item_size = array_size;
 
-    cl_check(
-        clEnqueueNDRangeKernel(qc.command_queue,
-                               qc.kernel,
-                               1,
-                               NULL,
-                               &global_item_size,
-                               &local_item_size,
-                               0,
-                               NULL,
-                               NULL)
-    );
+    qb_run(qc, global_item_size, local_item_size);
 
     cl_check(
         clEnqueueReadBuffer(qc.command_queue,
