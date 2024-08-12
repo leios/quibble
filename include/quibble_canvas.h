@@ -50,4 +50,9 @@ void qb_run(struct quibble_canvas qc,
             size_t global_item_size,
             size_t local_item_size);
 
+void qb_copy_buffer_to_canvas(struct quibble_canvas qc,
+                              struct quibble_buffer qb);
+void qb_copy_buffer_from_canvas(struct quibble_canvas qc,
+                                struct quibble_buffer qb);
+
 #endif

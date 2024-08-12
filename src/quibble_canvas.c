@@ -259,3 +259,35 @@ void qb_run(struct quibble_canvas qc,
     );
 
 }
+
+void qb_copy_buffer_to_canvas(struct quibble_canvas qc,
+                              struct quibble_buffer qb){
+    cl_check(
+        clEnqueueWriteBuffer(qc.command_queue,
+                             *qb.canvas,
+                             CL_TRUE,
+                             0,
+                             qb.n * sizeof(float),
+                             qb.cpu,
+                             0,
+                             NULL,
+                             NULL)
+    );
+
+}
+void qb_copy_buffer_from_canvas(struct quibble_canvas qc,
+                                struct quibble_buffer qb){
+    cl_check(
+        clEnqueueReadBuffer(qc.command_queue,
+                            *qb.canvas,
+                            CL_TRUE,
+                            0,
+                            qb.n * sizeof(float),
+                            qb.cpu,
+                            0,
+                            NULL,
+                            NULL)
+    );
+
+}
+

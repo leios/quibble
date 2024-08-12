@@ -7,7 +7,7 @@
 struct quibble_buffer{
     size_t n;
     float *cpu;
-    cl_mem gpu;
+    cl_mem *canvas;
 };
 
 struct quibble_buffer qb_create_buffer(cl_context context, int n);
