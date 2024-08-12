@@ -8,6 +8,10 @@ Purpose: This file defines quibble buffers, which are CPU / GPU array pairs
             so you can recast the fis in the kernel to the appropriate type.
             Right now, we are just defaulting to floats
          2. Think about textures!
+         Copying buffers from CPU <-> GPU is handled in quibble_canvas.c
+         Not sure if qb.canvas should be a pointer or not. Users shouldn't
+             need to think about it, so I think it's fine as long as all the 
+             pointer logic is internal to quibble.
 
 //----------------------------------------------------------------------------*/
 
@@ -35,5 +39,5 @@ struct quibble_buffer qb_create_buffer(cl_context context, int n){
 
 void qb_free_buffer(struct quibble_buffer qb){
     free(qb.cpu);
-    cl_check(clReleaseMemObject(qb.gpu));
+    cl_check(clReleaseMemObject(*qb.canvas));
 }
