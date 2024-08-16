@@ -3,31 +3,31 @@
 
 #include "quibble_buffers.h"
 
-struct quibble_variable{
-    struct quibble_buffer buffer;
+typedef struct{
+    quibble_buffer buffer;
     int index;
-};
+} quibble_variable;
 
-struct quibble_array{
-    struct quibble_buffer buffer;
+typedef struct{
+    quibble_buffer buffer;
     int start_index;
     int end_index;
-};
+} quibble_array;
 
-struct quibble_variable qb_create_variable(struct quibble_buffer qb,
+quibble_variable qb_create_variable(quibble_buffer qb,
                                            int index,
                                            float value);
 
-struct quibble_array qb_create_array(struct quibble_buffer qb,
+quibble_array qb_create_array(quibble_buffer qb,
                                      int start_index,
                                      int n,
                                      float *a);
 
-void qb_set_variable(struct quibble_variable qv, float value);
-void qb_set_array(struct quibble_array qa, int n, float *a);
+void qb_set_variable(quibble_variable qv, float value);
+void qb_set_array(quibble_array qa, int n, float *a);
 
-float qb_variable_value(struct quibble_variable qv);
-void qb_inplace_array_value(float *a, int n, struct quibble_array qa);
-float *qb_array_value(struct quibble_array qa);
+float qb_variable_value(quibble_variable qv);
+void qb_inplace_array_value(float *a, int n, quibble_array qa);
+float *qb_array_value(quibble_array qa);
 
 #endif

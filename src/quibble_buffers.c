@@ -17,8 +17,8 @@ Purpose: This file defines quibble buffers, which are CPU / GPU array pairs
 
 #include "../include/quibble_buffers.h"
 
-struct quibble_buffer qb_create_buffer(cl_context context, int n){
-    struct quibble_buffer qb;
+quibble_buffer qb_create_buffer(cl_context context, int n){
+    quibble_buffer qb;
     qb.n = n;
 
     float *cpu_array = (float*)malloc(sizeof(float)*n);
@@ -37,7 +37,7 @@ struct quibble_buffer qb_create_buffer(cl_context context, int n){
     cl_check(err);
 }
 
-void qb_free_buffer(struct quibble_buffer qb){
+void qb_free_buffer(quibble_buffer qb){
     free(qb.cpu);
     cl_check(clReleaseMemObject(*qb.canvas));
 }

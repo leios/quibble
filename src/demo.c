@@ -34,7 +34,7 @@ int main(){
     }
 
     cl_int err;
-    struct quibble_canvas qc = create_canvas(kernel_source, 1, 0, 1);
+    quibble_canvas qc = create_canvas(kernel_source, 1, 0, 1);
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(qc.context,
