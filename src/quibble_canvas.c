@@ -52,16 +52,16 @@ char *get_platform_name(cl_platform_id platform_id){
     return str;
 }
 
-struct quibble_canvas create_blank_canvas(){
+quibble_canvas create_blank_canvas(){
 
-    struct quibble_canvas qc;
+    quibble_canvas qc;
 
     qc.stage = 0;
 
     return qc;
 }
 
-void qb_find_platforms(struct quibble_canvas *qc, bool verbose){
+void qb_find_platforms(quibble_canvas *qc, bool verbose){
     // 10 is arbitrary, but should be high enough for almost any task
     cl_check(
         clGetPlatformIDs(10, NULL, &qc->num_platforms)
@@ -89,7 +89,7 @@ void qb_find_platforms(struct quibble_canvas *qc, bool verbose){
     }
 }
 
-void qb_find_devices(struct quibble_canvas *qc, bool verbose){
+void qb_find_devices(quibble_canvas *qc, bool verbose){
 
     cl_check(
         clGetDeviceIDs(qc->platform_ids[qc->chosen_platform],
@@ -132,7 +132,7 @@ void qb_find_devices(struct quibble_canvas *qc, bool verbose){
 }
 
 void qb_list_devices(){
-    struct quibble_canvas qc = create_blank_canvas();
+    quibble_canvas qc = create_blank_canvas();
     qb_find_platforms(&qc, 0);
 
     cl_uint num_devices;
@@ -171,15 +171,15 @@ void qb_list_devices(){
     }
 }
 
-struct quibble_canvas create_default_canvas(char *kernel, bool verbose){
+quibble_canvas create_default_canvas(char *kernel, bool verbose){
     return create_canvas(kernel, 0,0,verbose);
 }
 
-struct quibble_canvas create_canvas(char *kernel,
+quibble_canvas create_canvas(char *kernel,
                                     int platform,
                                     int device,
                                     bool verbose){
-    struct quibble_canvas qc = create_blank_canvas();
+    quibble_canvas qc = create_blank_canvas();
 
     qc.chosen_platform = platform;
     qc.chosen_device = device;
@@ -229,7 +229,7 @@ struct quibble_canvas create_canvas(char *kernel,
     return qc;
 }
 
-void free_quibble_canvas(struct quibble_canvas qc){
+void free_quibble_canvas(quibble_canvas qc){
     free(qc.platform_ids);
     free(qc.device_ids);
     qb_free_buffer(qc.buffer);
@@ -242,7 +242,7 @@ void free_quibble_canvas(struct quibble_canvas qc){
 
 }
 
-void qb_run(struct quibble_canvas qc,
+void qb_run(quibble_canvas qc,
             size_t global_item_size,
             size_t local_item_size){
 
@@ -260,8 +260,7 @@ void qb_run(struct quibble_canvas qc,
 
 }
 
-void qb_copy_buffer_to_canvas(struct quibble_canvas qc,
-                              struct quibble_buffer qb){
+void qb_copy_buffer_to_canvas(quibble_canvas qc, quibble_buffer qb){
     cl_check(
         clEnqueueWriteBuffer(qc.command_queue,
                              *qb.canvas,
@@ -275,8 +274,7 @@ void qb_copy_buffer_to_canvas(struct quibble_canvas qc,
     );
 
 }
-void qb_copy_buffer_from_canvas(struct quibble_canvas qc,
-                                struct quibble_buffer qb){
+void qb_copy_buffer_from_canvas(quibble_canvas qc, quibble_buffer qb){
     cl_check(
         clEnqueueReadBuffer(qc.command_queue,
                             *qb.canvas,

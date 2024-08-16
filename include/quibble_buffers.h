@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include "../include/errors.h"
 
-struct quibble_buffer{
+typedef struct {
     size_t n;
     float *cpu;
     cl_mem *canvas;
-};
+} quibble_buffer;
 
-struct quibble_buffer qb_create_buffer(cl_context context, int n);
-void qb_free_buffer(struct quibble_buffer qb);
+quibble_buffer qb_create_buffer(cl_context context, int n);
+void qb_free_buffer(quibble_buffer qb);
 
 #endif

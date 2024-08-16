@@ -25,6 +25,9 @@ add_executable(
     include/quibble_inputs.h
     src/quibble_inputs.c
 
+    include/quibble_verses.h
+    src/quibble_verses.c
+
     include/demo_functions.h
     src/demo_functions.c
 

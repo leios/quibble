@@ -11,10 +11,10 @@ Purpose: This file defines quibble inputs, which are variables stored in a
 
 #include "../include/quibble_inputs.h"
 
-struct quibble_variable qb_create_variable(struct quibble_buffer qb,
+quibble_variable qb_create_variable(quibble_buffer qb,
                                            int index,
                                            float value){
-    struct quibble_variable qv;
+    quibble_variable qv;
     qv.index = index;
     qv.buffer = qb;
     qv.buffer.cpu[index] = value;
@@ -22,11 +22,11 @@ struct quibble_variable qb_create_variable(struct quibble_buffer qb,
     return qv;
 }
 
-struct quibble_array qb_create_array(struct quibble_buffer qb,
+quibble_array qb_create_array(quibble_buffer qb,
                                      int start_index,
                                      int n,
                                      float *a){
-    struct quibble_array qa;
+    quibble_array qa;
     qa.start_index = start_index;
     qa.end_index = start_index + n;
     qa.buffer = qb;
@@ -37,11 +37,11 @@ struct quibble_array qb_create_array(struct quibble_buffer qb,
     return qa;
 }
 
-void qb_set_variable(struct quibble_variable qv, float value){
+void qb_set_variable(quibble_variable qv, float value){
     qv.buffer.cpu[qv.index] = value;
 }
 
-void qb_set_array(struct quibble_array qa, int n, float *a){
+void qb_set_array(quibble_array qa, int n, float *a){
     if (n != qa.end_index - qa.start_index){
         fprintf(stderr,
                 "Quibble array is not the same size as the input array!\n    Quibble array size: %d\n    Input array size: %n",
@@ -56,11 +56,11 @@ void qb_set_array(struct quibble_array qa, int n, float *a){
 
 }
 
-float qb_variable_value(struct quibble_variable qv){
+float qb_variable_value(quibble_variable qv){
     return qv.buffer.cpu[qv.index];
 }
 
-void qb_inplace_array_value(float *a, int n, struct quibble_array qa){
+void qb_inplace_array_value(float *a, int n, quibble_array qa){
     if (n != qa.end_index - qa.start_index){
         fprintf(stderr,
                 "Quibble array is not the same size as the output array!\n    Quibble array size: %d\n    Output array size: %n",
@@ -74,7 +74,7 @@ void qb_inplace_array_value(float *a, int n, struct quibble_array qa){
     }
 }
 
-float *qb_array_value(struct quibble_array qa){
+float *qb_array_value(quibble_array qa){
     int size = qa.end_index - qa.start_index;
     float *a = (float *)malloc(size*sizeof(float));
     for (int i = qa.start_index; i < qa.end_index; ++i){
