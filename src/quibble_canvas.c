@@ -232,7 +232,7 @@ quibble_canvas create_canvas(char *kernel,
 void free_quibble_canvas(quibble_canvas qc){
     free(qc.platform_ids);
     free(qc.device_ids);
-    qb_free_buffer(qc.buffer);
+    //qb_free_buffer(qc.buffer);
     cl_check(clFlush(qc.command_queue));
     cl_check(clFinish(qc.command_queue));
     cl_check(clReleaseCommandQueue(qc.command_queue));

@@ -14,6 +14,7 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/demo_functions.h"
 #include "../include/errors.h"
 #include "../include/quibble_canvas.h"
+#include "../include/quibble_verses.h"
 
 int main(){
 
@@ -22,6 +23,9 @@ int main(){
         }
     );
 
+    printf("%s\n", kernel_string);
+    printf("dcompiled: %d\n", qb_is_dcompiled(kernel_string));
+    qb_preprocess_verse(kernel_string);
     printf("%s\n", kernel_string);
 
     // Creating Kernel String

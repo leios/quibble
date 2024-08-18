@@ -8,6 +8,11 @@ Purpose: A quibble_verse is a user-submitted code fragment that will later be
 #include "../include/quibble_verses.h"
 
 void qb_replace_char(char *verse, int verse_size, char a, char b){
+    for (int i = 0; i < verse_size; ++i){
+        if (verse[i] == a){
+            verse[i] = b;
+        }
+    }
 }
 
 void qb_replace_char_if_proceeding(char *verse, int verse_size,
@@ -15,24 +20,42 @@ void qb_replace_char_if_proceeding(char *verse, int verse_size,
                                    char a, char b){
 }
 
-void preprocess_verse(char *verse, int verse_size){
-    // replace all spaces by new lines
-    qb_replace_char(verse, verse_size, ' ', '\n');
+bool qb_is_dcompiled(char *verse){
+    char substr[22] = "// DCOMPILE GENERATED\n";
+    for (int i = 0; i < 22; ++i){
+        if (verse[i] != substr[i]){
+            return false;
+        }
+    }
 
-    // except for the arguments after some preprocessor options that need to be
-    // in the same line
-    qb_replace_char_if_proceeding(verse, verse_size, "#ifdef", 7, '\n', ' ');
-    qb_replace_char_if_proceeding(verse, verse_size, "#ifndef", 8, '\n', ' ');
+    return true;
 
-    // #define with two arguments will not work
-    qb_replace_char_if_proceeding(verse, verse_size, "#define", 7, '\n', ' ');
+}
 
-    // don't leave any spaces in arguments
-    qb_replace_char_if_proceeding(verse, verse_size, "#if", 3, '\n', ' ');
+void qb_preprocess_verse(char *verse){
+    if (qb_is_dcompiled(verse)){
+        int verse_size = strlen(verse);
+        // replace all spaces by new lines
+        qb_replace_char(verse, verse_size, ' ', '\n');
 
-    // don't leave any spaces in arguments
-    qb_replace_char_if_proceeding(verse, verse_size, "#elif", 5, '\n', ' ');
-    qb_replace_char_if_proceeding(verse, verse_size, "#pragma", 7, '\n', ' ');
+        // except for the arguments after some preprocessor options
+        // that need to be in the same line
+        qb_replace_char_if_proceeding(verse, verse_size,
+                                      "#ifdef", 7, '\n', ' ');
+        qb_replace_char_if_proceeding(verse, verse_size,
+                                      "#ifndef", 8, '\n', ' ');
+
+        // #define with two arguments will not work
+        qb_replace_char_if_proceeding(verse, verse_size,
+                                      "#define", 7, '\n', ' ');
+
+        // don't leave any spaces in arguments
+        qb_replace_char_if_proceeding(verse, verse_size, "#if", 3, '\n', ' ');
+
+        // don't leave any spaces in arguments
+        qb_replace_char_if_proceeding(verse, verse_size, "#elif", 5, '\n', ' ');
+        qb_replace_char_if_proceeding(verse, verse_size, "#pragma", 7, '\n', ' ');
+    }
 }
 
 // Reads an input file and parses everything into verses or OCL functions
