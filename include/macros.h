@@ -10,6 +10,9 @@
 //#define CL_TARGET_OPENCL_VERSION 120
 
 // Delay Compilation
-#define DCOMPILE(...) ({ #__VA_ARGS__;})
+#define DCOMPILE(...) ({ \
+    char str[MAX_PREAMBLE_SIZE/8] = "// DCOMPILE GENERATED\n"; \
+    strcat(str, #__VA_ARGS__); \
+})
 
 #endif

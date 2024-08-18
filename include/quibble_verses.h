@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct{
     char *variable;
@@ -23,11 +24,13 @@ typedef struct{
 } quibble_program;
 
 void qb_replace_char(char *verse, int verse_size, char a, char b);
+
 void qb_replace_char_if_proceeding(char *verse, int verse_size,
                                    char *preamble, int preamble_size,
                                    char a, char b);
 
-void preprocess_verse(char *verse, int verse_size);
+bool qb_is_dcompiled(char *verse);
+void qb_preprocess_verse(char *verse);
 
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_create_program(char *filename);
