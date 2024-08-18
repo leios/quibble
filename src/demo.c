@@ -17,6 +17,13 @@ Purpose: This file is a quick example of how we might read function fragments in
 
 int main(){
 
+    char *kernel_string = DCOMPILE(
+        __verse check(){
+        }
+    );
+
+    printf("%s\n", kernel_string);
+
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
     define_preamble(kernel_source);
