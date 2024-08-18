@@ -172,7 +172,7 @@ void qb_list_devices(){
 }
 
 quibble_canvas create_default_canvas(char *kernel, bool verbose){
-    return create_canvas(kernel, 0,0,verbose);
+    return create_canvas(kernel, 0,0, verbose);
 }
 
 quibble_canvas create_canvas(char *kernel,
