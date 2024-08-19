@@ -28,6 +28,12 @@ int main(){
     qb_preprocess_verse(kernel_string);
     printf("%s\n", kernel_string);
 
+    char check[21] = "This is a test string";
+    qb_replace_char_if_proceeding(check, 100, "test", 4, ' ', '\n');
+    if (strcmp(check, "This is a test\nstring") == 0){
+        printf("qb_replace_char_if_proceeding test passed!\n");
+    }
+
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
     define_preamble(kernel_source);
