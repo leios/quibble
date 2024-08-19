@@ -18,6 +18,33 @@ void qb_replace_char(char *verse, int verse_size, char a, char b){
 void qb_replace_char_if_proceeding(char *verse, int verse_size,
                                    char *preamble, int preamble_size,
                                    char a, char b){
+    bool match = true;
+    int count = 0;
+    for (int i = 0; i < verse_size; ++i){
+        while (match){
+            if (verse[i+count] != preamble[count]){
+                match = false;
+            }
+
+            count++;
+
+            if (count == preamble_size){
+                match = false;
+            }
+        }
+
+        // match found
+        if (count == preamble_size){
+            if (verse[i+count] == a){
+                verse[i+count] = b;
+            }
+            else{
+                fprintf(stderr, "match found for %s,\nbut proceeding character is '%s', not '%s'!", preamble, a, b);
+            }
+        }
+        match = true;
+        count = 0;
+    }
 }
 
 bool qb_is_dcompiled(char *verse){
