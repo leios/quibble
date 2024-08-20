@@ -24,6 +24,12 @@ typedef struct{
     quibble_verse *list;
 } quibble_program;
 
+int qb_find_next_char(char *verse, int verse_size, int current_index, char a);
+int qb_find_next_string(char *verse, int verse_size, int current_index,
+                        char *a, int word_size);
+int qb_find_matching_char(char *verse, int verse_size, int current_index,
+                          char a, char b);
+
 void qb_replace_char(char *verse, int verse_size, char a, char b);
 
 void qb_replace_char_if_proceeding(char *verse, int verse_size,
