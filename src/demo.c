@@ -26,10 +26,23 @@ int main(){
         }
     );
 
-    printf("%s\n", kernel_string);
-    printf("dcompiled: %d\n", qb_is_dcompiled(kernel_string));
+    // qb_is_dcompiled
+    if (qb_is_dcompiled(kernel_string)){
+        printf("Passed: qb_is_dcompiled\n");
+    }
+    else{
+        printf("Failed: qb_is_dcompiled\n");
+    }
+
+    // qb_preprocess_verse
     qb_preprocess_verse(kernel_string);
-    printf("%s\n", kernel_string);
+    if (strcmp(kernel_string,
+               "//\nDCOMPILE\nGENERATED\n__verse\ncheck(){\n}") == 0){
+        printf("Passed: qb_preprocess_verse\n");
+    }
+    else{
+        printf("Failed: qb_preprocess_verse\n");
+    }
 
     // qb_replace_char_if_proceeding
     char check[21] = "This is a test string";
@@ -76,6 +89,9 @@ int main(){
         printf("%d\n", qb_find_matching_char(check_2, 10, 0, '(', ')'));
     }
  
+    /*------------------------------------------------------------------------//
+        DEMO
+    //------------------------------------------------------------------------*/
 
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
