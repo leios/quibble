@@ -18,6 +18,9 @@ Purpose: This file is a quick example of how we might read function fragments in
 
 int main(){
 
+    /*------------------------------------------------------------------------//
+        QUICK TESTS
+    //------------------------------------------------------------------------*/
     char *kernel_string = DCOMPILE(
         __verse check(){
         }
@@ -28,11 +31,51 @@ int main(){
     qb_preprocess_verse(kernel_string);
     printf("%s\n", kernel_string);
 
+    // qb_replace_char_if_proceeding
     char check[21] = "This is a test string";
     qb_replace_char_if_proceeding(check, 100, "test", 4, ' ', '\n');
-    if (strcmp(check, "This is a test\nstring") == 0){
-        printf("qb_replace_char_if_proceeding test passed!\n");
+    qb_replace_char_if_proceeding(check, 100, "s", 1, ' ', '_');
+    if (strcmp(check, "This_is_a test\nstring") == 0){
+        printf("Passed: qb_replace_char_if_proceeding\n");
     }
+
+    // qb_find_next_char
+    if (qb_find_next_char(check, 21, 0, 't') == 10 &&
+        qb_find_next_char(check, 21, 0, 'z') == -1 &&
+        qb_find_next_char(check, 21, 11, 't') == 13){
+        printf("Passed: qb_find_next_char\n");
+    }
+    else{
+        printf("Failed: qb_find_next_char\n");
+    }
+
+    // qb_find_next_string
+    if (qb_find_next_string(check, 21, 0, "t", 1) == 10 &&
+        qb_find_next_string(check, 21, 0, "test", 4) == 10 &&
+        qb_find_next_string(check, 21, 0, "z", 1) == -1 &&
+        qb_find_next_string(check, 21, 11, "test", 4) == -1 &&
+        qb_find_next_string(check, 21, 11, "string", 15) == -1){
+        printf("Passed: qb_find_next_string\n");
+    }
+    else{
+        printf("Failed: qb_find_next_string\n");
+    }
+
+    // qb_find_matching_char
+    char check_2[10] = "([]()(()))";
+        // qb_find_next_string
+    if (qb_find_matching_char(check_2, 10, 0, '(', ')') == 9 &&
+        qb_find_matching_char(check_2, 10, 1, '[', ']') == 2 &&
+        qb_find_matching_char(check_2, 10, 5, '(', ')') == 8 &&
+        qb_find_matching_char(check_2, 10, 7, '(', ')') == -1 &&
+        qb_find_matching_char("(()((", 5, 0, '(', ')') == -1){
+        printf("Passed: qb_find_matching_char\n");
+    }
+    else{
+        printf("Failed: qb_find_matching_char\n");
+        printf("%d\n", qb_find_matching_char(check_2, 10, 0, '(', ')'));
+    }
+ 
 
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);
