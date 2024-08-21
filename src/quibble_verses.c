@@ -114,15 +114,14 @@ quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
 quibble_verse qb_parse_verse(char *verse){
 }
 
-quibble_keyword *qb_parse_keywords(char *preamble){
+int qb_find_number_of_kwargs(char *preamble){
 
     int preamble_size = strlen(preamble);
-
-    // Find number of entries
     int i = 0;
     int num_entries = 0;
     int next_equal = 0;
     int next_semicolon = 0;
+
     while (i < preamble_size){
         next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
         next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
@@ -137,13 +136,23 @@ quibble_keyword *qb_parse_keywords(char *preamble){
         }
     }
 
+    return num_entries;
+
+}
+
+quibble_keyword *qb_parse_keywords(char *preamble){
+
+    int preamble_size = strlen(preamble);
+
+    int num_entries = qb_find_number_of_kwargs(preamble);
+
     quibble_keyword *final_keywords =
          (quibble_keyword *)malloc(sizeof(quibble_keyword) * num_entries);
 
-    i = 0;
-    next_equal = 0;
-    next_semicolon = 0;
+    int i = 0;
     int curr_entry = 0;
+    int next_equal = 0;
+    int next_semicolon = 0;
 
     while (i < preamble_size){
         next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
@@ -268,14 +277,15 @@ quibble_verse qb_echo_verse(quibble_verse qv, ...){
 }
 
 // To be used in `qb_configure_verse` to create preamble string
-char *qb_create_preamble(quibble_verse qv){
+char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs){
 
     char temp[MAX_PREAMBLE_SIZE];
-    for (int i = 0; i < qv.num_kwargs; ++i){
-        strcmp(temp, qv.kwargs[i].variable);
-        strcmp(temp, " = ");
-        strcmp(temp, qv.kwargs[i].value);
-        strcmp(temp, ";\n");
+    memset(temp,0,strlen(temp));
+    for (int i = 0; i < num_kwargs; ++i){
+        strcat(temp, qkwargs[i].variable);
+        strcat(temp, " = ");
+        strcat(temp, qkwargs[i].value);
+        strcat(temp, ";\n");
     }
 
     int len = strlen(temp);

@@ -46,6 +46,7 @@ void qb_preprocess_verse(char *verse);
 quibble_program qb_create_program(char *filename);
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name);
 quibble_verse qb_parse_verse(char *verse);
+int qb_find_number_of_kwargs(char *preamble);
 quibble_keyword *qb_parse_keywords(char *preamble);
 
 // Configures preambles of existing verses
@@ -54,7 +55,7 @@ void qb_configure_verse(quibble_verse *qv, ...);
 // An echo is a verse with the same body, but different preamble
 quibble_verse qb_echo_verse(quibble_verse qv, ...);
 
-char *qb_create_preamble(quibble_verse qv);
+char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs);
 
 void qb_free_keyword(quibble_keyword qkwarg);
 void qb_free_verse(quibble_verse qv);
