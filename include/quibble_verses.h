@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "macros.h"
+
 typedef struct{
     char *variable;
     char *value;
@@ -24,6 +26,7 @@ typedef struct{
     quibble_verse *list;
 } quibble_program;
 
+char *qb_strip_spaces(char *verse, int start_index, int end_index);
 int qb_find_next_char(char *verse, int verse_size, int current_index, char a);
 int qb_find_next_string(char *verse, int verse_size, int current_index,
                         char *a, int word_size);

@@ -11,6 +11,34 @@ Purpose: A quibble_verse is a user-submitted code fragment that will later be
 FILE IO WORK
 //----------------------------------------------------------------------------*/
 
+char *qb_strip_spaces(char *verse, int start_index, int end_index){
+    int start_offset = 0;
+    int end_offset = 0;
+
+    // Finding start offset
+    char curr_char = verse[start_index];
+    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
+        ++start_offset;
+        curr_char = verse[start_index+start_offset];
+    }
+
+    // Finding end offset
+    curr_char = verse[end_index - 1];
+    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
+        ++end_offset;
+        curr_char = verse[end_index - 1 - end_offset];
+    }
+
+    int str_len = (end_index - end_offset) - (start_index + start_offset);
+    char *final_str = (char *)malloc(sizeof(char) * str_len);
+
+    for (int i = 0; i < str_len; ++i){
+        final_str[i] = verse[start_index + start_offset + i];
+    }
+
+    return final_str;
+}
+
 int qb_find_next_char(char *verse, int verse_size, int current_index, char a){
     for (int i = current_index; i < verse_size; ++i){
         if (verse[i] == a){
@@ -87,6 +115,62 @@ quibble_verse qb_parse_verse(char *verse){
 }
 
 quibble_keyword *qb_parse_keywords(char *preamble){
+
+    int preamble_size = strlen(preamble);
+
+    // Find number of entries
+    int i = 0;
+    int num_entries = 0;
+    int next_equal = 0;
+    int next_semicolon = 0;
+    while (i < preamble_size){
+        next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
+        next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
+
+        if (next_equal > i && next_semicolon > next_equal){
+            ++num_entries;
+            i += next_semicolon + 1;
+        }
+        else {
+            fprintf(stderr, "Keyword(s) not able to be parsed!\n");
+            exit(1);
+        }
+    }
+
+    quibble_keyword *final_keywords =
+         (quibble_keyword *)malloc(sizeof(quibble_keyword) * num_entries);
+
+    i = 0;
+    next_equal = 0;
+    next_semicolon = 0;
+    int curr_entry = 0;
+
+    while (i < preamble_size){
+        next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
+        next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
+
+        final_keywords[curr_entry].variable =
+            qb_strip_spaces(preamble, i, next_equal);
+
+        final_keywords[curr_entry].value =
+            qb_strip_spaces(preamble, next_equal+1, next_semicolon);
+
+        // Check to make sure entry is unique
+        for (int j = 1; j <= curr_entry; ++j){
+            if (strcmp(final_keywords[j-1].variable,
+                       final_keywords[j].variable) == 0){
+                fprintf(stderr, "Variable %s used more than once for keyword arguments!\n", final_keywords[j]);
+                exit(1);
+            }
+        }
+
+        i += next_semicolon + 1;
+        ++curr_entry;
+
+    }
+
+    return final_keywords;
+
 }
 
 /*----------------------------------------------------------------------------//
@@ -185,7 +269,23 @@ quibble_verse qb_echo_verse(quibble_verse qv, ...){
 
 // To be used in `qb_configure_verse` to create preamble string
 char *qb_create_preamble(quibble_verse qv){
-    
+
+    char temp[MAX_PREAMBLE_SIZE];
+    for (int i = 0; i < qv.num_kwargs; ++i){
+        strcmp(temp, qv.kwargs[i].variable);
+        strcmp(temp, " = ");
+        strcmp(temp, qv.kwargs[i].value);
+        strcmp(temp, ";\n");
+    }
+
+    int len = strlen(temp);
+    char *final_output = (char *)malloc(sizeof(char)*len);
+
+    for (int i = 0; i < len; ++i){
+        final_output[i] = temp[i];
+    }
+
+    return final_output;
 }
 
 /*----------------------------------------------------------------------------//
