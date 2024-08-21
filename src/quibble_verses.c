@@ -12,6 +12,7 @@ FILE IO WORK
 //----------------------------------------------------------------------------*/
 
 char *qb_strip_spaces(char *verse, int start_index, int end_index){
+
     int start_offset = 0;
     int end_offset = 0;
 
@@ -23,7 +24,7 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
     }
 
     // Finding end offset
-    curr_char = verse[end_index - 1];
+    curr_char = verse[end_index-1];
     while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
         ++end_offset;
         curr_char = verse[end_index - 1 - end_offset];
@@ -31,6 +32,7 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
 
     int str_len = (end_index - end_offset) - (start_index + start_offset);
     char *final_str = (char *)malloc(sizeof(char) * str_len);
+    memset(final_str,0,strlen(final_str));
 
     for (int i = 0; i < str_len; ++i){
         final_str[i] = verse[start_index + start_offset + i];
@@ -109,9 +111,86 @@ quibble_program qb_create_program(char *filename){
 }
 
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
+
+    for (int i = 0; i < qp.num_verses; ++i){
+        if (strcmp(qp.verse_list[i].name, verse_name) == 0){
+            return qp.verse_list[i];
+        }
+    }
+    fprintf(stderr, "No verse %s found!", verse_name);
+
+}
+
+bool qb_is_verse(char *verse, int offset){
+    char substr[7] = "__verse";
+    for (int i = 0; i < 7; ++i){
+        if (verse[i+offset] != substr[i]){
+            return false;
+        }
+    }
+
+    return true;
 }
 
 quibble_verse qb_parse_verse(char *verse){
+    int verse_size = strlen(verse);
+    int offset = 0;
+    bool dcompiled = qb_is_dcompiled(verse);
+    if (dcompiled){
+        offset += 22;
+    }
+    if (qb_is_verse(verse, offset) != true){
+        fprintf(stderr, "Verse must be configured with `__verse` identifier!\n");
+        exit(1);
+    }
+    offset += 7;
+
+    quibble_verse final_verse;
+
+    int preamble_start = qb_find_next_char(verse, verse_size, offset, '(')+1;
+    int preamble_end =
+        qb_find_matching_char(verse, verse_size, preamble_start, '(', ')');
+
+
+    if (preamble_end-preamble_start > 0){
+        char *preamble =
+            (char *)malloc(sizeof(char)*(preamble_end-preamble_start));
+        memset(preamble,0,strlen(preamble));
+        for (int i = 0; i < (preamble_end-preamble_start); ++i){
+            preamble[i] = verse[preamble_start+i];
+        }
+        final_verse.num_kwargs = qb_find_number_of_kwargs(preamble);
+        final_verse.kwargs =
+            qb_parse_keywords(preamble, final_verse.num_kwargs);
+        free(preamble);
+    }
+    else {
+        final_verse.kwargs = NULL;
+        final_verse.num_kwargs = 0;
+    }
+
+    int body_start = qb_find_next_char(verse, verse_size, offset, '{')+1;
+    int body_end =
+        qb_find_matching_char(verse, verse_size, body_start, '(', ')');
+
+    if (preamble_end-preamble_start > 0){
+        char *body = (char *)malloc(sizeof(char)*(body_end-body_start));
+        memset(body,0,strlen(body));
+        for (int i = 0; i < (body_end-body_start); ++i){
+            body[i] = verse[body_start+i+1];
+        }
+
+        if (dcompiled){
+            qb_preprocess_verse(body);
+        }
+        final_verse.body = body;
+    }
+    else{
+        final_verse.body = NULL;
+    }
+    final_verse.name = qb_strip_spaces(verse, offset, preamble_start-1);
+
+    return final_verse;
 }
 
 int qb_find_number_of_kwargs(char *preamble){
@@ -131,8 +210,7 @@ int qb_find_number_of_kwargs(char *preamble){
             i += next_semicolon + 1;
         }
         else {
-            fprintf(stderr, "Keyword(s) not able to be parsed!\n");
-            exit(1);
+            return 0;
         }
     }
 
@@ -140,45 +218,48 @@ int qb_find_number_of_kwargs(char *preamble){
 
 }
 
-quibble_keyword *qb_parse_keywords(char *preamble){
+quibble_keyword *qb_parse_keywords(char *preamble, int num_entries){
 
     int preamble_size = strlen(preamble);
 
-    int num_entries = qb_find_number_of_kwargs(preamble);
+    if (num_entries > 0){
+        quibble_keyword *final_keywords =
+             (quibble_keyword *)malloc(sizeof(quibble_keyword) * num_entries);
 
-    quibble_keyword *final_keywords =
-         (quibble_keyword *)malloc(sizeof(quibble_keyword) * num_entries);
+        int i = 0;
+        int curr_entry = 0;
+        int next_equal = 0;
+        int next_semicolon = 0;
 
-    int i = 0;
-    int curr_entry = 0;
-    int next_equal = 0;
-    int next_semicolon = 0;
+        while (i < preamble_size){
+            next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
+            next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
 
-    while (i < preamble_size){
-        next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
-        next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
+            final_keywords[curr_entry].variable =
+                qb_strip_spaces(preamble, i, next_equal);
 
-        final_keywords[curr_entry].variable =
-            qb_strip_spaces(preamble, i, next_equal);
+            final_keywords[curr_entry].value =
+                qb_strip_spaces(preamble, next_equal+1, next_semicolon);
 
-        final_keywords[curr_entry].value =
-            qb_strip_spaces(preamble, next_equal+1, next_semicolon);
-
-        // Check to make sure entry is unique
-        for (int j = 1; j <= curr_entry; ++j){
-            if (strcmp(final_keywords[j-1].variable,
-                       final_keywords[j].variable) == 0){
-                fprintf(stderr, "Variable %s used more than once for keyword arguments!\n", final_keywords[j]);
-                exit(1);
+            // Check to make sure entry is unique
+            for (int j = 1; j <= curr_entry; ++j){
+                if (strcmp(final_keywords[j-1].variable,
+                           final_keywords[j].variable) == 0){
+                    fprintf(stderr, "Variable %s used more than once for keyword arguments!\n", final_keywords[j]);
+                    exit(1);
+                }
             }
+
+            i += next_semicolon + 1;
+            ++curr_entry;
+
         }
 
-        i += next_semicolon + 1;
-        ++curr_entry;
-
+        return final_keywords;
     }
-
-    return final_keywords;
+    else {
+        return NULL;
+    }
 
 }
 
@@ -290,6 +371,7 @@ char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs){
 
     int len = strlen(temp);
     char *final_output = (char *)malloc(sizeof(char)*len);
+    memset(final_output,0,strlen(final_output));
 
     for (int i = 0; i < len; ++i){
         final_output[i] = temp[i];
@@ -317,5 +399,14 @@ void qb_free_verse(quibble_verse qv){
     if (qv.echo == false){
         free(qv.body);
     }
+    free(qv.name);
     qb_free_keyword_array(qv.kwargs, qv.num_kwargs);
+}
+
+void qb_free_program(quibble_program qp){
+    free(qp.everything_else);
+    for (int i = 0; i < qp.num_verses; ++i){
+        qb_free_verse(qp.verse_list[i]);
+    }
+    free(qp.verse_list);
 }
