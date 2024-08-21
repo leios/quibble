@@ -88,6 +88,26 @@ int main(){
         printf("Failed: qb_find_matching_char\n");
         printf("%d\n", qb_find_matching_char(check_2, 10, 0, '(', ')'));
     }
+
+    // qb_parse_keywords
+    quibble_keyword *check_kwargs_1 = qb_parse_keywords("x = 5;");
+    quibble_keyword *check_kwargs_2 = qb_parse_keywords("x = 5; y = 2*x+3;");
+    quibble_keyword *check_kwargs_3 =
+        qb_parse_keywords("\t\n variable\t\n = \t\t\n whatever\n\n\t ;");
+
+    if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
+        strcmp(check_kwargs_1[0].value, "5") == 0 &&
+        strcmp(check_kwargs_2[0].variable, "x") == 0 &&
+        strcmp(check_kwargs_2[0].value, "5") == 0 &&
+        strcmp(check_kwargs_2[1].variable, "y") == 0 &&
+        strcmp(check_kwargs_2[1].value, "2*x+3") == 0 &&
+        strcmp(check_kwargs_3[0].variable, "variable") == 0 &&
+        strcmp(check_kwargs_3[0].value, "whatever") == 0 ){
+        printf("Passed: qb_parse_keywords\n");
+    }
+    else {
+        printf("Failed: qb_parse_keywords\n");
+    }
  
     /*------------------------------------------------------------------------//
         DEMO
