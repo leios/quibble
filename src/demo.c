@@ -90,10 +90,12 @@ int main(){
     }
 
     // qb_parse_keywords
-    quibble_keyword *check_kwargs_1 = qb_parse_keywords("x = 5;");
-    quibble_keyword *check_kwargs_2 = qb_parse_keywords("x = 5; y = 2*x+3;");
-    quibble_keyword *check_kwargs_3 =
-        qb_parse_keywords("\t\n variable\t\n = \t\t\n whatever\n\n\t ;");
+    char preamble_1[10] = "x = 5;";
+    char preamble_2[20] = "x = 5; y = 2*x+3;";
+    char preamble_3[40] = "\t\n variable\t\n = \t\t\n whatever\n\n\t ;";
+    quibble_keyword *check_kwargs_1 = qb_parse_keywords(preamble_1);
+    quibble_keyword *check_kwargs_2 = qb_parse_keywords(preamble_2);
+    quibble_keyword *check_kwargs_3 = qb_parse_keywords(preamble_3);
 
     if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
         strcmp(check_kwargs_1[0].value, "5") == 0 &&
@@ -108,7 +110,24 @@ int main(){
     else {
         printf("Failed: qb_parse_keywords\n");
     }
- 
+
+    // qb_create_preamble
+    int num_args_1 = qb_find_number_of_kwargs(preamble_1);
+    int num_args_2 = qb_find_number_of_kwargs(preamble_2);
+    int num_args_3 = qb_find_number_of_kwargs(preamble_3);
+
+    if (strcmp(qb_create_preamble(check_kwargs_1, num_args_1),
+               "x = 5;\n") == 0 &&
+        strcmp(qb_create_preamble(check_kwargs_2, num_args_2),
+               "x = 5;\ny = 2*x+3;\n") == 0 &&
+        strcmp(qb_create_preamble(check_kwargs_3, num_args_3),
+               "variable = whatever;\n") == 0){
+        printf("Passed: qb_create_preamble\n");
+    }
+    else {
+        printf("Failed: qb_create_preamble\n");
+    }
+
     /*------------------------------------------------------------------------//
         DEMO
     //------------------------------------------------------------------------*/
