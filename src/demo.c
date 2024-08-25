@@ -75,6 +75,7 @@ int main(){
     }
 
     // qb_find_matching_char
+    //                 "0123456789";
     char check_2[10] = "([]()(()))";
         // qb_find_next_string
     if (qb_find_matching_char(check_2, 10, 0, '(', ')') == 9 &&
@@ -146,6 +147,9 @@ int main(){
     else {
         printf("Failed: qb_parse_verse\n");
     }
+
+    // qb_create_program
+    qb_create_program("../test/example.qbl");
 
 
     /*------------------------------------------------------------------------//

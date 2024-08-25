@@ -1,0 +1,12 @@
+void simple_print(){
+    printf("printing from kernel...\n");
+}
+
+__verse check(x = 7, y = 8){
+    simple_print();
+}
+
+__verse check2(q = a*b*c, z = q*r){
+    // This comment shouldn't break anything
+    q += z;
+}

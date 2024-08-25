@@ -108,6 +108,116 @@ int qb_find_matching_char(char *verse, int verse_size, int current_index,
 
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_create_program(char *filename){
+
+    // Opening file
+    FILE* fileptr;
+    fileptr = fopen(filename, "r");
+
+    if (fileptr == NULL){
+        fprintf(stderr, "Error opening file %s!\n", filename);
+    }
+
+    // Finding file length
+    fseek(fileptr, 0, SEEK_END);
+    int filesize = ftell(fileptr);
+    fseek(fileptr, 0, SEEK_SET);
+
+    // Creating initial buffer
+    char *buffer = (char *)malloc(filesize);
+    memset(buffer,0,strlen(buffer));
+
+    while (!feof(fileptr)){
+        fread(buffer, sizeof(char), filesize, fileptr);
+    }
+
+    // Searching for number of verses
+    char verse_string[] = "__verse";
+
+    int match_count = 0;
+    int num_verses = 0;
+    for (int i = 0; i < filesize; ++i){
+        if (buffer[i] == verse_string[match_count]){
+            ++match_count;
+            if (match_count == 7){
+                ++num_verses;
+                match_count = 0;
+            }
+        }
+        else if (match_count != 0){
+            match_count = 0;
+        }
+    }
+
+    // creating program andp opulating verses and everything else
+    quibble_program qp;
+    qp.num_verses = num_verses;
+    qp.verse_list = (quibble_verse *)malloc(sizeof(quibble_verse)*num_verses);
+
+    if (num_verses > 0){
+        char *tmp_everything_else = (char *)malloc(MAX_SOURCE_SIZE);
+        memset(tmp_everything_else,0,strlen(tmp_everything_else));
+
+        char *tmp_verse = (char *)malloc(MAX_SOURCE_SIZE);
+        memset(tmp_verse,0,strlen(tmp_verse));
+
+        int curr_verse = 0;
+        int verse_start = 0;
+        int verse_end = 0;
+        int index = 0;
+        int everything_else_index = 0;
+        match_count = 0;
+        while (index < filesize){
+            if (buffer[index] == verse_string[match_count]){
+                ++match_count;
+                if (match_count == 7){
+                    verse_start = index - 6;
+                    verse_end = qb_find_next_char(
+                        buffer, filesize, verse_start, '(');
+                    verse_end = qb_find_matching_char(
+                        buffer, filesize, verse_end, '(', ')');
+
+                    verse_end = qb_find_next_char(
+                        buffer, filesize, verse_end, '{');
+                    verse_end = qb_find_matching_char(
+                        buffer, filesize, verse_end, '{', '}') + 1;
+
+                    for (int j = 0; j < verse_end - verse_start; ++j){
+                        tmp_verse[j] = buffer[verse_start + j];
+                    }
+
+                    qp.verse_list[curr_verse] = qb_parse_verse(tmp_verse);
+                    ++curr_verse;
+
+                    // setting everything back
+                    match_count = 0;
+                    everything_else_index -= 7;
+                    verse_end = 0;
+                    verse_start = 0;
+                    memset(tmp_verse,0,strlen(tmp_verse));
+                }
+            }
+            else if (match_count != 0){
+                match_count = 0;
+            }
+
+            ++index;
+            ++everything_else_index;
+        }
+
+        // Only free if we ar not using it directly
+        free(buffer);
+        free(tmp_everything_else);
+        free(tmp_verse);
+    }
+    else {
+        qp.verse_list = NULL;
+        qp.everything_else = buffer;
+    }
+
+    // Freeing everything
+    fclose(fileptr);
+
+    return qp;
 }
 
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
