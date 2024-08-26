@@ -88,19 +88,12 @@ char *qb_variable_to_string(quibble_variable qv){
     snprintf(result, len, "fi_buffer[%d];", qv.index);
     return result;
 }
-char *qb_array_to_string(quibble_array qa, char *variable){
-    int len = snprintf(NULL, 0, "%d", qa.start_index)*2;
-    len += snprintf(NULL, 0, "%d", qa.end_index);
-    len += snprintf(NULL, 0, "%d", qa.end_index - qa.start_index);
-    len += strlen(variable);
-    len += strlen("(float *)malloc(sizeof(float)*);\nfor (int _i = ; _i < ; ++_i){\n[_i-] = fi_buffer[_i];\n}\n");
+char *qb_array_to_string(quibble_array qa){
+    int len = snprintf(NULL, 0, "%d", qa.start_index);
+    len += strlen("fi_buffer + ;");
 
     char *result = (char *)malloc(sizeof(char) * len);
-    snprintf(result, len, "(float *)malloc(sizeof(float)*%d);\nfor (int _i = %d; _i < %d; ++_i){\n[_i-%d] = fi_buffer[_i];\n}\n", 
-        qa.end_index - qa.start_index,
-        qa.start_index,
-        qa.end_index,
-        qa.start_index);
+    snprintf(result, len, "fi_buffer + %d", qa.start_index);
     return result;
 }
 
