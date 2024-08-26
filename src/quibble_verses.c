@@ -189,8 +189,11 @@ quibble_program qb_create_program(char *filename){
                     ++curr_verse;
 
                     // setting everything back
+                    index = verse_end;
                     match_count = 0;
                     everything_else_index -= 7;
+                    memset(tmp_everything_else+everything_else_index, 0,
+                           strlen(tmp_everything_else));
                     verse_end = 0;
                     verse_start = 0;
                     memset(tmp_verse,0,strlen(tmp_verse));
@@ -200,9 +203,15 @@ quibble_program qb_create_program(char *filename){
                 match_count = 0;
             }
 
+            tmp_everything_else[everything_else_index] = buffer[index];
             ++index;
             ++everything_else_index;
         }
+
+        char *everything_else =
+           qb_strip_spaces(tmp_everything_else, 0, everything_else_index);
+
+        qp.everything_else = everything_else;
 
         // Only free if we ar not using it directly
         free(buffer);
@@ -213,6 +222,7 @@ quibble_program qb_create_program(char *filename){
         qp.verse_list = NULL;
         qp.everything_else = buffer;
     }
+
 
     // Freeing everything
     fclose(fileptr);
@@ -259,16 +269,18 @@ quibble_verse qb_parse_verse(char *verse){
 
     int preamble_start = qb_find_next_char(verse, verse_size, offset, '(')+1;
     int preamble_end =
-        qb_find_matching_char(verse, verse_size, preamble_start, '(', ')');
+        qb_find_matching_char(verse, verse_size, preamble_start-1, '(', ')');
 
 
     if (preamble_end-preamble_start > 0){
         char *preamble =
             (char *)malloc(sizeof(char)*(preamble_end-preamble_start));
         memset(preamble,0,strlen(preamble));
+
         for (int i = 0; i < (preamble_end-preamble_start); ++i){
             preamble[i] = verse[preamble_start+i];
         }
+
         final_verse.num_kwargs = qb_find_number_of_kwargs(preamble);
         final_verse.kwargs =
             qb_parse_keywords(preamble, final_verse.num_kwargs);
@@ -281,13 +293,13 @@ quibble_verse qb_parse_verse(char *verse){
 
     int body_start = qb_find_next_char(verse, verse_size, offset, '{')+1;
     int body_end =
-        qb_find_matching_char(verse, verse_size, body_start, '(', ')');
+        qb_find_matching_char(verse, verse_size, body_start-1, '{', '}');
 
-    if (preamble_end-preamble_start > 0){
+    if (body_end-body_start > 0){
         char *body = (char *)malloc(sizeof(char)*(body_end-body_start));
         memset(body,0,strlen(body));
         for (int i = 0; i < (body_end-body_start); ++i){
-            body[i] = verse[body_start+i+1];
+            body[i] = verse[body_start+i];
         }
 
         if (dcompiled){
@@ -453,6 +465,7 @@ void qb_preprocess_verse(char *verse){
         qb_replace_char_if_proceeding(verse, verse_size, "#pragma",
                                       7, '\n', ' ');
     }
+
 }
 
 /*----------------------------------------------------------------------------//
@@ -515,8 +528,8 @@ void qb_free_verse(quibble_verse qv){
 
 void qb_free_program(quibble_program qp){
     free(qp.everything_else);
-    for (int i = 0; i < qp.num_verses; ++i){
-        qb_free_verse(qp.verse_list[i]);
-    }
-    free(qp.verse_list);
+    //for (int i = 0; i < qp.num_verses; ++i){
+    //    qb_free_verse(qp.verse_list[i]);
+    //}
+    //free(qp.verse_list);
 }

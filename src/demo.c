@@ -148,9 +148,29 @@ int main(){
         printf("Failed: qb_parse_verse\n");
     }
 
-    // qb_create_program
-    qb_create_program("../test/example.qbl");
+    qb_free_verse(qv_1);
 
+    // qb_create_program
+    quibble_program qp = qb_create_program("../test/example.qbl");
+    quibble_verse qv_2 = qb_find_verse(qp, "check");
+    quibble_verse qv_3 = qb_find_verse(qp, "check2");
+
+    char *stripped_verse = qb_strip_spaces(qv_2.body, 0, strlen(qv_2.body));
+
+    quibble_program qp_2 = qb_create_program("../test/example_2.qbl");
+
+    if (strcmp(qv_2.name, "check") == 0 &&
+        strcmp(qv_3.name, "check2") == 0 &&
+        strcmp(stripped_verse, "simple_print();") == 0 &&
+        qp_2.verse_list == NULL){
+        printf("Passed: qb_create_program\n");
+    }
+    else {
+        printf("Failed: qb_create_program\n");
+    }
+
+    qb_free_program(qp);
+    qb_free_program(qp_2);
 
     /*------------------------------------------------------------------------//
         DEMO
