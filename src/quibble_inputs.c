@@ -11,9 +11,7 @@ Purpose: This file defines quibble inputs, which are variables stored in a
 
 #include "../include/quibble_inputs.h"
 
-quibble_variable qb_create_variable(quibble_buffer qb,
-                                           int index,
-                                           float value){
+quibble_variable qb_create_variable(quibble_buffer qb, int index, float value){
     quibble_variable qv;
     qv.index = index;
     qv.buffer = qb;
@@ -23,9 +21,9 @@ quibble_variable qb_create_variable(quibble_buffer qb,
 }
 
 quibble_array qb_create_array(quibble_buffer qb,
-                                     int start_index,
-                                     int n,
-                                     float *a){
+                              int start_index,
+                              int n,
+                              float *a){
     quibble_array qa;
     qa.start_index = start_index;
     qa.end_index = start_index + n;
@@ -82,3 +80,41 @@ float *qb_array_value(quibble_array qa){
     }
     return a;
 }
+
+char *qb_variable_to_string(quibble_variable qv){
+    int len = snprintf(NULL, 0, "%d", qv.index);
+    len += snprintf(NULL, 0, "fi_buffer[];")+1;
+    char *result = (char *)malloc(sizeof(char)*len);
+    snprintf(result, len, "fi_buffer[%d];", qv.index);
+    return result;
+}
+char *qb_array_to_string(quibble_array qa, char *variable){
+    int len = snprintf(NULL, 0, "%d", qa.start_index)*2;
+    len += snprintf(NULL, 0, "%d", qa.end_index);
+    len += snprintf(NULL, 0, "%d", qa.end_index - qa.start_index);
+    len += strlen(variable);
+    len += strlen("(float *)malloc(sizeof(float)*);\nfor (int _i = ; _i < ; ++_i){\n[_i-] = fi_buffer[_i];\n}\n");
+
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "(float *)malloc(sizeof(float)*%d);\nfor (int _i = %d; _i < %d; ++_i){\n[_i-%d] = fi_buffer[_i];\n}\n", 
+        qa.end_index - qa.start_index,
+        qa.start_index,
+        qa.end_index,
+        qa.start_index);
+    return result;
+}
+
+char *qb_int_to_string(int i){
+    int len = snprintf(NULL, 0, "%d", i) + 1;
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "%d", i);
+    return result;
+}
+
+char *qb_float_to_string(float f){
+    int len = snprintf(NULL, 0, "%f", f) + 1;
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "%f", f);
+    return result;
+}
+
