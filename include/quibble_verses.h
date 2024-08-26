@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
 
 #include "macros.h"
@@ -52,10 +53,10 @@ int qb_find_number_of_kwargs(char *preamble);
 quibble_keyword *qb_parse_keywords(char *preamble, int num_entries);
 
 // Configures preambles of existing verses
-void qb_configure_verse(quibble_verse *qv, ...);
+void qb_configure_verse(quibble_verse *qv, int n, ...);
 
 // An echo is a verse with the same body, but different preamble
-quibble_verse qb_echo_verse(quibble_verse qv, ...);
+quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
 
 char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs);
 

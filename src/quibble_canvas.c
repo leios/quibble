@@ -78,9 +78,9 @@ void qb_find_platforms(quibble_canvas *qc, bool verbose){
     if (verbose){
         printf("Stage 1:\n");
         printf("    %d platforms found:\n", qc->num_platforms);
-        for (int i = 0; i < qc->num_platforms; ++i){
+        for (size_t i = 0; i < qc->num_platforms; ++i){
             char *platform_name = get_platform_name(qc->platform_ids[i]);
-            printf("        Platform %d: %s\n", i, platform_name);
+            printf("        Platform %lu: %s\n", i, platform_name);
             free(platform_name);
         }
         printf("    Choosing platform %d\n", qc->chosen_platform);
@@ -116,9 +116,9 @@ void qb_find_devices(quibble_canvas *qc, bool verbose){
         printf("    %d devices found on platform %s:\n",
                qc->num_devices,
                platform_name);
-        for (int j = 0; j < qc->num_devices; ++j){
+        for (size_t j = 0; j < qc->num_devices; ++j){
             char *device_name = get_device_name(qc->device_ids[j]);
-            printf("        device %d: %s\n", j, device_name);
+            printf("        device %lu: %s\n", j, device_name);
             free(device_name);
         }
 
@@ -136,7 +136,7 @@ void qb_list_devices(){
     qb_find_platforms(&qc, 0);
 
     cl_uint num_devices;
-    for (int i = 0; i < qc.num_platforms; ++i){
+    for (size_t i = 0; i < qc.num_platforms; ++i){
         char *platform_name = get_platform_name(qc.platform_ids[i]);
 
         // As in `qb_find_platforms` and `qb_list devices`, 10 is arbitrary
@@ -158,12 +158,12 @@ void qb_list_devices(){
                            &num_devices)
         );
 
-        printf("Platform %d: %s. %d known device(s)...\n", i, platform_name,
+        printf("Platform %lu: %s. %d known device(s)...\n", i, platform_name,
                num_devices);
 
-        for (int j = 0; j < num_devices; ++j){
+        for (size_t j = 0; j < num_devices; ++j){
             char *device_name = get_device_name(device_ids[j]);
-            printf("\tDevice %d: %s\n", j, device_name);
+            printf("\tDevice %lu: %s\n", j, device_name);
             free(device_name);
         }
         free(platform_name);
