@@ -266,24 +266,24 @@ quibble_verse qb_parse_verse(char *verse){
 
     quibble_verse final_verse;
 
-    int preamble_start = qb_find_next_char(verse, verse_size, offset, '(')+1;
-    int preamble_end =
-        qb_find_matching_char(verse, verse_size, preamble_start-1, '(', ')');
+    int prologue_start = qb_find_next_char(verse, verse_size, offset, '(')+1;
+    int prologue_end =
+        qb_find_matching_char(verse, verse_size, prologue_start-1, '(', ')');
 
 
-    if (preamble_end-preamble_start > 0){
-        char *preamble =
-            (char *)malloc(sizeof(char)*(preamble_end-preamble_start));
-        memset(preamble,0,strlen(preamble));
+    if (prologue_end-prologue_start > 0){
+        char *prologue =
+            (char *)malloc(sizeof(char)*(prologue_end-prologue_start));
+        memset(prologue,0,strlen(prologue));
 
-        for (int i = 0; i < (preamble_end-preamble_start); ++i){
-            preamble[i] = verse[preamble_start+i];
+        for (int i = 0; i < (prologue_end-prologue_start); ++i){
+            prologue[i] = verse[prologue_start+i];
         }
 
-        final_verse.num_kwargs = qb_find_number_of_kwargs(preamble);
+        final_verse.num_kwargs = qb_find_number_of_kwargs(prologue);
         final_verse.kwargs =
-            qb_parse_keywords(preamble, final_verse.num_kwargs);
-        free(preamble);
+            qb_parse_keywords(prologue, final_verse.num_kwargs);
+        free(prologue);
     }
     else {
         final_verse.kwargs = NULL;
@@ -309,22 +309,22 @@ quibble_verse qb_parse_verse(char *verse){
     else{
         final_verse.body = NULL;
     }
-    final_verse.name = qb_strip_spaces(verse, offset, preamble_start-1);
+    final_verse.name = qb_strip_spaces(verse, offset, prologue_start-1);
 
     return final_verse;
 }
 
-int qb_find_number_of_kwargs(char *preamble){
+int qb_find_number_of_kwargs(char *prologue){
 
-    int preamble_size = strlen(preamble);
+    int prologue_size = strlen(prologue);
     int i = 0;
     int num_entries = 0;
     int next_equal = 0;
     int next_semicolon = 0;
 
-    while (i < preamble_size){
-        next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
-        next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
+    while (i < prologue_size){
+        next_equal = qb_find_next_char(prologue, prologue_size, i, '=');
+        next_semicolon = qb_find_next_char(prologue, prologue_size, i, ';');
 
         if (next_equal > i && next_semicolon > next_equal){
             ++num_entries;
@@ -339,9 +339,9 @@ int qb_find_number_of_kwargs(char *preamble){
 
 }
 
-quibble_keyword *qb_parse_keywords(char *preamble, int num_entries){
+quibble_keyword *qb_parse_keywords(char *prologue, int num_entries){
 
-    int preamble_size = strlen(preamble);
+    int prologue_size = strlen(prologue);
 
     if (num_entries > 0){
         quibble_keyword *final_keywords =
@@ -352,15 +352,15 @@ quibble_keyword *qb_parse_keywords(char *preamble, int num_entries){
         int next_equal = 0;
         int next_semicolon = 0;
 
-        while (i < preamble_size){
-            next_equal = qb_find_next_char(preamble, preamble_size, i, '=');
-            next_semicolon = qb_find_next_char(preamble, preamble_size, i, ';');
+        while (i < prologue_size){
+            next_equal = qb_find_next_char(prologue, prologue_size, i, '=');
+            next_semicolon = qb_find_next_char(prologue, prologue_size, i, ';');
 
             final_keywords[curr_entry].variable =
-                qb_strip_spaces(preamble, i, next_equal);
+                qb_strip_spaces(prologue, i, next_equal);
 
             final_keywords[curr_entry].value =
-                qb_strip_spaces(preamble, next_equal+1, next_semicolon);
+                qb_strip_spaces(prologue, next_equal+1, next_semicolon);
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
@@ -397,7 +397,7 @@ void qb_replace_char(char *verse, int verse_size, char a, char b){
 }
 
 void qb_replace_char_if_proceeding(char *verse, int verse_size,
-                                   char *preamble, int preamble_size,
+                                   char *prologue, int prologue_size,
                                    char a, char b){
 
     bool find_match = true;
@@ -405,13 +405,13 @@ void qb_replace_char_if_proceeding(char *verse, int verse_size,
     int count = 0;
     for (int i = 0; i < verse_size; ++i){
         while (find_match){
-            if (verse[i+count] != preamble[count]){
+            if (verse[i+count] != prologue[count]){
                 find_match = false;
             }
 
             count++;
 
-            if (count == preamble_size && find_match){
+            if (count == prologue_size && find_match){
                 find_match = false;
                 match_found = true;
             }
@@ -471,7 +471,7 @@ void qb_preprocess_verse(char *verse){
 CONFIGURATION
 //----------------------------------------------------------------------------*/
 
-// Configures preambles of existing verses
+// Configures prologues of existing verses
 // The variadic function takes triples after the initial verse and number of
 // kwargs being modified:
 //     1. char * name of variable
@@ -489,12 +489,12 @@ void qb_configure_verse(quibble_verse *qv, int n, ...){
  
 }
 
-// An echo is a verse with the same body, but different preamble
+// An echo is a verse with the same body, but different prologue
 quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 }
 
-// To be used in `qb_configure_verse` to create preamble string
-char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs){
+// To be used in `qb_configure_verse` to create prologue string
+char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs){
 
     char temp[MAX_PREAMBLE_SIZE];
 
