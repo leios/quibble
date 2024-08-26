@@ -29,12 +29,14 @@ quibble_buffer qb_create_buffer(cl_context context, int n){
     qb.cpu = cpu_array;
 
     cl_int err;
-    cl_mem gpu_array = clCreateBuffer(context,
-                                      CL_MEM_READ_WRITE,
-                                      n * sizeof(float),
-                                      NULL,
-                                      &err);
+    cl_mem canvas_array = clCreateBuffer(context,
+                                         CL_MEM_READ_WRITE,
+                                         n * sizeof(float),
+                                         NULL,
+                                         &err);
+    qb.canvas = &canvas_array;
     cl_check(err);
+    return qb;
 }
 
 void qb_free_buffer(quibble_buffer qb){

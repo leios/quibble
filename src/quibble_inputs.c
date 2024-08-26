@@ -44,7 +44,7 @@ void qb_set_variable(quibble_variable qv, float value){
 void qb_set_array(quibble_array qa, int n, float *a){
     if (n != qa.end_index - qa.start_index){
         fprintf(stderr,
-                "Quibble array is not the same size as the input array!\n    Quibble array size: %d\n    Input array size: %n",
+                "Quibble array is not the same size as the input array!\n    Quibble array size: %d\n    Input array size: %d",
                 qa.end_index - qa.start_index,
                 n);
         exit(1);
@@ -63,7 +63,7 @@ float qb_variable_value(quibble_variable qv){
 void qb_inplace_array_value(float *a, int n, quibble_array qa){
     if (n != qa.end_index - qa.start_index){
         fprintf(stderr,
-                "Quibble array is not the same size as the output array!\n    Quibble array size: %d\n    Output array size: %n",
+                "Quibble array is not the same size as the output array!\n    Quibble array size: %d\n    Output array size: %d",
                 qa.end_index - qa.start_index,
                 n);
         exit(1);

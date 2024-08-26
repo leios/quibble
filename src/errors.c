@@ -305,4 +305,5 @@ const char *get_cl_error_string(cl_int error)
         */
         default: return "Unspecified OpenCL error...";
     }
+    return CL_SUCCESS;
 }

@@ -32,7 +32,6 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
 
     int str_len = (end_index - end_offset) - (start_index + start_offset);
     char *final_str = (char *)malloc(sizeof(char) * str_len);
-    memset(final_str,0,strlen(final_str));
 
     for (int i = 0; i < str_len; ++i){
         final_str[i] = verse[start_index + start_offset + i];
@@ -238,7 +237,7 @@ quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
         }
     }
     fprintf(stderr, "No verse %s found!", verse_name);
-
+    exit(1);
 }
 
 bool qb_is_verse(char *verse, int offset){
@@ -367,7 +366,7 @@ quibble_keyword *qb_parse_keywords(char *preamble, int num_entries){
             for (int j = 1; j <= curr_entry; ++j){
                 if (strcmp(final_keywords[j-1].variable,
                            final_keywords[j].variable) == 0){
-                    fprintf(stderr, "Variable %s used more than once for keyword arguments!\n", final_keywords[j]);
+                    fprintf(stderr, "Variable %s used more than once for keyword arguments!\n", final_keywords[j].variable);
                     exit(1);
                 }
             }
@@ -473,18 +472,30 @@ CONFIGURATION
 //----------------------------------------------------------------------------*/
 
 // Configures preambles of existing verses
-void qb_configure_verse(quibble_verse *qv, ...){
+// The variadic function takes triples after the initial verse and number of
+// kwargs being modified:
+//     1. char * name of variable
+//     2. char * type of value
+//     3. auto value to be used
+void qb_configure_verse(quibble_verse *qv, int n, ...){
+    va_list args;
+    va_start(args, n*3);
+ 
+    // va_arg(args, int);
+ 
+    va_end(args);
+ 
 }
 
 // An echo is a verse with the same body, but different preamble
-quibble_verse qb_echo_verse(quibble_verse qv, ...){
+quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 }
 
 // To be used in `qb_configure_verse` to create preamble string
 char *qb_create_preamble(quibble_keyword *qkwargs, int num_kwargs){
 
     char temp[MAX_PREAMBLE_SIZE];
-    memset(temp,0,strlen(temp));
+
     for (int i = 0; i < num_kwargs; ++i){
         strcat(temp, qkwargs[i].variable);
         strcat(temp, " = ");
