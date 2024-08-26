@@ -32,6 +32,7 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
 
     int str_len = (end_index - end_offset) - (start_index + start_offset);
     char *final_str = (char *)malloc(sizeof(char) * str_len);
+    memset(final_str, 0, strlen(final_str));
 
     for (int i = 0; i < str_len; ++i){
         final_str[i] = verse[start_index + start_offset + i];
@@ -232,11 +233,12 @@ quibble_program qb_create_program(char *filename){
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
 
     for (int i = 0; i < qp.num_verses; ++i){
+        printf("%s\n", qp.verse_list[i].name);
         if (strcmp(qp.verse_list[i].name, verse_name) == 0){
             return qp.verse_list[i];
         }
     }
-    fprintf(stderr, "No verse %s found!", verse_name);
+    fprintf(stderr, "No verse %s found!\n", verse_name);
     exit(1);
 }
 
@@ -464,7 +466,6 @@ void qb_preprocess_verse(char *verse){
         qb_replace_char_if_proceeding(verse, verse_size, "#pragma",
                                       7, '\n', ' ');
     }
-
 }
 
 /*----------------------------------------------------------------------------//
@@ -496,7 +497,8 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 // To be used in `qb_configure_verse` to create prologue string
 char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs){
 
-    char temp[MAX_PREAMBLE_SIZE];
+    char *temp = (char *)malloc(MAX_PREAMBLE_SIZE);
+    memset(temp, 0, strlen(temp));
 
     for (int i = 0; i < num_kwargs; ++i){
         strcat(temp, qkwargs[i].variable);
@@ -513,6 +515,7 @@ char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs){
         final_output[i] = temp[i];
     }
 
+    free(temp);
     return final_output;
 }
 
@@ -541,8 +544,8 @@ void qb_free_verse(quibble_verse qv){
 
 void qb_free_program(quibble_program qp){
     free(qp.everything_else);
-    //for (int i = 0; i < qp.num_verses; ++i){
-    //    qb_free_verse(qp.verse_list[i]);
-    //}
-    //free(qp.verse_list);
+    for (int i = 0; i < qp.num_verses; ++i){
+        qb_free_verse(qp.verse_list[i]);
+    }
+    free(qp.verse_list);
 }
