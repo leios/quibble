@@ -35,14 +35,18 @@ int main(){
     }
 
     // qb_preprocess_verse
-    qb_preprocess_verse(kernel_string);
-    if (strcmp(kernel_string,
+    // DCOMPILE creates a const, so copying to another container
+    char *check_string =
+        qb_strip_spaces(kernel_string, 0, strlen(kernel_string));
+    qb_preprocess_verse(check_string);
+    if (strcmp(check_string,
                "//\nDCOMPILE\nGENERATED\n__verse\ncheck(){\n}") == 0){
         printf("Passed: qb_preprocess_verse\n");
     }
     else{
         printf("Failed: qb_preprocess_verse\n");
     }
+    free(check_string);
 
     // qb_replace_char_if_proceeding
     char check[21] = "This is a test string";
@@ -182,7 +186,6 @@ int main(){
     define_functions(kernel_source, 100);
     define_postamble(kernel_source);
 
-    size_t kernel_size = strlen(kernel_source);
 
     // Array creation
     int array_size = 10;
