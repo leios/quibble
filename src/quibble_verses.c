@@ -31,8 +31,7 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
     }
 
     int str_len = (end_index - end_offset) - (start_index + start_offset);
-    char *final_str = (char *)malloc(sizeof(char) * str_len);
-    memset(final_str, 0, strlen(final_str));
+    char *final_str = (char *)calloc(str_len, sizeof(char));
 
     for (int i = 0; i < str_len; ++i){
         final_str[i] = verse[start_index + start_offset + i];
@@ -123,8 +122,7 @@ quibble_program qb_create_program(char *filename){
     fseek(fileptr, 0, SEEK_SET);
 
     // Creating initial buffer
-    char *buffer = (char *)malloc(filesize);
-    memset(buffer,0,strlen(buffer));
+    char *buffer = (char *)calloc(filesize, sizeof(char));
 
     while (!feof(fileptr)){
         fread(buffer, sizeof(char), filesize, fileptr);
@@ -154,11 +152,10 @@ quibble_program qb_create_program(char *filename){
     qp.verse_list = (quibble_verse *)malloc(sizeof(quibble_verse)*num_verses);
 
     if (num_verses > 0){
-        char *tmp_everything_else = (char *)malloc(MAX_SOURCE_SIZE);
-        memset(tmp_everything_else,0,strlen(tmp_everything_else));
+        char *tmp_everything_else =
+            (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
 
-        char *tmp_verse = (char *)malloc(MAX_SOURCE_SIZE);
-        memset(tmp_verse,0,strlen(tmp_verse));
+        char *tmp_verse = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
 
         int curr_verse = 0;
         int verse_start = 0;
@@ -275,8 +272,7 @@ quibble_verse qb_parse_verse(char *verse){
 
     if (prologue_end-prologue_start > 0){
         char *prologue =
-            (char *)malloc(sizeof(char)*(prologue_end-prologue_start));
-        memset(prologue,0,strlen(prologue));
+            (char *)calloc((prologue_end-prologue_start), sizeof(char));
 
         for (int i = 0; i < (prologue_end-prologue_start); ++i){
             prologue[i] = verse[prologue_start+i];
@@ -297,8 +293,7 @@ quibble_verse qb_parse_verse(char *verse){
         qb_find_matching_char(verse, verse_size, body_start-1, '{', '}');
 
     if (body_end-body_start > 0){
-        char *body = (char *)malloc(sizeof(char)*(body_end-body_start));
-        memset(body,0,strlen(body));
+        char *body = (char *)calloc((body_end-body_start), sizeof(char));
         for (int i = 0; i < (body_end-body_start); ++i){
             body[i] = verse[body_start+i];
         }
@@ -497,8 +492,7 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 // To be used in `qb_configure_verse` to create prologue string
 char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs){
 
-    char *temp = (char *)malloc(MAX_PREAMBLE_SIZE);
-    memset(temp, 0, strlen(temp));
+    char *temp = (char *)calloc(MAX_PREAMBLE_SIZE, sizeof(char));
 
     for (int i = 0; i < num_kwargs; ++i){
         strcat(temp, qkwargs[i].variable);
@@ -508,8 +502,7 @@ char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs){
     }
 
     int len = strlen(temp);
-    char *final_output = (char *)malloc(sizeof(char)*len);
-    memset(final_output,0,strlen(final_output));
+    char *final_output = (char *)calloc(len, sizeof(char));
 
     for (int i = 0; i < len; ++i){
         final_output[i] = temp[i];
