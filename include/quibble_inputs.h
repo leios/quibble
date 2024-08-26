@@ -14,14 +14,12 @@ typedef struct{
     int end_index;
 } quibble_array;
 
-quibble_variable qb_create_variable(quibble_buffer qb,
-                                           int index,
-                                           float value);
+quibble_variable qb_create_variable(quibble_buffer qb, int index, float value);
 
 quibble_array qb_create_array(quibble_buffer qb,
-                                     int start_index,
-                                     int n,
-                                     float *a);
+                              int start_index,
+                              int n,
+                              float *a);
 
 void qb_set_variable(quibble_variable qv, float value);
 void qb_set_array(quibble_array qa, int n, float *a);
@@ -29,5 +27,11 @@ void qb_set_array(quibble_array qa, int n, float *a);
 float qb_variable_value(quibble_variable qv);
 void qb_inplace_array_value(float *a, int n, quibble_array qa);
 float *qb_array_value(quibble_array qa);
+
+char *qb_variable_to_string(quibble_variable qv);
+char *qb_array_to_string(quibble_array qa, char *variable);
+
+char *qb_int_to_string(int i);
+char *qb_float_to_string(float f);
 
 #endif

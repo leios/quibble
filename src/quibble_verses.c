@@ -482,6 +482,8 @@ void qb_configure_verse(quibble_verse *qv, int n, ...){
     va_start(args, n*3);
  
     // va_arg(args, int);
+
+    // Don't forget to cree all variable strings!!!
  
     va_end(args);
  
