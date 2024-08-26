@@ -91,16 +91,16 @@ int main(){
     }
 
     // qb_parse_keywords
-    char preamble_1[10] = "x = 5;";
-    char preamble_2[20] = "x = 5; y = 2*x+3;";
-    char preamble_3[40] = "\t\n variable\t\n = \t\t\n whatever\n\n\t ;";
-    int num_args_1 = qb_find_number_of_kwargs(preamble_1);
-    int num_args_2 = qb_find_number_of_kwargs(preamble_2);
-    int num_args_3 = qb_find_number_of_kwargs(preamble_3);
+    char prologue_1[10] = "x = 5;";
+    char prologue_2[20] = "x = 5; y = 2*x+3;";
+    char prologue_3[40] = "\t\n variable\t\n = \t\t\n whatever\n\n\t ;";
+    int num_args_1 = qb_find_number_of_kwargs(prologue_1);
+    int num_args_2 = qb_find_number_of_kwargs(prologue_2);
+    int num_args_3 = qb_find_number_of_kwargs(prologue_3);
 
-    quibble_keyword *check_kwargs_1 = qb_parse_keywords(preamble_1, num_args_1);
-    quibble_keyword *check_kwargs_2 = qb_parse_keywords(preamble_2, num_args_2);
-    quibble_keyword *check_kwargs_3 = qb_parse_keywords(preamble_3, num_args_3);
+    quibble_keyword *check_kwargs_1 = qb_parse_keywords(prologue_1, num_args_1);
+    quibble_keyword *check_kwargs_2 = qb_parse_keywords(prologue_2, num_args_2);
+    quibble_keyword *check_kwargs_3 = qb_parse_keywords(prologue_3, num_args_3);
 
     if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
         strcmp(check_kwargs_1[0].value, "5") == 0 &&
@@ -116,17 +116,17 @@ int main(){
         printf("Failed: qb_parse_keywords\n");
     }
 
-    // qb_create_preamble
-    if (strcmp(qb_create_preamble(check_kwargs_1, num_args_1),
+    // qb_create_prologue
+    if (strcmp(qb_create_prologue(check_kwargs_1, num_args_1),
                "x = 5;\n") == 0 &&
-        strcmp(qb_create_preamble(check_kwargs_2, num_args_2),
+        strcmp(qb_create_prologue(check_kwargs_2, num_args_2),
                "x = 5;\ny = 2*x+3;\n") == 0 &&
-        strcmp(qb_create_preamble(check_kwargs_3, num_args_3),
+        strcmp(qb_create_prologue(check_kwargs_3, num_args_3),
                "variable = whatever;\n") == 0){
-        printf("Passed: qb_create_preamble\n");
+        printf("Passed: qb_create_prologue\n");
     }
     else {
-        printf("Failed: qb_create_preamble\n");
+        printf("Failed: qb_create_prologue\n");
     }
 
     qb_free_keyword_array(check_kwargs_1, num_args_1);
@@ -188,7 +188,7 @@ int main(){
     int array_size = 10;
     float *a = (float*)malloc(sizeof(float)*array_size);
 
-    for (size_t i = 0; i < array_size; ++i){
+    for (int i = 0; i < array_size; ++i){
         a[i] = 0;
     }
 
