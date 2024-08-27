@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "macros.h"
+#include "quibble_inputs.h"
 
 typedef struct{
     char *variable;
@@ -17,7 +18,6 @@ typedef struct{
 typedef struct{
     char *body;
     char *name;
-    char *epilogue;
     quibble_keyword *kwargs;
     int num_kwargs;
     bool echo;
@@ -53,10 +53,8 @@ quibble_verse qb_parse_verse(char *verse);
 int qb_find_number_of_kwargs(char *prologue);
 quibble_keyword *qb_parse_keywords(char *prologue, int num_entries);
 
-// Configures prologues of existing verses
+int qb_find_kwarg_index(quibble_verse qv, char *variable);
 void qb_configure_verse(quibble_verse *qv, int n, ...);
-
-// An echo is a verse with the same body, but different prologue
 quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
 
 char *qb_create_prologue(quibble_keyword *qkwargs, int num_kwargs);

@@ -307,6 +307,7 @@ quibble_verse qb_parse_verse(char *verse){
         final_verse.body = NULL;
     }
     final_verse.name = qb_strip_spaces(verse, offset, prologue_start-1);
+    final_verse.echo = false;
 
     return final_verse;
 }
@@ -467,26 +468,100 @@ void qb_preprocess_verse(char *verse){
 CONFIGURATION
 //----------------------------------------------------------------------------*/
 
+int qb_find_kwarg_index(quibble_verse qv, char *variable){
+    for (int i = 0; i < qv.num_kwargs; ++i){
+        if (strcmp(qv.kwargs[i].variable, variable) == 0){
+            return i;
+        }
+    }
+    fprintf(stderr, "Keyword variable %s not found!\n", variable);
+    exit(1);
+}
+
 // Configures prologues of existing verses
 // The variadic function takes triples after the initial verse and number of
 // kwargs being modified:
 //     1. char * name of variable
 //     2. char * type of value
 //     3. auto value to be used
-void qb_configure_verse(quibble_verse *qv, int n, ...){
-    va_list args;
-    va_start(args, n*3);
- 
-    // va_arg(args, int);
+void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
+    for (int i = 0; i < n; ++i){
+        char *curr_variable = va_arg(args, char *);
+        int kwarg_index = qb_find_kwarg_index(*qv, curr_variable);
+        free(qv->kwargs[kwarg_index].value);
 
-    // Don't forget to cree all variable strings!!!
+        char *curr_type = va_arg(args, char *);
+        if (strcmp(curr_type, "float") == 0 ||
+            strcmp(curr_type, "f") == 0     ||
+            strcmp(curr_type, "int") == 0   ||
+            strcmp(curr_type, "i") == 0     ||
+            strcmp(curr_type, "d") == 0){
+            qv->kwargs[kwarg_index].value = va_arg(args, char *);
+            
+        }
+        else if (strcmp(curr_type, "quibble_array") == 0 ||
+                 strcmp(curr_type, "qa") == 0){
+            qv->kwargs[kwarg_index].value = 
+                qb_array_to_string(va_arg(args, quibble_array));
+        }
+        else if (strcmp(curr_type, "quibble_variable") == 0 ||
+                 strcmp(curr_type, "qv") == 0){
+            qv->kwargs[kwarg_index].value = 
+                qb_variable_to_string(va_arg(args, quibble_variable));
+        }
+        else{
+            fprintf(stderr,
+                    "Type %s not supported as quibble input!\n",
+                    curr_type);
+            exit(1);
+        }
+    }
+
+}
+void qb_configure_verse(quibble_verse *qv, int n, ...){
+    n *= 3;
+    va_list args;
+    va_start(args, n);
+
+    qb_configure_verse_variadic(qv, n, args);
  
     va_end(args);
- 
 }
 
 // An echo is a verse with the same body, but different prologue
 quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
+    quibble_verse final_qv;
+    final_qv.echo = true;
+    final_qv.body = qv.body;
+    final_qv.name = qv.name;
+    final_qv.num_kwargs = qv.num_kwargs;
+    final_qv.kwargs =
+        (quibble_keyword *)malloc(sizeof(quibble_keyword)*qv.num_kwargs);
+
+    for (int i = 0; i < qv.num_kwargs; ++i){
+        int vlength = strlen(qv.kwargs[i].variable);
+        final_qv.kwargs[i].variable = (char *)malloc(sizeof(char)*vlength);
+
+        for (int j = 0; j < vlength; ++j){
+            final_qv.kwargs[i].variable[j] = qv.kwargs[i].variable[j];
+        }
+
+        vlength = strlen(qv.kwargs[i].value);
+        final_qv.kwargs[i].value = (char *)malloc(sizeof(char)*vlength);
+        for (int j = 0; j < vlength; ++j){
+            final_qv.kwargs[i].value[j] = qv.kwargs[i].value[j];
+        }
+    }
+
+    n *= 3;
+    va_list args;
+    va_start(args, n);
+ 
+    qb_configure_verse_variadic(&final_qv, n, args);
+ 
+    va_end(args);
+
+    return final_qv;
 }
 
 // To be used in `qb_configure_verse` to create prologue string
