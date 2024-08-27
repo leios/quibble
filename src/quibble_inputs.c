@@ -96,18 +96,3 @@ char *qb_array_to_string(quibble_array qa){
     snprintf(result, len, "fi_buffer + %d", qa.start_index);
     return result;
 }
-
-char *qb_int_to_string(int i){
-    int len = snprintf(NULL, 0, "%d", i) + 1;
-    char *result = (char *)malloc(sizeof(char) * len);
-    snprintf(result, len, "%d", i);
-    return result;
-}
-
-char *qb_float_to_string(float f){
-    int len = snprintf(NULL, 0, "%f", f) + 1;
-    char *result = (char *)malloc(sizeof(char) * len);
-    snprintf(result, len, "%f", f);
-    return result;
-}
-

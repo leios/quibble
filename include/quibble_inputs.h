@@ -31,7 +31,4 @@ float *qb_array_value(quibble_array qa);
 char *qb_variable_to_string(quibble_variable qv);
 char *qb_array_to_string(quibble_array qa);
 
-char *qb_int_to_string(int i);
-char *qb_float_to_string(float f);
-
 #endif
