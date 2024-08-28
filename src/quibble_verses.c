@@ -31,11 +31,13 @@ char *qb_strip_spaces(char *verse, int start_index, int end_index){
     }
 
     int str_len = (end_index - end_offset) - (start_index + start_offset);
-    char *final_str = (char *)calloc(str_len, sizeof(char));
+    char *final_str = (char *)calloc(str_len+1, sizeof(char));
 
     for (int i = 0; i < str_len; ++i){
         final_str[i] = verse[start_index + start_offset + i];
     }
+
+    final_str[str_len] = 0;
 
     return final_str;
 }
@@ -230,7 +232,6 @@ quibble_program qb_create_program(char *filename){
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
 
     for (int i = 0; i < qp.num_verses; ++i){
-        printf("%s\n", qp.verse_list[i].name);
         if (strcmp(qp.verse_list[i].name, verse_name) == 0){
             return qp.verse_list[i];
         }
@@ -319,6 +320,10 @@ int qb_find_number_of_kwargs(char *prologue){
     int num_entries = 0;
     int next_equal = 0;
     int next_semicolon = 0;
+    if (qb_find_next_char(prologue, prologue_size, i, ',') > 0){
+        fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble keyword is a self-contained C expression and must end with a `;`!");
+        exit(1);
+    }
 
     while (i < prologue_size){
         next_equal = qb_find_next_char(prologue, prologue_size, i, '=');
@@ -491,13 +496,22 @@ void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
         free(qv->kwargs[kwarg_index].value);
 
         char *curr_type = va_arg(args, char *);
-        if (strcmp(curr_type, "float") == 0 ||
-            strcmp(curr_type, "f") == 0     ||
-            strcmp(curr_type, "int") == 0   ||
+
+        printf("%s\t%s\n", curr_variable, curr_type);
+        if (strcmp(curr_type, "int") == 0   ||
             strcmp(curr_type, "i") == 0     ||
             strcmp(curr_type, "d") == 0){
-            qv->kwargs[kwarg_index].value = va_arg(args, char *);
-            
+
+            int arg = va_arg(args, double);
+            qv->kwargs[kwarg_index].value = qb_int_to_string(arg);
+        }
+        else if (strcmp(curr_type, "float") == 0  ||
+                 strcmp(curr_type, "double") == 0 ||
+                 strcmp(curr_type, "f") == 0      ||
+                 strcmp(curr_type, "lf") == 0){
+            double arg = va_arg(args, double);
+            qv->kwargs[kwarg_index].value = qb_float_to_string(arg);
+            printf("%s\n", qv->kwargs[kwarg_index].value);
         }
         else if (strcmp(curr_type, "quibble_array") == 0 ||
                  strcmp(curr_type, "qa") == 0){
@@ -519,7 +533,6 @@ void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
 
 }
 void qb_configure_verse(quibble_verse *qv, int n, ...){
-    n *= 3;
     va_list args;
     va_start(args, n);
 
@@ -553,7 +566,6 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
         }
     }
 
-    n *= 3;
     va_list args;
     va_start(args, n);
  
