@@ -164,6 +164,8 @@ int main(){
     quibble_program qp_2 = qb_create_program("../test/example_2.qbl");
 
     if (strcmp(qv_2.name, "check") == 0 &&
+        strcmp(qv_2.kwargs[0].variable, "x") == 0 &&
+        strcmp(qv_2.kwargs[0].value, "7") == 0 &&
         strcmp(qv_3.name, "check2") == 0 &&
         strcmp(stripped_verse, "simple_print();") == 0 &&
         qp_2.verse_list == NULL){
@@ -172,6 +174,9 @@ int main(){
     else {
         printf("Failed: qb_create_program\n");
     }
+
+    // qb_configure_verse
+    qb_configure_verse(&qv_2, 1, "x", "float", 8.0);
 
     qb_free_program(qp);
     qb_free_program(qp_2);

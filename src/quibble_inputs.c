@@ -83,16 +83,39 @@ float *qb_array_value(quibble_array qa){
 
 char *qb_variable_to_string(quibble_variable qv){
     int len = snprintf(NULL, 0, "%d", qv.index);
-    len += snprintf(NULL, 0, "fi_buffer[];")+1;
+    len += snprintf(NULL, 0, "qi_buffer[];")+1;
     char *result = (char *)malloc(sizeof(char)*len);
-    snprintf(result, len, "fi_buffer[%d];", qv.index);
+    snprintf(result, len, "qi_buffer[%d];", qv.index);
     return result;
 }
+
 char *qb_array_to_string(quibble_array qa){
     int len = snprintf(NULL, 0, "%d", qa.start_index);
-    len += strlen("fi_buffer + ;");
+    len += strlen("qi_buffer + ;");
 
     char *result = (char *)malloc(sizeof(char) * len);
-    snprintf(result, len, "fi_buffer + %d", qa.start_index);
+    snprintf(result, len, "qi_buffer + %d", qa.start_index);
     return result;
 }
+
+char *qb_int_to_string(int i){
+    int len = snprintf(NULL, 0, "%d", i) + 1;
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "%d", i);
+    return result;
+}
+
+char *qb_float_to_string(float f){
+    int len = snprintf(NULL, 0, "%f", f) + 1;
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "%f", f);
+    return result;
+}
+
+char *qb_double_to_string(double d){
+    int len = snprintf(NULL, 0, "%lf", d) + 1;
+    char *result = (char *)malloc(sizeof(char) * len);
+    snprintf(result, len, "%lf", d);
+    return result;
+}
+
