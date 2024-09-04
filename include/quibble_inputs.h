@@ -1,7 +1,15 @@
 #ifndef QUIBBLE_INPUTS_H
 #define QUIBBLE_INPUTS_H
 
-#include "quibble_buffers.h"
+#include "errors.h"
+#include "macros.h"
+#include <CL/cl.h>
+
+typedef struct {
+    size_t n;
+    float *cpu;
+    cl_mem *canvas;
+} quibble_buffer;
 
 typedef struct{
     quibble_buffer buffer;
@@ -34,5 +42,7 @@ char *qb_array_to_string(quibble_array qa);
 char *qb_int_to_string(int i);
 char *qb_float_to_string(float f);
 char *qb_double_to_string(double d);
+
+void qb_free_buffer(quibble_buffer qb);
 
 #endif

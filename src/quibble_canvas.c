@@ -6,17 +6,6 @@ Purpose: This file defines the quibble_canvas and associate functions.
 
   Notes: There are a few random numbers and NULLs in the OpenCL API that I 
              don't fully understand at this point
-         The Quibble Context is initialized in stages:
-             0: Nothing
-             1: platforms found
-             2: device selected
-             3: Ready to launch:
-                CL context created
-                CL command_queue generated
-                CL program created
-                CL Program built
-                CL Kernel Created
-                CL Args set
          There is also a separate launch function for Quibble Contexts
          "demo" is hardcoded as kernel name.
              remember that most of this will be determined by quibble, not
@@ -31,6 +20,22 @@ Purpose: This file defines the quibble_canvas and associate functions.
                 then find the first default CPU or GPU, depending on the call
              2. Defining a set of properties like CL's CL_DEFAULT, CL_GPU, which
                 can be used to specify the type of device wanted.
+
+    QUIBBLE BUFFERS
+
+Purpose: This file also defines quibble buffers, which are CPU / GPU array pairs
+         meant for the storage of variables so users can avoid recompilation
+
+  Notes: Improvements:
+         1. Make the buffer always UInt and then carry the types around
+            so you can recast the fis in the kernel to the appropriate type.
+            Right now, we are just defaulting to floats
+         2. Think about textures!
+         Copying buffers from CPU <-> GPU is handled in quibble_canvas.c
+         Not sure if qb.canvas should be a pointer or not. Users shouldn't
+             need to think about it, so I think it's fine as long as all the 
+             pointer logic is internal to quibble.
+
 
 //----------------------------------------------------------------------------*/
 
@@ -52,15 +57,6 @@ char *get_platform_name(cl_platform_id platform_id){
     return str;
 }
 
-quibble_canvas create_blank_canvas(){
-
-    quibble_canvas qc;
-
-    qc.stage = 0;
-
-    return qc;
-}
-
 void qb_find_platforms(quibble_canvas *qc, bool verbose){
     // 10 is arbitrary, but should be high enough for almost any task
     cl_check(
@@ -72,8 +68,6 @@ void qb_find_platforms(quibble_canvas *qc, bool verbose){
     cl_check(
         clGetPlatformIDs(qc->num_platforms, qc->platform_ids, NULL)
     );
-
-    qc->stage = 1;
 
     if (verbose){
         printf("Stage 1:\n");
@@ -132,7 +126,7 @@ void qb_find_devices(quibble_canvas *qc, bool verbose){
 }
 
 void qb_list_devices(){
-    quibble_canvas qc = create_blank_canvas();
+    quibble_canvas qc;
     qb_find_platforms(&qc, 0);
 
     cl_uint num_devices;
@@ -176,10 +170,11 @@ quibble_canvas create_default_canvas(char *kernel, bool verbose){
 }
 
 quibble_canvas create_canvas(char *kernel,
-                                    int platform,
-                                    int device,
-                                    bool verbose){
-    quibble_canvas qc = create_blank_canvas();
+                             int platform,
+                             int device,
+                             bool verbose){
+    quibble_canvas qc;
+    qc.has_buffer = false;
 
     qc.chosen_platform = platform;
     qc.chosen_device = device;
@@ -224,15 +219,15 @@ quibble_canvas create_canvas(char *kernel,
     qc.kernel = clCreateKernel(qc.program, "demo", &err);
     cl_check(err);
 
-    qc.stage = 3;
-
     return qc;
 }
 
 void free_quibble_canvas(quibble_canvas qc){
     free(qc.platform_ids);
     free(qc.device_ids);
-    //qb_free_buffer(qc.buffer);
+    if (qc.has_buffer){
+        qb_free_buffer(qc.buffer);
+    }
     cl_check(clFlush(qc.command_queue));
     cl_check(clFinish(qc.command_queue));
     cl_check(clReleaseCommandQueue(qc.command_queue));
@@ -259,6 +254,10 @@ void qb_run(quibble_canvas qc,
     );
 
 }
+
+/*----------------------------------------------------------------------------//
+QUIBBLE BUFFERS
+//----------------------------------------------------------------------------*/
 
 void qb_copy_buffer_to_canvas(quibble_canvas qc, quibble_buffer qb){
     cl_check(
@@ -287,5 +286,28 @@ void qb_copy_buffer_from_canvas(quibble_canvas qc, quibble_buffer qb){
                             NULL)
     );
 
+}
+
+void qb_create_buffer(quibble_canvas *qc, int n){
+    qc->has_buffer = true;
+    quibble_buffer qb;
+    qb.n = n;
+
+    float *cpu_array = (float*)malloc(sizeof(float)*n);
+    for (int i = 0; i < n; ++i){
+        cpu_array[i] = 0;
+    }
+
+    qb.cpu = cpu_array;
+
+    cl_int err;
+    cl_mem canvas_array = clCreateBuffer(qc->context,
+                                         CL_MEM_READ_WRITE,
+                                         n * sizeof(float),
+                                         NULL,
+                                         &err);
+    qb.canvas = &canvas_array;
+    cl_check(err);
+    qc->buffer = qb;
 }
 

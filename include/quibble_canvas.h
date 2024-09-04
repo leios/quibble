@@ -5,12 +5,13 @@
 #include "macros.h"
 #include <CL/cl.h>
 
-#include "quibble_buffers.h"
+#include "quibble_inputs.h"
 #include <stdbool.h>
 
 typedef struct {
     // Quibble stuff
     quibble_buffer buffer;
+    bool has_buffer;
     int res_x;
     int res_y;
     unsigned int **framebuffers;
@@ -34,7 +35,6 @@ typedef struct {
 
 char *get_device_name(cl_device_id device_id);
 char *get_platform_name(cl_platform_id platform_id);
-quibble_canvas create_blank_canvas();
 void qb_find_platforms(quibble_canvas *qc, bool verbose);
 void qb_list_devices();
 
@@ -52,5 +52,7 @@ void qb_run(quibble_canvas qc,
 
 void qb_copy_buffer_to_canvas(quibble_canvas qc, quibble_buffer qb);
 void qb_copy_buffer_from_canvas(quibble_canvas qc, quibble_buffer qb);
+
+void qb_create_buffer(quibble_canvas *qc, int n);
 
 #endif

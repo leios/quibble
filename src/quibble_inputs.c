@@ -119,3 +119,8 @@ char *qb_double_to_string(double d){
     return result;
 }
 
+void qb_free_buffer(quibble_buffer qb){
+    free(qb.cpu);
+    cl_check(clReleaseMemObject(*qb.canvas));
+}
+

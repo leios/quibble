@@ -22,14 +22,11 @@ add_executable(
     include/errors.h
     src/errors.c
 
-    include/quibble_buffers.h
-    src/quibble_buffers.c
+    include/quibble_inputs.h
+    src/quibble_inputs.c
 
     include/quibble_canvas.h
     src/quibble_canvas.c
-
-    include/quibble_inputs.h
-    src/quibble_inputs.c
 
     include/quibble_verses.h
     src/quibble_verses.c
@@ -51,8 +48,8 @@ add_executable(
     include/errors.h
     src/errors.c
 
-    include/quibble_buffers.h
-    src/quibble_buffers.c
+    include/quibble_inputs.h
+    src/quibble_inputs.c
 
     include/quibble_canvas.h
     src/quibble_canvas.c
