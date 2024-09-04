@@ -497,12 +497,11 @@ void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
 
         char *curr_type = va_arg(args, char *);
 
-        printf("%s\t%s\n", curr_variable, curr_type);
         if (strcmp(curr_type, "int") == 0   ||
             strcmp(curr_type, "i") == 0     ||
             strcmp(curr_type, "d") == 0){
 
-            int arg = va_arg(args, double);
+            int arg = va_arg(args, int);
             qv->kwargs[kwarg_index].value = qb_int_to_string(arg);
         }
         else if (strcmp(curr_type, "float") == 0  ||
@@ -511,7 +510,6 @@ void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
                  strcmp(curr_type, "lf") == 0){
             double arg = va_arg(args, double);
             qv->kwargs[kwarg_index].value = qb_float_to_string(arg);
-            printf("%s\n", qv->kwargs[kwarg_index].value);
         }
         else if (strcmp(curr_type, "quibble_array") == 0 ||
                  strcmp(curr_type, "qa") == 0){
@@ -552,14 +550,14 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
         (quibble_keyword *)malloc(sizeof(quibble_keyword)*qv.num_kwargs);
 
     for (int i = 0; i < qv.num_kwargs; ++i){
-        int vlength = strlen(qv.kwargs[i].variable);
+        int vlength = strlen(qv.kwargs[i].variable)+1;
         final_qv.kwargs[i].variable = (char *)malloc(sizeof(char)*vlength);
 
         for (int j = 0; j < vlength; ++j){
             final_qv.kwargs[i].variable[j] = qv.kwargs[i].variable[j];
         }
 
-        vlength = strlen(qv.kwargs[i].value);
+        vlength = strlen(qv.kwargs[i].value)+1;
         final_qv.kwargs[i].value = (char *)malloc(sizeof(char)*vlength);
         for (int j = 0; j < vlength; ++j){
             final_qv.kwargs[i].value[j] = qv.kwargs[i].value[j];
@@ -617,8 +615,8 @@ void qb_free_keyword_array(quibble_keyword *qkwargs, int n){
 void qb_free_verse(quibble_verse qv){
     if (qv.echo == false){
         free(qv.body);
+        free(qv.name);
     }
-    free(qv.name);
     qb_free_keyword_array(qv.kwargs, qv.num_kwargs);
 }
 

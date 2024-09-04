@@ -175,9 +175,33 @@ int main(){
         printf("Failed: qb_create_program\n");
     }
 
-    // qb_configure_verse
-    qb_configure_verse(&qv_2, 1, "x", "float", 8.0);
+    // qb_configure_verse and qb_create_echo
+    qb_configure_verse(&qv_2, 1, "x", "int", 8);
 
+    bool final_val = true;
+    if (final_val){
+        final_val = strcmp(qv_2.kwargs[0].value, "8") == 0;
+    }
+
+    // Checking that x can be overwritten
+    quibble_verse e_1 = qb_echo_verse(qv_2, 1, "x", "float", 8.0);
+    if (final_val){
+        final_val = strcmp(e_1.kwargs[0].value, "8.000000") == 0;
+    }
+
+    // Checking that y is correct
+    if (final_val){
+        final_val = strcmp(e_1.kwargs[1].value, "8") == 0;
+    }
+
+    if (final_val){
+        printf("Passed: qb_configure_verse\n");
+    }
+    else {
+        printf("Failed: qb_configure_verse\n");
+    }
+
+    qb_free_verse(e_1);
     qb_free_program(qp);
     qb_free_program(qp_2);
 
