@@ -34,6 +34,9 @@ add_executable(
     include/demo_functions.h
     src/demo_functions.c
 
+    include/tests.h
+    src/tests.c
+
     src/demo.c
 )
 
