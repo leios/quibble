@@ -125,7 +125,7 @@ void qb_find_devices(quibble_canvas *qc, bool verbose){
 
 }
 
-void qb_list_devices(){
+void qb_list_devices(void){
     quibble_canvas qc;
     qb_find_platforms(&qc, 0);
 

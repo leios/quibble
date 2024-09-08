@@ -8,6 +8,7 @@
 #include <CL/cl.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 // QBT -> Quibble Text
 #define QBT_RED     "\x1b[31m"

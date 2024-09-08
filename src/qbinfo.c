@@ -7,7 +7,7 @@ Purpose: This file defines the `qbinfo` command, which gives users a simple
 
 #include "../include/quibble_canvas.h"
 
-int main(){
+int main(void){
     qb_list_devices();
 
     return 0;
