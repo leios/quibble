@@ -36,7 +36,7 @@ typedef struct {
 char *get_device_name(cl_device_id device_id);
 char *get_platform_name(cl_platform_id platform_id);
 void qb_find_platforms(quibble_canvas *qc, bool verbose);
-void qb_list_devices();
+void qb_list_devices(void);
 
 // I'll need to add `char *kernel` and `res_x`, `res_y`
 quibble_canvas create_canvas(char * kernel,

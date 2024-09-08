@@ -17,7 +17,7 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/quibble_verses.h"
 #include "../include/tests.h"
 
-int main(){
+int main(void){
 
     // Tests
     quibble_verse_tests();
@@ -38,7 +38,7 @@ int main(){
     }
 
     cl_int err;
-    quibble_canvas qc = create_canvas(kernel_source, 1, 0, 1);
+    quibble_canvas qc = create_canvas(kernel_source, 0, 0, 1);
 
     // creating d_a and copying to GPU
     cl_mem d_a = clCreateBuffer(qc.context,

@@ -1,6 +1,6 @@
 #include "../include/tests.h"
 
-void quibble_verse_tests(){
+void quibble_verse_tests(void){
     char *kernel_string = DCOMPILE(
         __verse check(){
         }

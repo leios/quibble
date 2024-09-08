@@ -3,6 +3,6 @@
 
 #include "quibble_verses.h"  
 
-void quibble_verse_tests();
+void quibble_verse_tests(void);
 
 #endif
