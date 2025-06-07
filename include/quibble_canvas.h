@@ -6,6 +6,7 @@
 #include <CL/cl.h>
 
 #include "quibble_inputs.h"
+#include "io.h"
 #include <stdbool.h>
 
 typedef struct {
