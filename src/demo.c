@@ -15,11 +15,13 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/errors.h"
 #include "../include/quibble_canvas.h"
 #include "../include/quibble_verses.h"
-#include "../include/tests.h"
+#include "../test/verse_tests.h"
+#include "../test/input_tests.h"
 
 int main(void){
 
     // Tests
+    quibble_input_tests();
     quibble_verse_tests();
 
     // Creating Kernel String

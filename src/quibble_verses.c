@@ -241,7 +241,7 @@ quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
 }
 
 bool qb_is_verse(char *verse, int offset){
-    char substr[7] = "__verse";
+    char substr[8] = "__verse";
     for (int i = 0; i < 7; ++i){
         if (verse[i+offset] != substr[i]){
             return false;
@@ -432,7 +432,7 @@ void qb_replace_char_if_proceeding(char *verse, int verse_size,
 }
 
 bool qb_is_dcompiled(char *verse){
-    char substr[22] = "// DCOMPILE GENERATED\n";
+    char substr[23] = "// DCOMPILE GENERATED\n";
     for (int i = 0; i < 22; ++i){
         if (verse[i] != substr[i]){
             return false;
