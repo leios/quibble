@@ -1,111 +1,11 @@
 /*-------------quibble_program.c----------------------------------------------//
 
-Purpose: A quibble program is a user-submitted set of verses, stanzas, poems,
-         and functions (usually from a *.qbl file)
+ Purpose: A quibble program is a user-submitted set of verses, stanzas, poems,
+          and functions (usually from a *.qbl file)
 
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
-
-/*----------------------------------------------------------------------------//
-FILE IO WORK
-//----------------------------------------------------------------------------*/
-
-char *qb_strip_spaces(char *verse, int start_index, int end_index){
-
-    int start_offset = 0;
-    int end_offset = 0;
-
-    // Finding start offset
-    char curr_char = verse[start_index];
-    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
-        ++start_offset;
-        curr_char = verse[start_index+start_offset];
-    }
-
-    // Finding end offset
-    curr_char = verse[end_index-1];
-    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
-        ++end_offset;
-        curr_char = verse[end_index - 1 - end_offset];
-    }
-
-    int str_len = (end_index - end_offset) - (start_index + start_offset);
-    char *final_str = (char *)calloc(str_len+1, sizeof(char));
-
-    for (int i = 0; i < str_len; ++i){
-        final_str[i] = verse[start_index + start_offset + i];
-    }
-
-    final_str[str_len] = 0;
-
-    return final_str;
-}
-
-int qb_find_next_char(char *verse, int verse_size, int current_index, char a){
-    for (int i = current_index; i < verse_size; ++i){
-        if (verse[i] == a){
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-int qb_find_next_string(char *verse, int verse_size, int current_index,
-                        char *a, int word_size){
-    bool find_match = true;
-    int count = 0;
-    for (int i = current_index; i < verse_size; ++i){
-        while (find_match){
-            // ending iteration early if strings are not equal
-            if (verse[i+count] != a[count]){
-                find_match = false;
-            }
-
-            count++;
-
-            // Exiting with `i` if we hit the end of the word with equal strings
-            if (count == word_size && find_match){
-                find_match = false;
-                return i;
-            }
-        }
-
-        find_match = true;
-        count = 0;
-    }
-    return -1;
-}
-
-int qb_find_matching_char(char *verse, int verse_size, int current_index,
-                          char a, char b){
-
-    // Checking initial character to make sure it is valid
-    int open_count = -1;
-    if (verse[current_index] == a){
-        open_count = 1;
-    }
-    else{
-        return -1;
-    }
-
-    // Iterating through to find closing brackets
-    int i = current_index;
-    while (open_count > 0){
-        ++i;
-        if (verse[i] == a){
-            ++open_count;
-        }
-        if (verse[i] == b){
-            --open_count;
-        }
-        if (i == verse_size){
-            return -1;
-        }
-    }
-    return i;
-}
 
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_create_program(char *filename){
@@ -473,9 +373,9 @@ void qb_preprocess_verse(char *verse){
 CONFIGURATION
 //----------------------------------------------------------------------------*/
 
-int qb_find_kwarg_index(quibble_verse qv, char *variable){
-    for (int i = 0; i < qv.num_kwargs; ++i){
-        if (strcmp(qv.kwargs[i].variable, variable) == 0){
+int qb_find_kwarg_index(quibble_keyword *qk, int n, char *variable){
+    for (int i = 0; i < n; ++i){
+        if (strcmp(qk[i].variable, variable) == 0){
             return i;
         }
     }
@@ -492,7 +392,9 @@ int qb_find_kwarg_index(quibble_verse qv, char *variable){
 void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
     for (int i = 0; i < n; ++i){
         char *curr_variable = va_arg(args, char *);
-        int kwarg_index = qb_find_kwarg_index(*qv, curr_variable);
+        int kwarg_index = qb_find_kwarg_index(qv->kwargs,
+                                              qv->num_kwargs,
+                                              curr_variable);
         free(qv->kwargs[kwarg_index].value);
 
         char *curr_type = va_arg(args, char *);
