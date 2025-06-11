@@ -388,7 +388,7 @@ quibble_keyword *qb_parse_keywords(char *prologue, int num_entries){
 }
 
 /*----------------------------------------------------------------------------//
-DCOMPILE INTERFACE
+QBINLINE INTERFACE
 //----------------------------------------------------------------------------*/
 
 void qb_replace_char(char *verse, int verse_size, char a, char b){
@@ -432,7 +432,7 @@ void qb_replace_char_if_proceeding(char *verse, int verse_size,
 }
 
 bool qb_is_dcompiled(char *verse){
-    char substr[23] = "// DCOMPILE GENERATED\n";
+    char substr[23] = "// QBINLINE GENERATED\n";
     for (int i = 0; i < 22; ++i){
         if (verse[i] != substr[i]){
             return false;

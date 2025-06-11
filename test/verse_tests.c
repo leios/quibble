@@ -1,7 +1,7 @@
 #include "verse_tests.h"
 
 void quibble_verse_tests(void){
-    char *kernel_string = DCOMPILE(
+    char *kernel_string = QBINLINE(
         __verse check(){
         }
     );
@@ -15,12 +15,12 @@ void quibble_verse_tests(void){
     }
 
     // qb_preprocess_verse
-    // DCOMPILE creates a const, so copying to another container
+    // QBINLINE creates a const, so copying to another container
     char *check_string =
         qb_strip_spaces(kernel_string, 0, strlen(kernel_string));
     qb_preprocess_verse(check_string);
     if (strcmp(check_string,
-               "//\nDCOMPILE\nGENERATED\n__verse\ncheck(){\n}") == 0){
+               "//\nQBINLINE\nGENERATED\n__verse\ncheck(){\n}") == 0){
         printf(QBT_GREEN "Passed: " QBT_RESET "qb_preprocess_verse\n");
     }
     else{
@@ -120,7 +120,7 @@ void quibble_verse_tests(void){
 
 
     // qb_parse_verse
-    char *empty_verse = DCOMPILE(
+    char *empty_verse = QBINLINE(
         __verse check(){}
     );
 

@@ -11,6 +11,6 @@
 //#define CL_TARGET_OPENCL_VERSION 120
 
 // Delay Compilation
-#define DCOMPILE(...) "// DCOMPILE GENERATED\n" #__VA_ARGS__ "\0"
+#define QBINLINE(...) "// QBINLINE GENERATED\n" #__VA_ARGS__ "\0"
 
 #endif
