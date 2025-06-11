@@ -3,6 +3,6 @@
 
 #include "../include/quibble_inputs.h"
 
-void quibble_input_tests(void);
+void quibble_input_tests(int platform, int device);
 
 #endif

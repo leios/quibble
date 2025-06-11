@@ -1,6 +1,6 @@
 #include "input_tests.h"
 
-void quibble_input_tests(void){
+void quibble_input_tests(int platform, int device){
 
     if (true){
         printf(QBT_GREEN "Passed: "QBT_RESET"qb_replace_char_if_proceeding\n");

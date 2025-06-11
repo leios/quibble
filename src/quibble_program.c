@@ -1,11 +1,11 @@
-/*-------------quibble_verses.c-----------------------------------------------//
+/*-------------quibble_program.c----------------------------------------------//
 
-Purpose: A quibble_verse is a user-submitted code fragment that will later be
-         transformed into a working OpenCL kernel
+Purpose: A quibble program is a user-submitted set of verses, stanzas, poems,
+         and functions (usually from a *.qbl file)
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_verses.h"
+#include "../include/quibble_program.h"
 
 /*----------------------------------------------------------------------------//
 FILE IO WORK

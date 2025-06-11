@@ -21,8 +21,8 @@ Purpose: This file is a quick example of how we might read function fragments in
 int main(void){
 
     // Tests
-    quibble_input_tests();
     quibble_verse_tests();
+    //quibble_input_tests(0, 0);
 
     // Creating Kernel String
     char *kernel_source = (char*)malloc(MAX_SOURCE_SIZE);

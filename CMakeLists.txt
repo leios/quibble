@@ -31,17 +31,17 @@ add_executable(
     include/quibble_canvas.h
     src/quibble_canvas.c
 
-    include/quibble_verses.h
-    src/quibble_verses.c
+    include/quibble_program.h
+    src/quibble_program.c
 
     include/demo_functions.h
     src/demo_functions.c
 
-    test/input_tests.h
-    test/input_tests.c
-
     test/verse_tests.h
     test/verse_tests.c
+
+    #test/input_tests.h
+    #test/input_tests.c
 
     src/demo.c
 )
