@@ -40,6 +40,9 @@ quibble_program qb_create_program(char *filename){
     quibble_program qp;
     qp.num_verses = num_verses;
     qp.verse_list = (quibble_verse *)malloc(sizeof(quibble_verse)*num_verses);
+    qp.stanza_list =
+        (quibble_stanza *)malloc(sizeof(quibble_stanza)*num_stanzas);
+    qp.poem_list = (quibble_poem *)malloc(sizeof(quibble_poem)*num_poems);
 
     if (num_verses > 0 ||
         num_stanzas > 0 ||
@@ -864,17 +867,57 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 }
 
 // To be used in `qb_configure_verse` to create prologue string
-char *qb_create_prologue(char *config,
-                         quibble_arg *args, int num_args,
+char *qb_create_prologue(char *config, char *name,
+                         quibble_arg *qargs, int num_args,
                          quibble_keyword *qkwargs, int num_kwargs){
 
     char *temp = (char *)calloc(MAX_PROLOGUE_SIZE, sizeof(char));
 
-    for (int i = 0; i < num_kwargs; ++i){
-        strcat(temp, qkwargs[i].variable);
-        strcat(temp, " = ");
-        strcat(temp, qkwargs[i].value);
-        strcat(temp, ";\n");
+    int num_config_args = qb_find_number_of_args(config);
+
+    if (num_config_args == num_args){
+        quibble_arg *temp_args = qb_parse_args(config, num_args);
+        for (int i = 0; i < num_args; ++i){
+            strcat(temp, qargs[i].variable);
+            strcat(temp, " = ");
+            strcat(temp, temp_args[i].variable);
+            strcat(temp, ";\n");
+        }
+        qb_free_arg_array(temp_args, num_args);
+    }
+    else {
+        fprintf(stderr, "Incorrect number of arguments for %s\nExpected %d, got %d!", name, num_args, num_config_args);
+        exit(1);
+    }
+
+    int num_config_kwargs = qb_find_number_of_kwargs(config);
+
+    if (num_config_kwargs > 0){
+        quibble_keyword *temp_kwargs =
+            qb_parse_keywords(config, num_config_kwargs);
+
+        char *value;
+        for (int i = 0; i < num_kwargs; ++i){
+            value = qkwargs[i].value;
+            for (int j  = 0; j < num_config_kwargs; ++j){
+                if(strcmp(temp_kwargs[j].variable, qkwargs[i].variable)){
+                    value = temp_kwargs[i].value;
+                }
+            }
+            strcat(temp, qkwargs[i].variable);
+            strcat(temp, " = ");
+            strcat(temp, value);
+            strcat(temp, ";\n");
+        }
+        qb_free_keyword_array(temp_kwargs, num_config_kwargs);
+    }
+    else {
+        for (int i = 0; i < num_kwargs; ++i){
+            strcat(temp, qkwargs[i].variable);
+            strcat(temp, " = ");
+            strcat(temp, qkwargs[i].value);
+            strcat(temp, ";\n");
+        }
     }
 
     int len = strlen(temp);

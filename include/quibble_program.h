@@ -61,18 +61,16 @@ typedef struct{
 
 // TODO
 // Remove echoes
+void qb_configure_verse(quibble_verse *qv, int n, ...);
+quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
+
 char *qb_expand_verse(quibble_program *qp, char* verse_name, char *prologue);
 char *qb_expand_stanza(quibble_program *qp,
                        char* stanza_name, char *prologue, char *body);
 char *qb_expand_poem(quibble_program *qp, char* poem_name);
 
 void qb_build_program(quibble_program qp);
-char *qb_create_prologue(char *config,
-                         quibble_arg *args, int num_args,
-                         quibble_keyword *qkwargs, int num_kwargs);
-void qb_configure_verse(quibble_verse *qv, int n, ...);
 void qb_configure_program(quibble_program *qp, int n, ...);
-quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
 
 // string manip
 bool qb_is_stanza(char *stanza, int offset);
@@ -101,6 +99,11 @@ int qb_find_kwarg_index(quibble_keyword *qk, int n, char *variable);
 quibble_stanza qb_parse_stanza(char *stanza);
 quibble_poem qb_parse_poem(char *stanza);
 quibble_verse qb_parse_verse(char *verse);
+
+// Build / expansion
+char *qb_create_prologue(char *config, char *name,
+                         quibble_arg *args, int num_args,
+                         quibble_keyword *qkwargs, int num_kwargs);
 
 // Free
 void qb_free_arg(quibble_arg arg);
