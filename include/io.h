@@ -2,6 +2,7 @@
 #define IO_H
 
 #include <stdlib.h>
+#include <string.h>
 #include <png.h>
 
 typedef struct {
@@ -28,5 +29,5 @@ void qb_replace_char_if_proceeding(char *body, int body_size,
                                    char *prologue, int prologue_size,
                                    char a, char b);
 
-
+int qb_find_occurrences(char *query, char *body);
 #endif

@@ -126,3 +126,22 @@ int qb_find_matching_char(char *body, int body_size, int current_index,
     return i;
 }
 
+int qb_find_occurrences(char *query, char *body){
+    int query_length = strlen(query);
+    int bodysize = strlen(body);
+    int match_count = 0;
+    int num_queries = 0;
+    for (int i = 0; i < bodysize; ++i){
+        if (body[i] == query[match_count]){
+            ++match_count;
+            if (match_count == query_length){
+                ++num_queries;
+                match_count = 0;
+            }
+        }
+        else if (match_count != 0){
+            match_count = 0;
+        }
+    }
+    return num_queries;
+}
