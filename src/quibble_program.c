@@ -9,6 +9,9 @@
 
 #include "../include/quibble_program.h"
 
+/*----------------------------------------------------------------------------//
+    PROGRAM GENERATION
+//----------------------------------------------------------------------------*/
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_create_program(char *filename){
 
@@ -246,6 +249,83 @@ quibble_poem qb_find_poem(quibble_program qp, char *poem_name){
     exit(1);
 }
 
+/*----------------------------------------------------------------------------//
+    QBINLINE
+//----------------------------------------------------------------------------*/
+
+void qb_replace_char_if_proceeding(char *verse, int verse_size,
+                                   char *prologue, int prologue_size,
+                                   char a, char b){
+
+    bool find_match = true;
+    bool match_found = false;
+    int count = 0;
+    for (int i = 0; i < verse_size; ++i){
+        while (find_match){
+            if (verse[i+count] != prologue[count]){
+                find_match = false;
+            }
+
+            count++;
+
+            if (count == prologue_size && find_match){
+                find_match = false;
+                match_found = true;
+            }
+        }
+
+        // match found
+        if (match_found &&
+            verse[i+count] == a){
+            verse[i+count] = b;
+            match_found = false;
+        }
+        find_match = true;
+        count = 0;
+    }
+}
+
+void qb_replace_char(char *verse, int verse_size, char a, char b){
+    for (int i = 0; i < verse_size; ++i){
+        if (verse[i] == a){
+            verse[i] = b;
+        }
+    }
+}
+
+void qb_preprocess_content(char *content){
+    if (qb_is_inlined(content)){
+        int content_size = strlen(content);
+        // replace all spaces by new lines
+        qb_replace_char(content, content_size, ' ', '\n');
+
+        // except for the arguments after some preprocessor options
+        // that need to be in the same line
+        qb_replace_char_if_proceeding(content, content_size,
+                                      "#ifdef", 7, '\n', ' ');
+        qb_replace_char_if_proceeding(content, content_size,
+                                      "#ifndef", 8, '\n', ' ');
+
+        // #define with two arguments will not work
+        qb_replace_char_if_proceeding(content, content_size,
+                                      "#define", 7, '\n', ' ');
+
+        // don't leave any spaces in arguments
+        qb_replace_char_if_proceeding(content, content_size,
+                                      "#if", 3, '\n', ' ');
+
+        // don't leave any spaces in arguments
+        qb_replace_char_if_proceeding(content, content_size,
+                                      "#elif", 5, '\n', ' ');
+        qb_replace_char_if_proceeding(content, content_size, "#pragma",
+                                      7, '\n', ' ');
+    }
+}
+
+/*----------------------------------------------------------------------------//
+    STRING MANIP
+//----------------------------------------------------------------------------*/
+
 bool qb_is_stanza(char *stanza, int offset){
     char substr[9] = "__stanza";
     for (int i = 0; i < 8; ++i){
@@ -278,6 +358,22 @@ bool qb_is_verse(char *verse, int offset){
 
     return true;
 }
+
+bool qb_is_inlined(char *verse){
+    char substr[23] = "// QBINLINE GENERATED\n";
+    for (int i = 0; i < 22; ++i){
+        if (verse[i] != substr[i]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+/*----------------------------------------------------------------------------//
+    STRING -> QUIBBLE
+//----------------------------------------------------------------------------*/
 
 quibble_stanza qb_parse_stanza(char *stanza){
     int stanza_size = strlen(stanza);
@@ -514,6 +610,10 @@ quibble_verse qb_parse_verse(char *verse){
     return final_verse;
 }
 
+/*----------------------------------------------------------------------------//
+    ARGS / KWARGS
+//----------------------------------------------------------------------------*/
+
 int qb_find_number_of_args(char *prologue){
 
     int prologue_size = strlen(prologue);
@@ -665,89 +765,6 @@ quibble_keyword *qb_parse_keywords(char *prologue, int num_entries){
 
 }
 
-/*----------------------------------------------------------------------------//
-QBINLINE INTERFACE
-//----------------------------------------------------------------------------*/
-
-void qb_replace_char(char *verse, int verse_size, char a, char b){
-    for (int i = 0; i < verse_size; ++i){
-        if (verse[i] == a){
-            verse[i] = b;
-        }
-    }
-}
-
-void qb_replace_char_if_proceeding(char *verse, int verse_size,
-                                   char *prologue, int prologue_size,
-                                   char a, char b){
-
-    bool find_match = true;
-    bool match_found = false;
-    int count = 0;
-    for (int i = 0; i < verse_size; ++i){
-        while (find_match){
-            if (verse[i+count] != prologue[count]){
-                find_match = false;
-            }
-
-            count++;
-
-            if (count == prologue_size && find_match){
-                find_match = false;
-                match_found = true;
-            }
-        }
-
-        // match found
-        if (match_found &&
-            verse[i+count] == a){
-            verse[i+count] = b;
-            match_found = false;
-        }
-        find_match = true;
-        count = 0;
-    }
-}
-
-bool qb_is_inlined(char *verse){
-    char substr[23] = "// QBINLINE GENERATED\n";
-    for (int i = 0; i < 22; ++i){
-        if (verse[i] != substr[i]){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void qb_preprocess_content(char *content){
-    if (qb_is_inlined(content)){
-        int content_size = strlen(content);
-        // replace all spaces by new lines
-        qb_replace_char(content, content_size, ' ', '\n');
-
-        // except for the arguments after some preprocessor options
-        // that need to be in the same line
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#ifdef", 7, '\n', ' ');
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#ifndef", 8, '\n', ' ');
-
-        // #define with two arguments will not work
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#define", 7, '\n', ' ');
-
-        // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#if", 3, '\n', ' ');
-
-        // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#elif", 5, '\n', ' ');
-        qb_replace_char_if_proceeding(content, content_size, "#pragma",
-                                      7, '\n', ' ');
-    }
-}
 
 /*----------------------------------------------------------------------------//
 CONFIGURATION
@@ -759,7 +776,7 @@ int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
             return i;
         }
     }
-    fprintf(stderr, "Keyword variable %s not found!\n", variable);
+    fprintf(stderr, "Argument %s not found!\n", variable);
     exit(1);
 }
 
@@ -822,6 +839,7 @@ void qb_configure_verse_variadic(quibble_verse *qv, int n, va_list args){
     }
 
 }
+
 void qb_configure_verse(quibble_verse *qv, int n, ...){
     va_list args;
     va_start(args, n);
@@ -865,6 +883,10 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 
     return final_qv;
 }
+
+/*----------------------------------------------------------------------------//
+    EXPANSION
+//----------------------------------------------------------------------------*/
 
 // To be used in `qb_configure_verse` to create prologue string
 char *qb_create_prologue(char *config, char *name,
@@ -932,12 +954,13 @@ char *qb_create_prologue(char *config, char *name,
 }
 
 /*----------------------------------------------------------------------------//
-FREE
+    FREE
 //----------------------------------------------------------------------------*/
 
 void qb_free_arg(quibble_arg qarg){
     free(qarg.variable);
 }
+
 void qb_free_keyword(quibble_keyword qkwarg){
     free(qkwarg.variable);
     free(qkwarg.value);
@@ -996,5 +1019,4 @@ void qb_free_program(quibble_program qp){
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
-    free(qp.verse_list);
 }
