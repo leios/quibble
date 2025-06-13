@@ -21,6 +21,7 @@ quibble_program qb_create_program(char *filename){
 
     if (fileptr == NULL){
         fprintf(stderr, "Error opening file %s!\n", filename);
+        exit(1);
     }
 
     // Finding file length
@@ -521,16 +522,11 @@ quibble_poem qb_parse_poem(char *poem){
         final_poem.args =
             qb_parse_args(prologue, final_poem.num_args);
 
-        final_poem.num_kwargs = qb_find_number_of_kwargs(prologue);
-        final_poem.kwargs =
-            qb_parse_keywords(prologue, final_poem.num_kwargs);
         free(prologue);
     }
     else {
         final_poem.args = NULL;
         final_poem.num_args = 0;
-        final_poem.kwargs = NULL;
-        final_poem.num_kwargs = 0;
     }
 
     int body_start = qb_find_next_char(poem, poem_size, offset, '{')+1;
@@ -937,13 +933,265 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 //----------------------------------------------------------------------------*/
 
 char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
+
+    int idx = qb_find_verse_index(qp, verse_name);
+    char *tmp_prologue = qb_create_prologue(config, verse_name,
+        qp.verse_list[idx].args, qp.verse_list[idx].num_args,
+        qp.verse_list[idx].kwargs, qp.verse_list[idx].num_kwargs);
+
+    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    strcat(tmp_body, tmp_prologue);
+    strcat(tmp_body, qp.verse_list[idx].body);
+
+    int len = strlen(tmp_body);
+    char *final_body = (char *)calloc(len, sizeof(char));
+
+    for (int i = 0; i < len; ++i){
+        final_body[i] = tmp_body[i];
+    }
+
+    free(tmp_body);
+    free(tmp_prologue);
+    return final_body;
+    
 }
 
 char *qb_expand_stanza(quibble_program qp,
                        char* stanza_name, char *config, char *body){
+
+    int idx = qb_find_stanza_index(qp, stanza_name);
+
+    char *tmp_prologue = qb_create_prologue(config, stanza_name,
+        qp.stanza_list[idx].args, qp.stanza_list[idx].num_args,
+        qp.stanza_list[idx].kwargs, qp.stanza_list[idx].num_kwargs);
+
+    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    strcat(tmp_body, tmp_prologue);
+    strcat(tmp_body, qp.stanza_list[idx].prologue);
+
+    // Parse verse content
+    int index = 0;
+    int offset = strlen(tmp_body);
+    int max_size = strlen(body);
+    int vcall_match_count = 0;
+
+    int verse_name_start;
+    int verse_name_end;
+    int config_end;
+    int verse_length;
+    char *vcall_string = "@VCALL ";
+    while (index < max_size){
+        if (body[index] == vcall_string[vcall_match_count]){
+            vcall_match_count++;
+            if (vcall_match_count == 7){
+                offset -= 6;
+                memset(tmp_body+index+offset, 0,
+                           strlen(tmp_body));
+
+                verse_name_start = index;
+                verse_name_end = qb_find_next_char(
+                    body, max_size, verse_name_start, '(');
+                char *verse_name = qb_strip_spaces(body, verse_name_start,
+                                             verse_name_end);
+                config_end = qb_find_matching_char(body, max_size,
+                    verse_name_end+1, '(',')');
+
+                if (config_end > verse_name_end+1){
+                    char *config = (char *)calloc(config_end-verse_name_end+1,
+                                                  sizeof(char));
+                    for (int i = 0; i < config_end-verse_name_end+1; ++i){
+                        config[i] = body[verse_name_end+1+i];
+                    }
+                    char *verse = qb_expand_verse(qp, verse_name, config);
+                    verse_length = strlen(verse);
+                    for (int i = 0; i < verse_length; ++i){
+                        tmp_body[index + offset + i] = verse[i];
+                    }
+                    offset += verse_length;
+                    free(config);
+                }
+                else{
+                    fprintf(stderr, "Verse %s called incorrectly!", verse_name);
+                    exit(1);
+                }
+                free(verse_name);
+            }
+        }
+        else if (vcall_match_count != 0){
+            vcall_match_count = 0;
+        }
+        tmp_body[index + offset] = body[index];
+        ++index;
+    }
+
+
+    strcat(tmp_body, qp.stanza_list[idx].epilogue);
+
+    int len = strlen(tmp_body);
+    char *final_body = (char *)calloc(len, sizeof(char));
+
+    for (int i = 0; i < len; ++i){
+        final_body[i] = tmp_body[i];
+    }
+
+    free(tmp_body);
+    free(tmp_prologue);
+
+    return final_body;
+
 }
 
-char *qb_expand_poem(quibble_program qp, int index){
+// TODO: ADD OTHERS: _pt, _time, _world_size, _origin ...
+char *qb_expand_poem(quibble_program qp, int poem_index){
+
+    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    char *body = qp.poem_list[poem_index].body;
+
+    strcat(tmp_body, "__kernel void ");
+    strcat(tmp_body, "_kernel(__global float *_img, ");
+    strcat(tmp_body, qp.poem_list[poem_index].name);
+    for (int i = 0; i < qp.poem_list[poem_index].num_args; ++i){
+        strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
+        if (i == qp.poem_list[poem_index].num_args - 1){
+            strcat(tmp_body, "){\n");
+        }
+        else{
+            strcat(tmp_body, ", ");
+        }
+    }
+
+    strcat(tmp_body, "    int _idx = get_global_id(0);\n");
+
+    // Parse verse content
+    int index = 0;
+    int offset = strlen(tmp_body);
+    int max_size = strlen(body);
+    int vcall_match_count = 0;
+    int scall_match_count = 0;
+
+    int meta_name_start;
+    int meta_name_end;
+    int config_end;
+    int meta_length;
+
+    int stanza_body_start;
+    int stanza_body_end;
+
+    char *vcall_string = "@VCALL ";
+    char *scall_string = "@SCALL ";
+    while (index < max_size){
+        if (body[index] == vcall_string[vcall_match_count]){
+            vcall_match_count++;
+            if (vcall_match_count == 7){
+                offset -= 6;
+                memset(tmp_body+index+offset, 0,
+                           strlen(tmp_body));
+
+                meta_name_start = index;
+                meta_name_end = qb_find_next_char(
+                    body, max_size, meta_name_start, '(');
+                char *verse_name = qb_strip_spaces(body, meta_name_start,
+                                             meta_name_end);
+                config_end = qb_find_matching_char(body, max_size,
+                    meta_name_end+1, '(',')');
+
+                if (config_end > meta_name_end+1){
+                    char *config = (char *)calloc(config_end-meta_name_end+1,
+                                                  sizeof(char));
+                    for (int i = 0; i < config_end-meta_name_end+1; ++i){
+                        config[i] = body[meta_name_end+1+i];
+                    }
+                    char *verse = qb_expand_verse(qp, verse_name, config);
+                    meta_length = strlen(verse);
+                    for (int i = 0; i < meta_length; ++i){
+                        tmp_body[index + offset + i] = verse[i];
+                    }
+                    offset += meta_length;
+                    free(config);
+                }
+                else{
+                    fprintf(stderr, "Verse %s called incorrectly!", verse_name);
+                    exit(1);
+                }
+                free(verse_name);
+            }
+        }
+        else if (vcall_match_count != 0){
+            vcall_match_count = 0;
+        }
+
+        if (body[index] == scall_string[scall_match_count]){
+            scall_match_count++;
+            if (scall_match_count == 7){
+                offset -= 6;
+                memset(tmp_body+index+offset, 0,
+                           strlen(tmp_body));
+
+                meta_name_start = index;
+                meta_name_end = qb_find_next_char(
+                    body, max_size, meta_name_start, '(');
+                char *stanza_name = qb_strip_spaces(body, meta_name_start,
+                                              meta_name_end);
+                config_end = qb_find_matching_char(body, max_size,
+                    meta_name_end+1, '(',')');
+
+                stanza_body_start = qb_find_next_char(
+                    body, max_size, config_end, '(')+1;
+                stanza_body_end = qb_find_matching_char(body, max_size,
+                    stanza_body_start, '{','}');
+                if (config_end > meta_name_end+1 &&
+                    stanza_body_end > stanza_body_start){
+                    char *config = (char *)calloc(config_end-meta_name_end+1,
+                                                  sizeof(char));
+
+                    for (int i = 0; i < config_end-meta_name_end+1; ++i){
+                        config[i] = body[meta_name_end+1+i];
+                    }
+                    char *stanza_body = (char *)calloc(stanza_body_end -
+                        stanza_body_start, sizeof(char));
+                    for (int i = 0;
+                         i < stanza_body_end - stanza_body_start;
+                         ++i){
+                        stanza_body[i] = body[stanza_body_start+i];
+                    }
+                    char *stanza = qb_expand_stanza(qp, stanza_name, config,
+                                                    stanza_body);
+                    meta_length = strlen(stanza);
+                    for (int i = 0; i < meta_length; ++i){
+                        tmp_body[index + offset + i] = stanza[i];
+                    }
+                    offset += meta_length;
+                    free(config);
+                    free(stanza_body);
+                }
+                else{
+                    fprintf(stderr, "Stanza %s called incorrectly!",
+                            stanza_name);
+                    exit(1);
+                }
+                free(stanza_name);
+            }
+        }
+        else if (scall_match_count != 0){
+            scall_match_count = 0;
+        }
+
+
+        tmp_body[index + offset] = body[index];
+        ++index;
+    }
+
+    int len = strlen(tmp_body);
+    char *final_body = (char *)calloc(len, sizeof(char));
+
+    for (int i = 0; i < len; ++i){
+        final_body[i] = tmp_body[i];
+    }
+
+    free(tmp_body);
+
+    return final_body;
+
 }
  
 void qb_rebuild_program(quibble_program qp){
@@ -1080,7 +1328,6 @@ void qb_free_stanza(quibble_stanza qs){
 void qb_free_poem(quibble_poem qp){
     free(qp.body);
     free(qp.name);
-    qb_free_keyword_array(qp.kwargs, qp.num_kwargs);
     qb_free_arg_array(qp.args, qp.num_args);
 }
 

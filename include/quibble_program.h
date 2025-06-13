@@ -40,8 +40,6 @@ typedef struct{
 } quibble_stanza;
 
 typedef struct{
-    quibble_keyword *kwargs;
-    int num_kwargs;
     quibble_arg *args;
     int num_args;
     char *body;

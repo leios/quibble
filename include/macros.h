@@ -5,6 +5,7 @@
 // #define MAX_SOURCE_SIZE (0x100000)
 #define MAX_SOURCE_SIZE (0x999999)
 #define MAX_PROLOGUE_SIZE (0x100000)
+#define MAX_META_SIZE (0x100000)
 
 // I might want to ise 1.2 in the end...
 #define CL_TARGET_OPENCL_VERSION 300
