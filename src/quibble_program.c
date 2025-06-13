@@ -35,9 +35,21 @@ quibble_program qb_create_program(char *filename){
         fread(buffer, sizeof(char), filesize, fileptr);
     }
 
+    quibble_program qp = qb_parse_program(buffer);
+
+    free(buffer);
+    fclose(fileptr);
+
+    return qp;
+}
+
+quibble_program qb_parse_program(char *buffer){
+
     int num_verses = qb_find_occurrences("__verse", buffer);
     int num_stanzas = qb_find_occurrences("__stanza", buffer);
     int num_poems = qb_find_occurrences("__poem", buffer);
+
+    int filesize = strlen(buffer);
 
     // creating program and populating verses and everything else
     quibble_program qp;
@@ -59,6 +71,13 @@ quibble_program qb_create_program(char *filename){
 
         int index = 0;
         int everything_else_index = 0;
+
+        bool qbinlined = qb_is_inlined(buffer);
+        if (qbinlined){
+            index += 22;
+            qb_preprocess_content(buffer);
+            filesize = strlen(buffer);
+        }
 
         int verse_match_count = 0;
         int stanza_match_count = 0;
@@ -105,7 +124,7 @@ quibble_program qb_create_program(char *filename){
                     // setting everything back
                     index = poem_end;
                     poem_match_count = 0;
-                    everything_else_index -= 7;
+                    everything_else_index -= 6;
                     memset(tmp_everything_else+everything_else_index, 0,
                            strlen(tmp_everything_else));
                     poem_end = 0;
@@ -141,7 +160,7 @@ quibble_program qb_create_program(char *filename){
                     // setting everything back
                     index = stanza_end;
                     stanza_match_count = 0;
-                    everything_else_index -= 7;
+                    everything_else_index -= 8;
                     memset(tmp_everything_else+everything_else_index, 0,
                            strlen(tmp_everything_else));
                     stanza_end = 0;
@@ -211,7 +230,6 @@ quibble_program qb_create_program(char *filename){
 
 
     // Freeing everything
-    fclose(fileptr);
 
     return qp;
 }
@@ -770,6 +788,36 @@ quibble_keyword *qb_parse_keywords(char *prologue, int num_entries){
 CONFIGURATION
 //----------------------------------------------------------------------------*/
 
+int qb_find_verse_index(quibble_program qp, char *name){
+    for (int i = 0; i < qp.num_verses; ++i){
+        if (strcmp(qp.verse_list[i].name, name) == 0){
+            return i;
+        }
+    }
+    fprintf(stderr, "Verse %s not found!\n", name);
+    exit(1);
+}
+
+int qb_find_poem_index(quibble_program qp, char *name){
+    for (int i = 0; i < qp.num_poems; ++i){
+        if (strcmp(qp.poem_list[i].name, name) == 0){
+            return i;
+        }
+    }
+    fprintf(stderr, "Poem %s not found!\n", name);
+    exit(1);
+}
+
+int qb_find_stanza_index(quibble_program qp, char *name){
+    for (int i = 0; i < qp.num_stanzas; ++i){
+        if (strcmp(qp.stanza_list[i].name, name) == 0){
+            return i;
+        }
+    }
+    fprintf(stderr, "Stanza %s not found!\n", name);
+    exit(1);
+}
+
 int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
     for (int i = 0; i < n; ++i){
         if (strcmp(qa[i].variable, variable) == 0){
@@ -887,6 +935,38 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 /*----------------------------------------------------------------------------//
     EXPANSION
 //----------------------------------------------------------------------------*/
+
+char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
+}
+
+char *qb_expand_stanza(quibble_program qp,
+                       char* stanza_name, char *config, char *body){
+}
+
+char *qb_expand_poem(quibble_program qp, int index){
+}
+ 
+void qb_rebuild_program(quibble_program qp){
+    free(qp.body);
+    qb_build_program(qp);
+}
+
+void qb_build_program(quibble_program qp){
+    char *body = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+    strcat(body, qp.everything_else);
+    for (int i = 0; i < qp.num_poems; ++i){
+        char *temp_poem = qb_expand_poem(qp, i);
+        strcat(body, temp_poem);
+        free(temp_poem);
+    }
+
+    int len = strlen(body);
+    char *final_body = (char *)calloc(len, sizeof(char));
+    for (int i = 0; i < len; ++i){
+        final_body[i] = body[i];
+    }
+    qp.body = final_body;
+}
 
 // To be used in `qb_configure_verse` to create prologue string
 char *qb_create_prologue(char *config, char *name,

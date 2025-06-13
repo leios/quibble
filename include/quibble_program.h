@@ -64,12 +64,11 @@ typedef struct{
 void qb_configure_verse(quibble_verse *qv, int n, ...);
 quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
 
-char *qb_expand_verse(quibble_program *qp, char* verse_name, char *prologue);
-char *qb_expand_stanza(quibble_program *qp,
+char *qb_expand_verse(quibble_program qp, char* verse_name, char *prologue);
+char *qb_expand_stanza(quibble_program qp,
                        char* stanza_name, char *prologue, char *body);
-char *qb_expand_poem(quibble_program *qp, char* poem_name);
+char *qb_expand_poem(quibble_program qp, int index);
 
-void qb_build_program(quibble_program qp);
 void qb_configure_program(quibble_program *qp, int n, ...);
 
 // string manip
@@ -80,10 +79,14 @@ bool qb_is_inlined(char *verse);
 void qb_preprocess_content(char *verse);
 
 // Reads an input file and parses everything into verses or OCL functions
+quibble_program qb_parse_program(char *buffer);
 quibble_program qb_create_program(char *filename);
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name);
 quibble_stanza qb_find_stanza(quibble_program qp, char *stanza_name);
 quibble_poem qb_find_poem(quibble_program qp, char *poem_name);
+int qb_find_verse_index(quibble_program qp, char *verse_name);
+int qb_find_stanza_index(quibble_program qp, char *stanza_name);
+int qb_find_poem_index(quibble_program qp, char *poem_name);
 
 // Args / Kwargs
 int qb_find_number_of_kwargs(char *prologue);
@@ -104,6 +107,8 @@ quibble_verse qb_parse_verse(char *verse);
 char *qb_create_prologue(char *config, char *name,
                          quibble_arg *args, int num_args,
                          quibble_keyword *qkwargs, int num_kwargs);
+void qb_build_program(quibble_program qp);
+void qb_rebuild_program(quibble_program qp);
 
 // Free
 void qb_free_arg(quibble_arg arg);
