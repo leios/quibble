@@ -91,6 +91,22 @@ void quibble_program_tests(void){
     else {
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_args\n");
     }
+
+    qb_free_arg_array(check_args_1, num_args_1);
+    qb_free_arg_array(check_args_2, num_args_2);
+    qb_free_arg_array(check_args_3, num_args_3);
+    qb_free_arg_array(check_args_4, num_args_4);
+    qb_free_arg_array(check_args_5, num_args_5);
+    qb_free_arg_array(check_args_6, num_args_6);
+    qb_free_arg_array(check_args_7, num_args_7);
+    
+    qb_free_keyword_array(check_kwargs_1, num_kwargs_1);
+    qb_free_keyword_array(check_kwargs_2, num_kwargs_2);
+    qb_free_keyword_array(check_kwargs_3, num_kwargs_3);
+    qb_free_keyword_array(check_kwargs_4, num_kwargs_4);
+    qb_free_keyword_array(check_kwargs_5, num_kwargs_5);
+    qb_free_keyword_array(check_kwargs_6, num_kwargs_6);
+    qb_free_keyword_array(check_kwargs_7, num_kwargs_7);
     
 /*
 
