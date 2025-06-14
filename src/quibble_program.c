@@ -562,14 +562,22 @@ int qb_find_number_of_args(char *prologue){
     if (qb_find_next_char(prologue, prologue_size, i, '|') > 0){
          prologue_size = qb_find_next_char(prologue, prologue_size, i, '|');
     }
-    if (qb_find_next_char(prologue, prologue_size, i, ';') > 0){
-        fprintf(stderr, "Semicolon (;) used instead of comma (,)!\nEach quibble arg is a single variable to be configured on function launch!");
-        exit(1);
+
+    // only keywords, no args...
+    if (qb_find_next_char(prologue, prologue_size, i, ';') > 0 &&
+        qb_find_next_char(prologue, prologue_size, i, '=') > 0){
+        return 0;
     }
 
     int next_comma = qb_find_next_char(prologue, prologue_size, i, ',');
+    // Only 1 or 0 entries...
     if (next_comma < 0){
-        return 0;
+        if (strlen(qb_strip_spaces(prologue, 0, prologue_size)) > 0){
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
     while (next_comma > 0){
 
@@ -601,6 +609,11 @@ int qb_find_number_of_kwargs(char *prologue){
         fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble keyword is a self-contained C expression and must end with a `;`!");
         exit(1);
     }
+    if (qb_find_next_char(prologue, prologue_size, i, '=') > 0 &&
+        qb_find_next_char(prologue, prologue_size, i, ';') < 0){
+        fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble keyword is a self-contained C expression and must end with a `;`!");
+        exit(1);
+    }
 
     int next_equal = qb_find_next_char(prologue, prologue_size, i, '=');
     int next_semicolon = qb_find_next_char(prologue, prologue_size, i, ';');
@@ -615,7 +628,7 @@ int qb_find_number_of_kwargs(char *prologue){
             i = next_semicolon + 1;
         }
         else {
-            fprintf(stderr, "improper keyword argument configuration!\n");
+            fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble keyword is a self-contained C expression and must end with a `;`!");
             exit(1);
         }
         next_equal = qb_find_next_char(prologue, prologue_size, i, '=');
