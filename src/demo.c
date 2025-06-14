@@ -14,14 +14,13 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/demo_functions.h"
 #include "../include/errors.h"
 #include "../include/quibble_canvas.h"
-#include "../include/quibble_verses.h"
-#include "../test/verse_tests.h"
-#include "../test/input_tests.h"
+#include "../include/quibble_program.h"
+#include "../test/tests.h"
 
 int main(void){
 
     // Tests
-    quibble_verse_tests();
+    quibble_io_tests();
     //quibble_input_tests(0, 0);
 
     // Creating Kernel String

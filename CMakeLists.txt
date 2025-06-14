@@ -37,11 +37,8 @@ add_executable(
     include/demo_functions.h
     src/demo_functions.c
 
-    test/verse_tests.h
-    test/verse_tests.c
-
-    #test/input_tests.h
-    #test/input_tests.c
+    test/tests.h
+    test/io_tests.c
 
     src/demo.c
 )
