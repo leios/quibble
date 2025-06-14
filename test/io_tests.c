@@ -1,5 +1,4 @@
 #include "tests.h"
-#include "../include/io.h"
 
 void quibble_io_tests(void){
     char *kernel_string = QBINLINE(

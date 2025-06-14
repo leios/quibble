@@ -30,4 +30,9 @@ void qb_replace_char_if_proceeding(char *body, int body_size,
                                    char a, char b);
 
 int qb_find_occurrences(char *query, char *body);
+
+// QBINLINE
+bool qb_is_inlined(char *verse);
+void qb_preprocess_content(char *verse);
+
 #endif

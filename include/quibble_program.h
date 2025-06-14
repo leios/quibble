@@ -73,8 +73,6 @@ void qb_configure_program(quibble_program *qp, int n, ...);
 bool qb_is_stanza(char *stanza, int offset);
 bool qb_is_poem(char *poem, int offset);
 bool qb_is_verse(char *verse, int offset);
-bool qb_is_inlined(char *verse);
-void qb_preprocess_content(char *verse);
 
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_parse_program(char *buffer);
