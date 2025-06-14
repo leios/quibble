@@ -17,12 +17,12 @@ typedef struct{
 typedef struct{
     char *variable;
     char *value;
-} quibble_keyword;
+} quibble_kwarg;
 
 typedef struct{
     char *body;
     char *name;
-    quibble_keyword *kwargs;
+    quibble_kwarg *kwargs;
     quibble_arg *args;
     int num_kwargs;
     int num_args;
@@ -30,7 +30,7 @@ typedef struct{
 } quibble_verse;
 
 typedef struct{
-    quibble_keyword *kwargs;
+    quibble_kwarg *kwargs;
     int num_kwargs;
     quibble_arg *args;
     int num_args;
@@ -80,14 +80,14 @@ int qb_find_stanza_index(quibble_program qp, char *stanza_name);
 int qb_find_poem_index(quibble_program qp, char *poem_name);
 
 // Args / Kwargs
-int qb_find_number_of_kwargs(char *prologue);
-int qb_find_number_of_args(char *prologue);
+int qb_find_number_of_kwargs(char *config);
+int qb_find_number_of_args(char *config);
 
-quibble_arg *qb_parse_args(char *prologue, int num_entries);
-quibble_keyword *qb_parse_keywords(char *prologue, int num_entries);
+quibble_arg *qb_parse_args(char *config, int num_entries);
+quibble_kwarg *qb_parse_kwargs(char *config, int num_entries);
 
 int qb_find_arg_index(quibble_arg *arg, int n, char *variable);
-int qb_find_kwarg_index(quibble_keyword *qk, int n, char *variable);
+int qb_find_kwarg_index(quibble_kwarg *qk, int n, char *variable);
 
 // Parsing from file
 quibble_stanza qb_parse_stanza(char *stanza);
@@ -97,7 +97,7 @@ quibble_verse qb_parse_verse(char *verse);
 // Build / expansion
 char *qb_create_prologue(char *config, char *name,
                          quibble_arg *args, int num_args,
-                         quibble_keyword *qkwargs, int num_kwargs);
+                         quibble_kwarg *qkwargs, int num_kwargs);
 void qb_build_program(quibble_program qp);
 void qb_rebuild_program(quibble_program qp);
 char *qb_expand_verse(quibble_program qp, char* verse_name, char *prologue);
@@ -108,11 +108,11 @@ char *qb_expand_poem(quibble_program qp, int index);
 
 // Free
 void qb_free_arg(quibble_arg arg);
-void qb_free_keyword(quibble_keyword qkwarg);
+void qb_free_kwarg(quibble_kwarg qkwarg);
 void qb_free_verse(quibble_verse qv);
 void qb_free_stanza(quibble_stanza qs);
 void qb_free_poem(quibble_poem qp);
-void qb_free_keyword_array(quibble_keyword *qkwargs, int n);
+void qb_free_kwarg_array(quibble_kwarg *qkwargs, int n);
 void qb_free_arg_array(quibble_arg *args, int n);
 void qb_free_program(quibble_program qp);
 
