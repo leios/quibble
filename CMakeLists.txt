@@ -39,6 +39,7 @@ add_executable(
 
     test/tests.h
     test/io_tests.c
+    test/program_tests.c
 
     src/demo.c
 )

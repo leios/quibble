@@ -1,17 +1,29 @@
 #include "tests.h"
 
-void quibble_verse_tests(void){
-    // qb_parse_keywords
-    char prologue_1[10] = "x = 5;";
-    char prologue_2[20] = "x = 5; y = 2*x+3;";
-    char prologue_3[40] = "\t\n variable\t\n = \t\t\n whatever\n\n\t ;";
-    int num_args_1 = qb_find_number_of_kwargs(prologue_1);
-    int num_args_2 = qb_find_number_of_kwargs(prologue_2);
-    int num_args_3 = qb_find_number_of_kwargs(prologue_3);
+void quibble_program_tests(void){
 
-    quibble_keyword *check_kwargs_1 = qb_parse_keywords(prologue_1, num_args_1);
-    quibble_keyword *check_kwargs_2 = qb_parse_keywords(prologue_2, num_args_2);
-    quibble_keyword *check_kwargs_3 = qb_parse_keywords(prologue_3, num_args_3);
+    printf("String Parsing Tests...\n");
+    // qb_parse_keywords
+    char prologue_1[10] = " | x = 5;";
+    char prologue_2[30] = "a , b, c | x = 5; y = 2*x+3;";
+    char prologue_3[60] = "\t\n a, \t b, \n c \n | \t\n variable\t\n = \t\t\n whatever\n\n\t ;";
+    char prologue_4[10] = "a,b,c";
+    int num_kwargs_1 = qb_find_number_of_kwargs(prologue_1);
+    int num_kwargs_2 = qb_find_number_of_kwargs(prologue_2);
+    int num_kwargs_3 = qb_find_number_of_kwargs(prologue_3);
+    int num_kwargs_4 = qb_find_number_of_kwargs(prologue_4);
+
+    quibble_keyword *check_kwargs_1 =
+        qb_parse_keywords(prologue_1, num_kwargs_1);
+
+    quibble_keyword *check_kwargs_2 =
+        qb_parse_keywords(prologue_2, num_kwargs_2);
+
+    quibble_keyword *check_kwargs_3 =
+        qb_parse_keywords(prologue_3, num_kwargs_3);
+
+    quibble_keyword *check_kwargs_4 =
+        qb_parse_keywords(prologue_4, num_kwargs_4);
 
     if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
         strcmp(check_kwargs_1[0].value, "5") == 0 &&
@@ -20,13 +32,43 @@ void quibble_verse_tests(void){
         strcmp(check_kwargs_2[1].variable, "y") == 0 &&
         strcmp(check_kwargs_2[1].value, "2*x+3") == 0 &&
         strcmp(check_kwargs_3[0].variable, "variable") == 0 &&
-        strcmp(check_kwargs_3[0].value, "whatever") == 0 ){
-        printf(QBT_GREEN"Passed: "QBT_RESET"qb_parse_keywords\n");
+        strcmp(check_kwargs_3[0].value, "whatever") == 0 &&
+        check_kwargs_4 == NULL ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_keywords\n");
     }
     else {
-        printf(QBT_RED"Failed: "QBT_RESET"qb_parse_keywords\n");
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_keywords\n");
     }
 
+    int num_args_1 = qb_find_number_of_args(prologue_1);
+    int num_args_2 = qb_find_number_of_args(prologue_2);
+    int num_args_3 = qb_find_number_of_args(prologue_3);
+    int num_args_4 = qb_find_number_of_args(prologue_4);
+
+    quibble_arg *check_args_1 = qb_parse_args(prologue_1, num_args_1);
+    quibble_arg *check_args_2 = qb_parse_args(prologue_2, num_args_2);
+    quibble_arg *check_args_3 = qb_parse_args(prologue_3, num_args_3);
+    quibble_arg *check_args_4 = qb_parse_args(prologue_4, num_args_4);
+
+
+    if (check_args_1 == NULL &&
+        strcmp(check_args_2[0].variable, "a") == 0 &&
+        strcmp(check_args_2[1].variable, "b") == 0 &&
+        strcmp(check_args_2[2].variable, "c") == 0 &&
+        strcmp(check_args_3[0].variable, "a") == 0 &&
+        strcmp(check_args_3[1].variable, "b") == 0 &&
+        strcmp(check_args_3[2].variable, "c") == 0 &&
+        strcmp(check_args_4[0].variable, "a") == 0 &&
+        strcmp(check_args_4[1].variable, "b") == 0 &&
+        strcmp(check_args_4[2].variable, "c") == 0){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_args\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_args\n");
+    }
+    
+
+/*
     // qb_create_prologue
     if (strcmp(qb_create_prologue(check_kwargs_1, num_args_1),
                "x = 5;\n") == 0 &&
@@ -111,4 +153,5 @@ void quibble_verse_tests(void){
     qb_free_verse(e_1);
     qb_free_program(qp);
     qb_free_program(qp_2);
+*/
 }
