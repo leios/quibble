@@ -19,6 +19,19 @@ void quibble_program_tests(void){
     int num_kwargs_6 = qb_find_number_of_kwargs(prologue_6);
     int num_kwargs_7 = qb_find_number_of_kwargs(prologue_7);
 
+    if (num_kwargs_1 == 1 &&
+        num_kwargs_2 == 2 &&
+        num_kwargs_3 == 1 &&
+        num_kwargs_4 == 0 &&
+        num_kwargs_5 == 0 &&
+        num_kwargs_6 == 1 &&
+        num_kwargs_7 == 0 ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_number_of_kwargs\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_number_of_kwargs\n");
+    }
+
     quibble_kwarg *check_kwargs_1 =
         qb_parse_kwargs(prologue_1, num_kwargs_1);
 
@@ -58,6 +71,23 @@ void quibble_program_tests(void){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_kwargs\n");
     }
 
+    if (qb_find_kwarg_index(check_kwargs_2, num_kwargs_2, "x") == 0 &&
+        qb_find_kwarg_index(check_kwargs_7, num_kwargs_7, "x") == -1 &&
+        qb_find_kwarg_index(check_kwargs_3, num_kwargs_3, "variable") == 0 ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_kwarg_index\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_kwarg_index\n");
+    }
+
+    qb_free_kwarg_array(check_kwargs_1, num_kwargs_1);
+    qb_free_kwarg_array(check_kwargs_2, num_kwargs_2);
+    qb_free_kwarg_array(check_kwargs_3, num_kwargs_3);
+    qb_free_kwarg_array(check_kwargs_4, num_kwargs_4);
+    qb_free_kwarg_array(check_kwargs_5, num_kwargs_5);
+    qb_free_kwarg_array(check_kwargs_6, num_kwargs_6);
+    qb_free_kwarg_array(check_kwargs_7, num_kwargs_7);
+
     int num_args_1 = qb_find_number_of_args(prologue_1);
     int num_args_2 = qb_find_number_of_args(prologue_2);
     int num_args_3 = qb_find_number_of_args(prologue_3);
@@ -65,6 +95,19 @@ void quibble_program_tests(void){
     int num_args_5 = qb_find_number_of_args(prologue_5);
     int num_args_6 = qb_find_number_of_args(prologue_6);
     int num_args_7 = qb_find_number_of_args(prologue_6);
+
+    if (num_args_1 == 0 &&
+        num_args_2 == 3 &&
+        num_args_3 == 3 &&
+        num_args_4 == 3 &&
+        num_args_5 == 1 &&
+        num_args_6 == 0 &&
+        num_args_7 == 0 ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_number_of_args\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_number_of_args\n");
+    }
 
     quibble_arg *check_args_1 = qb_parse_args(prologue_1, num_args_1);
     quibble_arg *check_args_2 = qb_parse_args(prologue_2, num_args_2);
@@ -92,6 +135,15 @@ void quibble_program_tests(void){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_args\n");
     }
 
+    if (qb_find_arg_index(check_args_5, num_args_5, "meh") == 0 &&
+        qb_find_arg_index(check_args_7, num_args_7, "x") == -1 &&
+        qb_find_arg_index(check_args_3, num_args_3, "b") == 1 ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_arg_index\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_arg_index\n");
+    }
+
     qb_free_arg_array(check_args_1, num_args_1);
     qb_free_arg_array(check_args_2, num_args_2);
     qb_free_arg_array(check_args_3, num_args_3);
@@ -100,13 +152,6 @@ void quibble_program_tests(void){
     qb_free_arg_array(check_args_6, num_args_6);
     qb_free_arg_array(check_args_7, num_args_7);
     
-    qb_free_kwarg_array(check_kwargs_1, num_kwargs_1);
-    qb_free_kwarg_array(check_kwargs_2, num_kwargs_2);
-    qb_free_kwarg_array(check_kwargs_3, num_kwargs_3);
-    qb_free_kwarg_array(check_kwargs_4, num_kwargs_4);
-    qb_free_kwarg_array(check_kwargs_5, num_kwargs_5);
-    qb_free_kwarg_array(check_kwargs_6, num_kwargs_6);
-    qb_free_kwarg_array(check_kwargs_7, num_kwargs_7);
     
 /*
 

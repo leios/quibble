@@ -768,6 +768,11 @@ int qb_find_stanza_index(quibble_program qp, char *name){
 }
 
 int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
+    if (n <= 0){
+        return -1;
+    }
+
+
     for (int i = 0; i < n; ++i){
         if (strcmp(qa[i].variable, variable) == 0){
             return i;
@@ -778,6 +783,10 @@ int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
 }
 
 int qb_find_kwarg_index(quibble_kwarg *qk, int n, char *variable){
+    if (n <= 0){
+        return -1;
+    }
+
     for (int i = 0; i < n; ++i){
         if (strcmp(qk[i].variable, variable) == 0){
             return i;
