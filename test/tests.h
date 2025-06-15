@@ -8,5 +8,6 @@ void quibble_verse_tests(void);
 void quibble_stanza_tests(void);
 void quibble_poem_tests(void);
 void quibble_program_tests(void);
+void quibble_arg_parsing_tests(void);
 
 #endif
