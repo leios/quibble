@@ -44,13 +44,13 @@ quibble_program qb_create_program(char *filename){
     return qp;
 }
 
-quibble_program qb_parse_program(char *buffer){
+quibble_program qb_parse_program(char *program){
 
-    int num_verses = qb_find_occurrences("__verse", buffer);
-    int num_stanzas = qb_find_occurrences("__stanza", buffer);
-    int num_poems = qb_find_occurrences("__poem", buffer);
+    int num_verses = qb_find_occurrences("__verse", program);
+    int num_stanzas = qb_find_occurrences("__stanza", program);
+    int num_poems = qb_find_occurrences("__poem", program);
 
-    int filesize = strlen(buffer);
+    int filesize = strlen(program);
 
     // creating program and populating verses and everything else
     quibble_program qp;
@@ -59,6 +59,7 @@ quibble_program qb_parse_program(char *buffer){
     qp.stanza_list =
         (quibble_stanza *)malloc(sizeof(quibble_stanza)*num_stanzas);
     qp.poem_list = (quibble_poem *)malloc(sizeof(quibble_poem)*num_poems);
+
 
     if (num_verses > 0 ||
         num_stanzas > 0 ||
@@ -73,11 +74,12 @@ quibble_program qb_parse_program(char *buffer){
         int index = 0;
         int everything_else_index = 0;
 
-        bool qbinlined = qb_is_inlined(buffer);
+        bool qbinlined = qb_is_inlined(program);
+        char *buffer = program;
         if (qbinlined){
             index += 22;
+            buffer = qb_copy(buffer);
             qb_preprocess_content(buffer);
-            filesize = strlen(buffer);
         }
 
         int verse_match_count = 0;
@@ -99,6 +101,7 @@ quibble_program qb_parse_program(char *buffer){
         char *verse_string = "__verse";
         char *stanza_string = "__stanza";
         char *poem_string = "__poem";
+
 
         while (index < filesize){
             if (buffer[index] == poem_string[poem_match_count] &&
@@ -228,7 +231,7 @@ quibble_program qb_parse_program(char *buffer){
         free(tmp_verse);
     }
     else {
-        qp.everything_else = buffer;
+        qp.everything_else = program;
     }
 
     return qp;
@@ -332,7 +335,7 @@ quibble_stanza qb_parse_stanza(char *stanza){
         offset += 8;
     }
     else {
-        fprintf(stderr, "Quibble stanzas must be configured with `__stanza`!");
+        fprintf(stderr, "Quibble stanzas must be configured with `__stanza`!\n");
         exit(1);
     }
 
@@ -425,7 +428,7 @@ quibble_poem qb_parse_poem(char *poem){
         offset += 6;
     }
     else {
-        fprintf(stderr, "Quibble poems must be configured with `__poem`!");
+        fprintf(stderr, "Quibble poems must be configured with `__poem`!\n");
         exit(1);
     }
 
@@ -491,7 +494,7 @@ quibble_verse qb_parse_verse(char *verse){
         offset += 7;
     }
     else {
-        fprintf(stderr, "Quibble verses must be configured with `__verse`!");
+        fprintf(stderr, "Quibble verses must be configured with `__verse`!\n");
         exit(1);
     }
 
@@ -606,12 +609,12 @@ int qb_find_number_of_kwargs(char *config){
          i += qb_find_next_char(config, config_size, i, '|') + 1;
     }
     if (qb_find_next_char(config, config_size, i, ',') > 0){
-        fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!");
+        fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
         exit(1);
     }
     if (qb_find_next_char(config, config_size, i, '=') > 0 &&
         qb_find_next_char(config, config_size, i, ';') < 0){
-        fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!");
+        fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
         exit(1);
     }
 
@@ -628,7 +631,7 @@ int qb_find_number_of_kwargs(char *config){
             i = next_semicolon + 1;
         }
         else {
-            fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!");
+            fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
             exit(1);
         }
         next_equal = qb_find_next_char(config, config_size, i, '=');
@@ -973,7 +976,7 @@ char *qb_expand_stanza(quibble_program qp,
                     free(config);
                 }
                 else{
-                    fprintf(stderr, "Verse %s called incorrectly!", verse_name);
+                    fprintf(stderr, "Verse %s called incorrectly!\n", verse_name);
                     exit(1);
                 }
                 free(verse_name);
@@ -1072,7 +1075,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                     free(config);
                 }
                 else{
-                    fprintf(stderr, "Verse %s called incorrectly!", verse_name);
+                    fprintf(stderr, "Verse %s called incorrectly!\n", verse_name);
                     exit(1);
                 }
                 free(verse_name);
@@ -1127,7 +1130,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                     free(stanza_body);
                 }
                 else{
-                    fprintf(stderr, "Stanza %s called incorrectly!",
+                    fprintf(stderr, "Stanza %s called incorrectly!\n",
                             stanza_name);
                     exit(1);
                 }
@@ -1198,7 +1201,7 @@ char *qb_create_prologue(char *config, char *name,
         qb_free_arg_array(temp_args, num_args);
     }
     else {
-        fprintf(stderr, "Incorrect number of arguments for %s\nExpected %d, got %d!", name, num_args, num_config_args);
+        fprintf(stderr, "Incorrect number of arguments for %s\nExpected %d, got %d!\n", name, num_args, num_config_args);
         exit(1);
     }
 

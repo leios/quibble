@@ -153,3 +153,16 @@ void quibble_arg_parsing_tests(void){
     qb_free_arg_array(check_args_7, num_args_7);
     
 }
+
+void quibble_program_tests(){
+    printf("Program Parsing Tests...\n");
+
+    char *simple_program = QBINLINE(
+        __verse check(){}
+        __stanza check(){}
+        __poem check(){}
+    );
+
+    quibble_program qp_check = qb_parse_program(simple_program);
+    qb_free_program(qp_check);
+}

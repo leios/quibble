@@ -16,6 +16,7 @@ quibble_pixel qb_zero_pixel(void);
 quibble_pixel *qb_create_pixel_array(int height, int width);
 
 // String Manipulation
+char *qb_copy(char *buffer);
 char *qb_strip_spaces(char *body, int start_index, int end_index);
 int qb_find_next_char(char *body, int body_size, int current_index, char a);
 int qb_find_next_string(char *body, int body_size, int current_index,

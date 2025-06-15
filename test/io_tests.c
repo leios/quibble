@@ -10,7 +10,7 @@ void quibble_io_tests(void){
         }
     );
 
-    // qb_is_dcompiled
+    // qb_is_qbinlined
     if (qb_is_inlined(kernel_string)){
         printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_is_qbinlined\n");
     }
@@ -20,8 +20,7 @@ void quibble_io_tests(void){
 
     // qb_preprocess_content
     // QBINLINE creates a const, so copying to another container
-    char *check_string =
-        qb_strip_spaces(kernel_string, 0, strlen(kernel_string));
+    char *check_string = qb_copy(kernel_string);
     qb_preprocess_content(check_string);
     if (strcmp(check_string,
                "//\nQBINLINE\nGENERATED\n__verse\ncheck(){\n}") == 0){
@@ -35,8 +34,8 @@ void quibble_io_tests(void){
     // Others
     // qb_replace_char_if_proceeding
     char check[22] = "This is a test string";
-    qb_replace_char_if_proceeding(check, 100, "test", 4, ' ', '\n');
-    qb_replace_char_if_proceeding(check, 100, "s", 1, ' ', '_');
+    qb_replace_char_if_proceeding(check, 22, "test", 4, ' ', '\n');
+    qb_replace_char_if_proceeding(check, 22, "s", 1, ' ', '_');
     if (strcmp(check, "This_is_a test\nstring") == 0){
         printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_replace_char_if_proceeding\n");
     }
@@ -45,7 +44,7 @@ void quibble_io_tests(void){
     }
 
     // qb_replace_char
-    qb_replace_char(check, 100, '\n', ' ');
+    qb_replace_char(check, 22, '\n', ' ');
     if (strcmp(check, "This_is_a test string") == 0){
         printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_replace_char\n");
     }

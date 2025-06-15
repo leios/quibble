@@ -30,6 +30,19 @@ quibble_pixel *qb_create_pixel_array(int height, int width){
 FILE IO WORK
 //----------------------------------------------------------------------------*/
 
+// Necessary to convert QBINLINE **const** char * values to mutable char *'s
+char *qb_copy(char *buffer){
+    int n = strlen(buffer);
+    char *copy_buffer = (char *)calloc(n, sizeof(char));
+    for (int i = 0; i < n; ++i){
+        copy_buffer[i] = buffer[i];
+    }
+
+    // Adding null terminator at end
+    copy_buffer[n] = 0;
+    return copy_buffer;
+}
+
 char *qb_strip_spaces(char *body, int start_index, int end_index){
 
     int start_offset = 0;
