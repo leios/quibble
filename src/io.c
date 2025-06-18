@@ -32,14 +32,9 @@ FILE IO WORK
 
 // Necessary to convert QBINLINE **const** char * values to mutable char *'s
 char *qb_copy(char *buffer){
-    int n = strlen(buffer);
+    int n = strlen(buffer)+1;
     char *copy_buffer = (char *)calloc(n, sizeof(char));
-    for (int i = 0; i < n; ++i){
-        copy_buffer[i] = buffer[i];
-    }
-
-    // Adding null terminator at end
-    copy_buffer[n] = 0;
+    strcpy(copy_buffer, buffer);
     return copy_buffer;
 }
 
@@ -65,48 +60,27 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
     int str_len = (end_index - end_offset) - (start_index + start_offset);
     char *final_str = (char *)calloc(str_len+1, sizeof(char));
 
-    for (int i = 0; i < str_len; ++i){
-        final_str[i] = body[start_index + start_offset + i];
-    }
-
-    final_str[str_len] = 0;
+    strncpy(final_str, body+start_index+start_offset, str_len);
 
     return final_str;
 }
 
-int qb_find_next_char(char *body, int body_size, int current_index, char a){
-    for (int i = current_index; i < body_size; ++i){
-        if (body[i] == a){
-            return i;
-        }
+int qb_find_next_char(char *body, int current_index, char a){
+    char *ptr = strchr(&body[current_index], a);
+    if (ptr != NULL){
+        return ptr - body;
     }
 
     return -1;
 }
 
-int qb_find_next_string(char *body, int body_size, int current_index,
-                        char *a, int word_size){
-    bool find_match = true;
-    int count = 0;
-    for (int i = current_index; i < body_size; ++i){
-        while (find_match){
-            // ending iteration early if strings are not equal
-            if (body[i+count] != a[count]){
-                find_match = false;
-            }
+int qb_find_next_string(char *body, int current_index, char *a){
 
-            count++;
-
-            // Exiting with `i` if we hit the end of the word with equal strings
-            if (count == word_size && find_match){
-                find_match = false;
-                return i;
-            }
-        }
-
-        find_match = true;
-        count = 0;
+    char *ptr = strstr(&body[current_index], a);
+    if (ptr != NULL){
+        return ptr - body;
     }
+
     return -1;
 }
 
@@ -140,67 +114,49 @@ int qb_find_matching_char(char *body, int body_size, int current_index,
 }
 
 int qb_find_occurrences(char *query, char *body){
-    int query_length = strlen(query);
-    int bodysize = strlen(body);
-    int match_count = 0;
-    int num_queries = 0;
-    for (int i = 0; i < bodysize; ++i){
-        if (body[i] == query[match_count]){
-            ++match_count;
-            if (match_count == query_length){
-                ++num_queries;
-                match_count = 0;
-            }
-        }
-        else if (match_count != 0){
-            match_count = 0;
-        }
+
+    char *temp_str = strstr(body, query);
+    if (temp_str == NULL){
+        return 0;
     }
-    return num_queries;
+
+    int count = 0;
+    int query_length = strlen(query);
+
+    while (temp_str != NULL){
+        count++;
+        temp_str += query_length;
+        temp_str = strstr(temp_str, query);
+    }
+
+    return count;
 }
 
 /*----------------------------------------------------------------------------//
     QBINLINE
 //----------------------------------------------------------------------------*/
 
-void qb_replace_char_if_proceeding(char *verse, int verse_size,
-                                   char *prologue, int prologue_size,
-                                   char a, char b){
+// replaces a character a with b if after char *prologue
+void qb_replace_char_if_proceeding(char *content, char *query, char a, char b){
 
-    bool find_match = true;
-    bool match_found = false;
-    int count = 0;
-    for (int i = 0; i < verse_size; ++i){
-        while (find_match){
-            if (verse[i+count] != prologue[count]){
-                find_match = false;
-            }
-
-            count++;
-
-            if (count == prologue_size && find_match){
-                find_match = false;
-                match_found = true;
-            }
-        }
-
-        // match found
-        if (match_found &&
-            verse[i+count] == a){
-            verse[i+count] = b;
-            match_found = false;
-        }
-        find_match = true;
-        count = 0;
+    char *substr = strstr(content, query);
+    if (substr != NULL){
+        qb_replace_next_char(substr, 0, a, b);
     }
 }
 
 void qb_replace_char(char *verse, int verse_size, char a, char b){
+    
     for (int i = 0; i < verse_size; ++i){
         if (verse[i] == a){
             verse[i] = b;
         }
     }
+}
+
+void qb_replace_next_char(char *content, int index, char a, char b){
+    char *tmp = strchr(&content[index], a);
+    content[tmp-content] = b;
 }
 
 void qb_preprocess_content(char *content){
@@ -211,24 +167,18 @@ void qb_preprocess_content(char *content){
 
         // except for the arguments after some preprocessor options
         // that need to be in the same line
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#ifdef", 7, '\n', ' ');
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#ifndef", 8, '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#ifdef", '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#ifndef", '\n', ' ');
 
         // #define with two arguments will not work
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#define", 7, '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#define", '\n', ' ');
 
         // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#if", 3, '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#if", '\n', ' ');
 
         // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, content_size,
-                                      "#elif", 5, '\n', ' ');
-        qb_replace_char_if_proceeding(content, content_size, "#pragma",
-                                      7, '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#elif", '\n', ' ');
+        qb_replace_char_if_proceeding(content, "#pragma", '\n', ' ');
     }
 }
 

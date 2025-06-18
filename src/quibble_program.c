@@ -4,6 +4,7 @@
           and functions (usually from a *.qbl file)
 
    Notes: Some unnecessary code duplication here, but... meh
+          Make sure to allocate NULL when num_anything == 0
 
 //----------------------------------------------------------------------------*/
 
@@ -102,20 +103,17 @@ quibble_program qb_parse_program(char *program){
         char *stanza_string = "__stanza";
         char *poem_string = "__poem";
 
-
         while (index < filesize){
             if (buffer[index] == poem_string[poem_match_count] &&
                 curr_poem < num_poems){
                 ++poem_match_count;
                 if (poem_match_count == 6){
                     poem_start = index - 5;
-                    poem_end = qb_find_next_char(
-                        buffer, filesize, poem_start, '(');
+                    poem_end = qb_find_next_char(buffer, poem_start, '(');
                     poem_end = qb_find_matching_char(
                         buffer, filesize, poem_end, '(', ')');
 
-                    poem_end = qb_find_next_char(
-                        buffer, filesize, poem_end, '{');
+                    poem_end = qb_find_next_char(buffer, poem_end, '{');
                     poem_end = qb_find_matching_char(
                         buffer, filesize, poem_end, '{', '}') + 1;
 
@@ -146,13 +144,11 @@ quibble_program qb_parse_program(char *program){
                 ++stanza_match_count;
                 if (stanza_match_count == 8){
                     stanza_start = index - 7;
-                    stanza_end = qb_find_next_char(
-                        buffer, filesize, stanza_start, '(');
+                    stanza_end = qb_find_next_char(buffer, stanza_start, '(');
                     stanza_end = qb_find_matching_char(
                         buffer, filesize, stanza_end, '(', ')');
 
-                    stanza_end = qb_find_next_char(
-                        buffer, filesize, stanza_end, '{');
+                    stanza_end = qb_find_next_char(buffer, stanza_end, '{');
                     stanza_end = qb_find_matching_char(
                         buffer, filesize, stanza_end, '{', '}') + 1;
 
@@ -183,13 +179,11 @@ quibble_program qb_parse_program(char *program){
                 ++verse_match_count;
                 if (verse_match_count == 7){
                     verse_start = index - 6;
-                    verse_end = qb_find_next_char(
-                        buffer, filesize, verse_start, '(');
+                    verse_end = qb_find_next_char(buffer, verse_start, '(');
                     verse_end = qb_find_matching_char(
                         buffer, filesize, verse_end, '(', ')');
 
-                    verse_end = qb_find_next_char(
-                        buffer, filesize, verse_end, '{');
+                    verse_end = qb_find_next_char(buffer, verse_end, '{');
                     verse_end = qb_find_matching_char(
                         buffer, filesize, verse_end, '{', '}') + 1;
 
@@ -341,7 +335,7 @@ quibble_stanza qb_parse_stanza(char *stanza){
 
     quibble_stanza final_stanza;
 
-    int config_start = qb_find_next_char(stanza, stanza_size, offset, '(')+1;
+    int config_start = qb_find_next_char(stanza, offset, '(')+1;
     int config_end =
         qb_find_matching_char(stanza, stanza_size, config_start-1, '(', ')');
 
@@ -370,10 +364,9 @@ quibble_stanza qb_parse_stanza(char *stanza){
         final_stanza.num_kwargs = 0;
     }
 
-    int prologue_start = qb_find_next_char(stanza, stanza_size, offset, '{')+1;
+    int prologue_start = qb_find_next_char(stanza, offset, '{')+1;
     int prologue_end =
-        qb_find_next_string(stanza, stanza_size, prologue_start-1,
-                            "__split_stanza();", 18);
+        qb_find_next_string(stanza, prologue_start, "__split_stanza();");
 
     if (prologue_end-prologue_start > 0){
         char *prologue = (char *)calloc((prologue_end-prologue_start),
@@ -393,7 +386,7 @@ quibble_stanza qb_parse_stanza(char *stanza){
 
     int epilogue_start = prologue_end + 18;
     int epilogue_end =
-        qb_find_next_char(stanza, stanza_size, epilogue_start-1, '}');
+        qb_find_next_char(stanza, epilogue_start-1, '}');
 
     if (epilogue_end-epilogue_start > 0){
         char *epilogue = (char *)calloc((epilogue_end-epilogue_start),
@@ -434,7 +427,7 @@ quibble_poem qb_parse_poem(char *poem){
 
     quibble_poem final_poem;
 
-    int config_start = qb_find_next_char(poem, poem_size, offset, '(')+1;
+    int config_start = qb_find_next_char(poem, offset, '(')+1;
     int config_end =
         qb_find_matching_char(poem, poem_size, config_start-1, '(', ')');
 
@@ -458,9 +451,8 @@ quibble_poem qb_parse_poem(char *poem){
         final_poem.num_args = 0;
     }
 
-    int body_start = qb_find_next_char(poem, poem_size, offset, '{')+1;
-    int body_end =
-        qb_find_matching_char(poem, poem_size, body_start-1, '{', '}');
+    int body_start = qb_find_next_char(poem, offset, '{')+1;
+    int body_end = qb_find_matching_char(poem, poem_size, body_start-1, '{', '}');
 
     if (body_end-body_start > 0){
         char *body = (char *)calloc((body_end-body_start), sizeof(char));
@@ -500,9 +492,8 @@ quibble_verse qb_parse_verse(char *verse){
 
     quibble_verse final_verse;
 
-    int config_start = qb_find_next_char(verse, verse_size, offset, '(')+1;
-    int config_end =
-        qb_find_matching_char(verse, verse_size, config_start-1, '(', ')');
+    int config_start = qb_find_next_char(verse, offset, '(')+1;
+    int config_end = qb_find_matching_char(verse, verse_size, config_start-1, '(', ')');
 
 
     if (config_end-config_start > 0){
@@ -529,7 +520,7 @@ quibble_verse qb_parse_verse(char *verse){
         final_verse.num_kwargs = 0;
     }
 
-    int body_start = qb_find_next_char(verse, verse_size, offset, '{')+1;
+    int body_start = qb_find_next_char(verse, offset, '{')+1;
     int body_end =
         qb_find_matching_char(verse, verse_size, body_start-1, '{', '}');
 
@@ -562,17 +553,17 @@ int qb_find_number_of_args(char *config){
     int config_size = strlen(config);
     int i = 0;
     int num_entries = 0;
-    if (qb_find_next_char(config, config_size, i, '|') > 0){
-         config_size = qb_find_next_char(config, config_size, i, '|');
+    if (qb_find_next_char(config, i, '|') > 0){
+         config_size = qb_find_next_char(config, i, '|');
     }
 
     // only kwargs, no args...
-    if (qb_find_next_char(config, config_size, i, ';') > 0 &&
-        qb_find_next_char(config, config_size, i, '=') > 0){
+    if (qb_find_next_char(config, i, ';') > 0 &&
+        qb_find_next_char(config, i, '=') > 0){
         return 0;
     }
 
-    int next_comma = qb_find_next_char(config, config_size, i, ',');
+    int next_comma = qb_find_next_char(config, i, ',');
     // Only 1 or 0 entries...
     if (next_comma < 0){
         if (strlen(qb_strip_spaces(config, 0, config_size)) > 0){
@@ -588,7 +579,7 @@ int qb_find_number_of_args(char *config){
             ++num_entries;
             i = next_comma + 1;
         }
-        next_comma = qb_find_next_char(config, config_size, i, ',');
+        next_comma = qb_find_next_char(config, i, ',');
     }
 
     return num_entries+1;
@@ -597,29 +588,28 @@ int qb_find_number_of_args(char *config){
 
 int qb_find_number_of_kwargs(char *config){
 
-    int config_size = strlen(config);
     int i = 0;
     int num_entries = 0;
 
-    if (qb_find_next_char(config, config_size, i, '=') < 0){
+    if (qb_find_next_char(config, i, '=') < 0){
         return 0;
     }
 
-    if (qb_find_next_char(config, config_size, i, '|') > 0){
-         i += qb_find_next_char(config, config_size, i, '|') + 1;
+    if (qb_find_next_char(config, i, '|') > 0){
+         i += qb_find_next_char(config, i, '|') + 1;
     }
-    if (qb_find_next_char(config, config_size, i, ',') > 0){
+    if (qb_find_next_char(config, i, ',') > 0){
         fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
         exit(1);
     }
-    if (qb_find_next_char(config, config_size, i, '=') > 0 &&
-        qb_find_next_char(config, config_size, i, ';') < 0){
+    if (qb_find_next_char(config, i, '=') > 0 &&
+        qb_find_next_char(config, i, ';') < 0){
         fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
         exit(1);
     }
 
-    int next_equal = qb_find_next_char(config, config_size, i, '=');
-    int next_semicolon = qb_find_next_char(config, config_size, i, ';');
+    int next_equal = qb_find_next_char(config, i, '=');
+    int next_semicolon = qb_find_next_char(config, i, ';');
 
     if(next_semicolon < 0){
         return 0;
@@ -634,8 +624,8 @@ int qb_find_number_of_kwargs(char *config){
             fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
             exit(1);
         }
-        next_equal = qb_find_next_char(config, config_size, i, '=');
-        next_semicolon = qb_find_next_char(config, config_size, i, ';');
+        next_equal = qb_find_next_char(config, i, '=');
+        next_semicolon = qb_find_next_char(config, i, ';');
     }
 
     return num_entries;
@@ -653,12 +643,12 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
         int i = 0;
         int curr_entry = 0;
         int next_comma = 0;
-        if (qb_find_next_char(config, config_size, i, '|') > 0){
-            config_size = qb_find_next_char(config, config_size, i, '|');
+        if (qb_find_next_char(config, i, '|') > 0){
+            config_size = qb_find_next_char(config, i, '|');
         }
 
         while (i < config_size){
-            next_comma = qb_find_next_char(config, config_size, i, ',');
+            next_comma = qb_find_next_char(config, i, ',');
 
             if (next_comma < 0){
                 next_comma = config_size;
@@ -699,13 +689,13 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries){
         int curr_entry = 0;
         int next_equal = 0;
         int next_semicolon = 0;
-        if (qb_find_next_char(config, config_size, i, '|') > 0){
-            i += qb_find_next_char(config, config_size, i, '|') + 1;
+        if (qb_find_next_char(config, i, '|') > 0){
+            i += qb_find_next_char(config, i, '|') + 1;
         }
 
         while (i < config_size){
-            next_equal = qb_find_next_char(config, config_size, i, '=');
-            next_semicolon = qb_find_next_char(config, config_size, i, ';');
+            next_equal = qb_find_next_char(config, i, '=');
+            next_semicolon = qb_find_next_char(config, i, ';');
 
             final_kwargs[curr_entry].variable =
                 qb_strip_spaces(config, i, next_equal);
@@ -954,8 +944,7 @@ char *qb_expand_stanza(quibble_program qp,
                            strlen(tmp_body));
 
                 verse_name_start = index;
-                verse_name_end = qb_find_next_char(
-                    body, max_size, verse_name_start, '(');
+                verse_name_end = qb_find_next_char(body, verse_name_start, '(');
                 char *verse_name = qb_strip_spaces(body, verse_name_start,
                                              verse_name_end);
                 config_end = qb_find_matching_char(body, max_size,
@@ -1053,8 +1042,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                            strlen(tmp_body));
 
                 meta_name_start = index;
-                meta_name_end = qb_find_next_char(
-                    body, max_size, meta_name_start, '(');
+                meta_name_end = qb_find_next_char(body, meta_name_start, '(');
                 char *verse_name = qb_strip_spaces(body, meta_name_start,
                                              meta_name_end);
                 config_end = qb_find_matching_char(body, max_size,
@@ -1093,15 +1081,13 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                            strlen(tmp_body));
 
                 meta_name_start = index;
-                meta_name_end = qb_find_next_char(
-                    body, max_size, meta_name_start, '(');
+                meta_name_end = qb_find_next_char(body, meta_name_start, '(');
                 char *stanza_name = qb_strip_spaces(body, meta_name_start,
                                               meta_name_end);
                 config_end = qb_find_matching_char(body, max_size,
                     meta_name_end+1, '(',')');
 
-                stanza_body_start = qb_find_next_char(
-                    body, max_size, config_end, '(')+1;
+                stanza_body_start = qb_find_next_char(body, config_end, '(')+1;
                 stanza_body_end = qb_find_matching_char(body, max_size,
                     stanza_body_start, '{','}');
                 if (config_end > meta_name_end+1 &&
@@ -1298,7 +1284,7 @@ void qb_free_poem(quibble_poem qp){
 
 void qb_free_program(quibble_program qp){
     free(qp.everything_else);
-    free(qp.body);
+    //free(qp.body);
     for (int i = 0; i < qp.num_verses; ++i){
         qb_free_verse(qp.verse_list[i]);
     }
