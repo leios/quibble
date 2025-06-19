@@ -1,4 +1,4 @@
-/*-------------io.h-----------------------------------------------------------//
+/*-------------io.c-----------------------------------------------------------//
 
 Purpose: This file is meant to define most of what is needed for 
          image and video creation
@@ -30,6 +30,13 @@ quibble_pixel *qb_create_pixel_array(int height, int width){
 FILE IO WORK
 //----------------------------------------------------------------------------*/
 
+bool qb_is_space(char a){
+    if (a == ' ' || a == '\t' || a == '\n'){
+        return true;
+    }
+    return false;
+}
+
 // Necessary to convert QBINLINE **const** char * values to mutable char *'s
 char *qb_copy(char *buffer){
     int n = strlen(buffer)+1;
@@ -40,27 +47,42 @@ char *qb_copy(char *buffer){
 
 char *qb_strip_spaces(char *body, int start_index, int end_index){
 
+    char *final_str = NULL;
+    char curr_char;
+    if (start_index == end_index){
+        curr_char = body[start_index];
+        if (!qb_is_space(curr_char)){
+            char *tmp_str = (char *)calloc(2, sizeof(char));
+            tmp_str[0] = body[start_index];
+            final_str = tmp_str;
+            return final_str;
+        }
+    }
+
     int start_offset = 0;
     int end_offset = 0;
 
     // Finding start offset
-    char curr_char = body[start_index];
-    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
+    curr_char = body[start_index];
+    while (qb_is_space(curr_char) &&
+           start_offset + start_index < end_index){
         ++start_offset;
         curr_char = body[start_index+start_offset];
     }
 
     // Finding end offset
-    curr_char = body[end_index-1];
-    while (curr_char == ' ' || curr_char == '\t' || curr_char == '\n'){
+    curr_char = body[end_index];
+    while (qb_is_space(curr_char) &&
+           end_index - end_offset > start_index){
         ++end_offset;
-        curr_char = body[end_index - 1 - end_offset];
+        curr_char = body[end_index - end_offset];
     }
 
-    int str_len = (end_index - end_offset) - (start_index + start_offset);
-    char *final_str = (char *)calloc(str_len+1, sizeof(char));
-
-    strncpy(final_str, body+start_index+start_offset, str_len);
+    int str_len = (end_index - end_offset) - (start_index + start_offset)+1;
+    if (str_len > 0){
+        final_str = (char *)calloc(str_len+1, sizeof(char));
+        strncpy(final_str, &body[start_index+start_offset], str_len);
+    }
 
     return final_str;
 }

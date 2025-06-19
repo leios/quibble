@@ -71,14 +71,19 @@ void quibble_io_tests(void){
         printf("\t"QBT_RED "Failed: "QBT_RESET"qb_find_occurrences\n");
     }
 
+    char *stripped_1 = qb_strip_spaces(check, 9, 14);
+    char *stripped_2 = qb_strip_spaces(check, 7, 9);
     // qb_strip_spaces
-    char *stripped = qb_strip_spaces(check, 9, 14);
-    if (strcmp(stripped, "test") == 0){
+    if (strcmp(stripped_1, "test_") == 0 &&
+        strcmp(stripped_2, "a") == 0){
         printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_strip_spaces\n");
     }
     else{
         printf("\t"QBT_RED "Failed: "QBT_RESET"qb_strip_spaces\n");
     }
+
+    free(stripped_1);
+    free(stripped_2);
 
     // qb_find_next_char
     if (qb_find_next_char(check, 0, 't') == 10 &&
@@ -117,5 +122,4 @@ void quibble_io_tests(void){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_matching_char\n");
     }
 
-    free(stripped);
 }

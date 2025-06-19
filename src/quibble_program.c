@@ -553,12 +553,22 @@ int qb_find_number_of_args(char *config){
     int config_size = strlen(config);
     int i = 0;
     int num_entries = 0;
-    if (qb_find_next_char(config, i, '|') > 0){
-         config_size = qb_find_next_char(config, i, '|');
+    int pipe_loc = qb_find_next_char(config, i, '|');
+    if (pipe_loc > 0){
+         config_size = pipe_loc-1;
+    }
+
+    if (config_size == 0){
+        if (qb_is_space(config[i])){
+            return 0;
+        }
+        else {
+            return 1;
+        }
     }
 
     // only kwargs, no args...
-    if (qb_find_next_char(config, i, ';') > 0 &&
+    if (qb_find_next_char(config, i, '=') <= config_size &&
         qb_find_next_char(config, i, '=') > 0){
         return 0;
     }
@@ -566,18 +576,19 @@ int qb_find_number_of_args(char *config){
     int next_comma = qb_find_next_char(config, i, ',');
     // Only 1 or 0 entries...
     if (next_comma < 0){
-        if (strlen(qb_strip_spaces(config, 0, config_size)) > 0){
-            return 1;
-        }
-        else {
+        char *value = qb_strip_spaces(config, i, config_size);
+        int ret = 1;
+        if (value == NULL){
             return 0;
         }
+        free(value);
+        return ret;
     }
     while (next_comma > 0){
 
         if (next_comma > i){
             ++num_entries;
-            i = next_comma + 1;
+            i = next_comma+1;
         }
         next_comma = qb_find_next_char(config, i, ',');
     }
@@ -654,7 +665,7 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
                 next_comma = config_size;
             }
             final_args[curr_entry].variable =
-                qb_strip_spaces(config, i, next_comma);
+                qb_strip_spaces(config, i, next_comma-1);
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
@@ -698,10 +709,10 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries){
             next_semicolon = qb_find_next_char(config, i, ';');
 
             final_kwargs[curr_entry].variable =
-                qb_strip_spaces(config, i, next_equal);
+                qb_strip_spaces(config, i, next_equal-1);
 
             final_kwargs[curr_entry].value =
-                qb_strip_spaces(config, next_equal+1, next_semicolon);
+                qb_strip_spaces(config, next_equal+1, next_semicolon-1);
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
