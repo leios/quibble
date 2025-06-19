@@ -57,6 +57,9 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
             final_str = tmp_str;
             return final_str;
         }
+        else {
+            return NULL;
+        }
     }
 
     int start_offset = 0;

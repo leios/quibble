@@ -6,6 +6,8 @@
    Notes: Some unnecessary code duplication here, but... meh
           Make sure to allocate NULL when num_anything == 0
 
+    TODO: qp_parse_program should also build!!!
+
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
@@ -55,12 +57,35 @@ quibble_program qb_parse_program(char *program){
 
     // creating program and populating verses and everything else
     quibble_program qp;
-    qp.num_verses = num_verses;
-    qp.verse_list = (quibble_verse *)malloc(sizeof(quibble_verse)*num_verses);
-    qp.stanza_list =
-        (quibble_stanza *)malloc(sizeof(quibble_stanza)*num_stanzas);
-    qp.poem_list = (quibble_poem *)malloc(sizeof(quibble_poem)*num_poems);
 
+    // TODO: Also build!!!
+    qp.body = NULL;
+    qp.num_verses = num_verses;
+    qp.num_stanzas = num_stanzas;
+    qp.num_poems = num_poems;
+
+    if (num_verses > 0){
+        qp.verse_list =
+           (quibble_verse *)malloc(sizeof(quibble_verse)*num_verses);
+    }
+    else {
+        qp.verse_list = NULL;
+    }
+
+    if (num_stanzas > 0){
+        qp.stanza_list =
+            (quibble_stanza *)malloc(sizeof(quibble_stanza)*num_stanzas);
+    }
+    else {
+        qp.stanza_list = NULL;
+    }
+
+    if (num_poems > 0){
+        qp.poem_list = (quibble_poem *)malloc(sizeof(quibble_poem)*num_poems);
+    }
+    else {
+        qp.poem_list = NULL;
+    }
 
     if (num_verses > 0 ||
         num_stanzas > 0 ||
@@ -68,9 +93,20 @@ quibble_program qb_parse_program(char *program){
         char *tmp_everything_else =
             (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
 
-        char *tmp_verse = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
-        char *tmp_poem = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
-        char *tmp_stanza = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+        char *tmp_verse = NULL;
+        if (num_verses > 0){
+            tmp_verse = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+        }
+
+        char *tmp_poem = NULL;
+        if (num_poems > 0){
+            tmp_poem = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+        }
+
+        char *tmp_stanza = NULL;
+        if (num_stanzas > 0){
+            tmp_stanza = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+        }
 
         int index = 0;
         int everything_else_index = 0;
@@ -127,9 +163,9 @@ quibble_program qb_parse_program(char *program){
                     // setting everything back
                     index = poem_end;
                     poem_match_count = 0;
-                    everything_else_index -= 6;
+                    everything_else_index -= 5;
                     memset(tmp_everything_else+everything_else_index, 0,
-                           strlen(tmp_everything_else));
+                           5*sizeof(char));
                     poem_end = 0;
                     poem_start = 0;
                     memset(tmp_poem,0,strlen(tmp_poem));
@@ -162,9 +198,9 @@ quibble_program qb_parse_program(char *program){
                     // setting everything back
                     index = stanza_end;
                     stanza_match_count = 0;
-                    everything_else_index -= 8;
+                    everything_else_index -= 7;
                     memset(tmp_everything_else+everything_else_index, 0,
-                           strlen(tmp_everything_else));
+                           7*sizeof(char));
                     stanza_end = 0;
                     stanza_start = 0;
                     memset(tmp_stanza,0,strlen(tmp_stanza));
@@ -197,9 +233,9 @@ quibble_program qb_parse_program(char *program){
                     // setting everything back
                     index = verse_end;
                     verse_match_count = 0;
-                    everything_else_index -= 7;
+                    everything_else_index -= 6;
                     memset(tmp_everything_else+everything_else_index, 0,
-                           strlen(tmp_everything_else));
+                           6*sizeof(char));
                     verse_end = 0;
                     verse_start = 0;
                     memset(tmp_verse,0,strlen(tmp_verse));
@@ -215,14 +251,17 @@ quibble_program qb_parse_program(char *program){
         }
 
         char *everything_else =
-           qb_strip_spaces(tmp_everything_else, 0, everything_else_index);
+           qb_strip_spaces(tmp_everything_else, 
+                           0, strlen(tmp_everything_else)-1);
 
         qp.everything_else = everything_else;
 
-        // Only free if we ar not using it directly
+        // Only free if we are not using it directly
         free(buffer);
         free(tmp_everything_else);
         free(tmp_verse);
+        free(tmp_stanza);
+        free(tmp_poem);
     }
     else {
         qp.everything_else = program;
@@ -404,7 +443,7 @@ quibble_stanza qb_parse_stanza(char *stanza){
         final_stanza.epilogue = NULL;
     }
 
-    final_stanza.name = qb_strip_spaces(stanza, offset, config_start-1);
+    final_stanza.name = qb_strip_spaces(stanza, offset, config_start-2);
 
     return final_stanza;
 }
@@ -468,7 +507,7 @@ quibble_poem qb_parse_poem(char *poem){
     else{
         final_poem.body = NULL;
     }
-    final_poem.name = qb_strip_spaces(poem, offset, config_start-1);
+    final_poem.name = qb_strip_spaces(poem, offset, config_start-2);
 
     return final_poem;
 }
@@ -538,7 +577,7 @@ quibble_verse qb_parse_verse(char *verse){
     else{
         final_verse.body = NULL;
     }
-    final_verse.name = qb_strip_spaces(verse, offset, config_start-1);
+    final_verse.name = qb_strip_spaces(verse, offset, config_start-2);
     final_verse.echo = false;
 
     return final_verse;
@@ -866,8 +905,13 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
     final_qv.body = qv.body;
     final_qv.name = qv.name;
     final_qv.num_kwargs = qv.num_kwargs;
-    final_qv.kwargs =
-        (quibble_kwarg *)malloc(sizeof(quibble_kwarg)*qv.num_kwargs);
+    if (qv.num_kwargs > 0){
+        final_qv.kwargs =
+            (quibble_kwarg *)malloc(sizeof(quibble_kwarg)*qv.num_kwargs);
+    }
+    else {
+        final_qv.kwargs = NULL;
+    }
 
     for (int i = 0; i < qv.num_kwargs; ++i){
         int vlength = strlen(qv.kwargs[i].variable)+1;

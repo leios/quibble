@@ -164,5 +164,20 @@ void quibble_program_tests(){
     );
 
     quibble_program qp_check = qb_parse_program(simple_program);
+
+    if (qp_check.num_verses == 1 &&
+        qp_check.body == NULL &&
+        qp_check.everything_else == NULL &&
+        strcmp(qp_check.verse_list[0].name, "check") == 0 &&
+        qp_check.num_poems == 1 &&
+        strcmp(qp_check.poem_list[0].name, "check") == 0 &&
+        qp_check.num_stanzas == 1 &&
+        strcmp(qp_check.stanza_list[0].name, "check") == 0 ){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_program\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program\n");
+    }
+
     qb_free_program(qp_check);
 }
