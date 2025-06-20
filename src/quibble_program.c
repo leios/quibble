@@ -56,8 +56,6 @@ quibble_program qb_parse_program(char *program){
     // creating program and populating verses and everything else
     quibble_program qp;
 
-    // TODO: Also build!!!
-    qp.body = NULL;
     qp.num_verses = num_verses;
     qp.num_stanzas = num_stanzas;
     qp.num_poems = num_poems;
@@ -264,6 +262,8 @@ quibble_program qb_parse_program(char *program){
     else {
         qp.everything_else = program;
     }
+
+    qb_build_program(&qp);
 
     return qp;
 }
@@ -1208,14 +1208,18 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
 
 }
  
-void qb_rebuild_program(quibble_program qp){
-    free(qp.body);
+void qb_rebuild_program(quibble_program *qp){
+    free(qp->body);
     qb_build_program(qp);
 }
 
-void qb_build_program(quibble_program qp){
+void qb_build_program(quibble_program *qp){
     char *body = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
-    strcat(body, qp.everything_else);
+    if (qp->everything_else != NULL){
+        strcat(body, qp->everything_else);
+    }
+    qp->body = body;
+    /*
     for (int i = 0; i < qp.num_poems; ++i){
         char *temp_poem = qb_expand_poem(qp, i);
         strcat(body, temp_poem);
@@ -1228,6 +1232,7 @@ void qb_build_program(quibble_program qp){
         final_body[i] = body[i];
     }
     qp.body = final_body;
+*/
 }
 
 // To be used in `qb_configure_verse` to create prologue string
@@ -1347,7 +1352,7 @@ void qb_free_poem(quibble_poem qp){
 
 void qb_free_program(quibble_program qp){
     free(qp.everything_else);
-    //free(qp.body);
+    free(qp.body);
     for (int i = 0; i < qp.num_verses; ++i){
         qb_free_verse(qp.verse_list[i]);
     }

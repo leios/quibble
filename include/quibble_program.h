@@ -98,8 +98,8 @@ quibble_verse qb_parse_verse(char *verse);
 char *qb_create_prologue(char *config, char *name,
                          quibble_arg *args, int num_args,
                          quibble_kwarg *qkwargs, int num_kwargs);
-void qb_build_program(quibble_program qp);
-void qb_rebuild_program(quibble_program qp);
+void qb_build_program(quibble_program *qp);
+void qb_rebuild_program(quibble_program *qp);
 char *qb_expand_verse(quibble_program qp, char* verse_name, char *prologue);
 char *qb_expand_stanza(quibble_program qp,
                        char* stanza_name, char *prologue, char *body);
