@@ -165,6 +165,8 @@ void quibble_program_tests(){
 
     quibble_program qp_check = qb_parse_program(simple_program);
 
+    qb_print_program(qp_check);
+
     if (qp_check.num_verses == 1 &&
         qp_check.body == NULL &&
         qp_check.everything_else == NULL &&
@@ -180,4 +182,8 @@ void quibble_program_tests(){
     }
 
     qb_free_program(qp_check);
+
+    quibble_program qp_2 = qb_create_program("../test/example.qbl");
+    qb_print_program(qp_2);
+    qb_free_program(qp_2);
 }

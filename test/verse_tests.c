@@ -1,49 +1,6 @@
 #include "tests.h"
 
 void quibble_verse_tests(void){
-    // qb_parse_keywords
-    char prologue_1[10] = "x = 5;";
-    char prologue_2[20] = "x = 5; y = 2*x+3;";
-    char prologue_3[40] = "\t\n variable\t\n = \t\t\n whatever\n\n\t ;";
-    int num_args_1 = qb_find_number_of_kwargs(prologue_1);
-    int num_args_2 = qb_find_number_of_kwargs(prologue_2);
-    int num_args_3 = qb_find_number_of_kwargs(prologue_3);
-
-    quibble_keyword *check_kwargs_1 = qb_parse_keywords(prologue_1, num_args_1);
-    quibble_keyword *check_kwargs_2 = qb_parse_keywords(prologue_2, num_args_2);
-    quibble_keyword *check_kwargs_3 = qb_parse_keywords(prologue_3, num_args_3);
-
-    if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
-        strcmp(check_kwargs_1[0].value, "5") == 0 &&
-        strcmp(check_kwargs_2[0].variable, "x") == 0 &&
-        strcmp(check_kwargs_2[0].value, "5") == 0 &&
-        strcmp(check_kwargs_2[1].variable, "y") == 0 &&
-        strcmp(check_kwargs_2[1].value, "2*x+3") == 0 &&
-        strcmp(check_kwargs_3[0].variable, "variable") == 0 &&
-        strcmp(check_kwargs_3[0].value, "whatever") == 0 ){
-        printf(QBT_GREEN"Passed: "QBT_RESET"qb_parse_keywords\n");
-    }
-    else {
-        printf(QBT_RED"Failed: "QBT_RESET"qb_parse_keywords\n");
-    }
-
-    // qb_create_prologue
-    if (strcmp(qb_create_prologue(check_kwargs_1, num_args_1),
-               "x = 5;\n") == 0 &&
-        strcmp(qb_create_prologue(check_kwargs_2, num_args_2),
-               "x = 5;\ny = 2*x+3;\n") == 0 &&
-        strcmp(qb_create_prologue(check_kwargs_3, num_args_3),
-               "variable = whatever;\n") == 0){
-        printf(QBT_GREEN"Passed: "QBT_RESET"qb_create_prologue\n");
-    }
-    else {
-        printf(QBT_RED"Failed: "QBT_RESET"qb_create_prologue\n");
-    }
-
-    qb_free_keyword_array(check_kwargs_1, num_args_1);
-    qb_free_keyword_array(check_kwargs_2, num_args_2);
-    qb_free_keyword_array(check_kwargs_3, num_args_3);
-
 
     // qb_parse_verse
     char *empty_verse = QBINLINE(

@@ -140,6 +140,7 @@ int qb_find_matching_char(char *body, int body_size, int current_index,
 
 int qb_find_occurrences(char *query, char *body){
 
+
     char *temp_str = strstr(body, query);
     if (temp_str == NULL){
         return 0;

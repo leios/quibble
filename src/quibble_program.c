@@ -33,16 +33,14 @@ quibble_program qb_create_program(char *filename){
     fseek(fileptr, 0, SEEK_SET);
 
     // Creating initial buffer
-    char *buffer = (char *)calloc(filesize, sizeof(char));
+    char *buffer = (char *)calloc(filesize+1, sizeof(char));
 
     while (!feof(fileptr)){
         fread(buffer, sizeof(char), filesize, fileptr);
     }
 
-    quibble_program qp = qb_parse_program(buffer);
-
-    free(buffer);
     fclose(fileptr);
+    quibble_program qp = qb_parse_program(buffer);
 
     return qp;
 }
@@ -359,6 +357,7 @@ bool qb_is_inlined(char *verse){
 quibble_stanza qb_parse_stanza(char *stanza){
     int stanza_size = strlen(stanza);
     int offset = 0;
+    bool is_split = true;
     bool qbinlined = qb_is_inlined(stanza);
     if (qbinlined){
         offset += 22;
@@ -381,7 +380,7 @@ quibble_stanza qb_parse_stanza(char *stanza){
 
     if (config_end-config_start > 0){
         char *config =
-            (char *)calloc((config_end-config_start), sizeof(char));
+            (char *)calloc((config_end-config_start)+1, sizeof(char));
 
         for (int i = 0; i < (config_end-config_start); ++i){
             config[i] = stanza[config_start+i];
@@ -407,11 +406,16 @@ quibble_stanza qb_parse_stanza(char *stanza){
     int prologue_end =
         qb_find_next_string(stanza, prologue_start, "__split_stanza();");
 
-    if (prologue_end-prologue_start > 0){
-        char *prologue = (char *)calloc((prologue_end-prologue_start),
+    if (prologue_end < 0){
+        is_split = false;
+        prologue_end = qb_find_next_char(stanza, prologue_start-1, '}');
+    }
+
+    if (prologue_end-prologue_start > 0 && prologue_end > 0){
+        char *prologue = (char *)calloc((prologue_end-prologue_start)+1,
                                         sizeof(char));
         for (int i = 0; i < (prologue_end-prologue_start); ++i){
-            prologue[i] = prologue[prologue_start+i];
+            prologue[i] = stanza[prologue_start+i];
         }
 
         if (qbinlined){
@@ -423,21 +427,25 @@ quibble_stanza qb_parse_stanza(char *stanza){
         final_stanza.prologue = NULL;
     }
 
-    int epilogue_start = prologue_end + 18;
-    int epilogue_end =
-        qb_find_next_char(stanza, epilogue_start-1, '}');
+    if (is_split){
+        int epilogue_start = prologue_end + 18;
+        int epilogue_end = qb_find_next_char(stanza, epilogue_start-1, '}');
 
-    if (epilogue_end-epilogue_start > 0){
-        char *epilogue = (char *)calloc((epilogue_end-epilogue_start),
-                                        sizeof(char));
-        for (int i = 0; i < (epilogue_end-epilogue_start); ++i){
-            epilogue[i] = epilogue[epilogue_start+i];
-        }
+        if (epilogue_end-epilogue_start > 0){
+            char *epilogue = (char *)calloc((epilogue_end-epilogue_start)+1,
+                                            sizeof(char));
+            for (int i = 0; i < (epilogue_end-epilogue_start); ++i){
+                epilogue[i] = stanza[epilogue_start+i];
+            }
 
-        if (qbinlined){
-            qb_preprocess_content(epilogue);
+            if (qbinlined){
+                qb_preprocess_content(epilogue);
+            }
+            final_stanza.epilogue = epilogue;
         }
-        final_stanza.epilogue = epilogue;
+        else{
+            final_stanza.epilogue = NULL;
+        }
     }
     else{
         final_stanza.epilogue = NULL;
@@ -473,7 +481,7 @@ quibble_poem qb_parse_poem(char *poem){
 
     if (config_end-config_start > 0){
         char *config =
-            (char *)calloc((config_end-config_start), sizeof(char));
+            (char *)calloc((config_end-config_start)+1, sizeof(char));
 
         for (int i = 0; i < (config_end-config_start); ++i){
             config[i] = poem[config_start+i];
@@ -494,7 +502,7 @@ quibble_poem qb_parse_poem(char *poem){
     int body_end = qb_find_matching_char(poem, poem_size, body_start-1, '{', '}');
 
     if (body_end-body_start > 0){
-        char *body = (char *)calloc((body_end-body_start), sizeof(char));
+        char *body = (char *)calloc((body_end-body_start)+1, sizeof(char));
         for (int i = 0; i < (body_end-body_start); ++i){
             body[i] = poem[body_start+i];
         }
@@ -537,7 +545,7 @@ quibble_verse qb_parse_verse(char *verse){
 
     if (config_end-config_start > 0){
         char *config =
-            (char *)calloc((config_end-config_start), sizeof(char));
+            (char *)calloc((config_end-config_start)+1, sizeof(char));
 
         for (int i = 0; i < (config_end-config_start); ++i){
             config[i] = verse[config_start+i];
@@ -564,7 +572,7 @@ quibble_verse qb_parse_verse(char *verse){
         qb_find_matching_char(verse, verse_size, body_start-1, '{', '}');
 
     if (body_end-body_start > 0){
-        char *body = (char *)calloc((body_end-body_start), sizeof(char));
+        char *body = (char *)calloc((body_end-body_start)+1, sizeof(char));
         for (int i = 0; i < (body_end-body_start); ++i){
             body[i] = verse[body_start+i];
         }
@@ -1352,4 +1360,70 @@ void qb_free_program(quibble_program qp){
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
+}
+
+/*----------------------------------------------------------------------------//
+    PRINTING
+//----------------------------------------------------------------------------*/
+
+void qb_print_arg(quibble_arg qa){
+    printf("%s\n", qa.variable);
+}
+
+void qb_print_kwarg(quibble_kwarg qk){
+    printf("%s = %s\n", qk.variable, qk.value);
+}
+
+void qb_print_verse(quibble_verse qv){
+    printf("Quibble Verse:\nName: %s\nBody:\n%s\n", qv.name, qv.body);
+    printf("Args...\n");
+    for (int i = 0; i < qv.num_args; ++i){
+        qb_print_arg(qv.args[i]);
+    }
+    printf("Kwargs...\n");
+    for (int i = 0; i < qv.num_kwargs; ++i){
+        qb_print_kwarg(qv.kwargs[i]);
+    }
+    printf("\n");
+}
+
+void qb_print_stanza(quibble_stanza qs){
+    printf("Quibble Stanza:\nName: %s\nPrologue:\n%s\nEpilogue\n%s\n",
+           qs.name, qs.prologue, qs.epilogue);
+    printf("Args...\n");
+    for (int i = 0; i < qs.num_args; ++i){
+        qb_print_arg(qs.args[i]);
+    }
+    printf("Kwargs...\n");
+    for (int i = 0; i < qs.num_kwargs; ++i){
+        qb_print_kwarg(qs.kwargs[i]);
+    }
+    printf("\n");
+}
+
+void qb_print_poem(quibble_poem qp){
+    printf("Quibble Poem:\nName: %s\nBody:\n%s\n", qp.name, qp.body);
+    printf("Args...\n");
+    for (int i = 0; i < qp.num_args; ++i){
+        qb_print_arg(qp.args[i]);
+    }
+    printf("\n");
+}
+
+void qb_print_program(quibble_program qp){
+
+    printf("Quibble Program:\nBody\n%s\nEverything Else:\n%s\n\n",
+           qp.body, qp.everything_else);
+
+    for (int i = 0; i < qp.num_poems; ++i){
+        qb_print_poem(qp.poem_list[i]);
+    }
+
+    for (int i = 0; i < qp.num_stanzas; ++i){
+        qb_print_stanza(qp.stanza_list[i]);
+    }
+
+    for (int i = 0; i < qp.num_verses; ++i){
+        qb_print_verse(qp.verse_list[i]);
+    }
 }

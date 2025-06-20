@@ -6,7 +6,7 @@ __verse nothing(){}
 __stanza nothing(){}
 __poem nothing(){}
 
-__verse mult_by(a; factor = 8;){
+__verse mult_by(a | factor = 8;){
     a[_idx] *= factor;
 }
 

@@ -116,4 +116,12 @@ void qb_free_kwarg_array(quibble_kwarg *qkwargs, int n);
 void qb_free_arg_array(quibble_arg *args, int n);
 void qb_free_program(quibble_program qp);
 
+// Printing
+void qb_print_arg(quibble_arg qa);
+void qb_print_kwarg(quibble_kwarg qk);
+void qb_print_verse(quibble_verse qv);
+void qb_print_stanza(quibble_stanza qs);
+void qb_print_poem(quibble_poem qp);
+void qb_print_program(quibble_program qp);
+
 #endif
