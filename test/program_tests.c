@@ -183,11 +183,15 @@ void quibble_program_tests(){
     qb_free_program(qp_check);
 
     quibble_program qp_2 = qb_create_program("../test/example.qbl");
-    if (qp_2.num_verses == 2 &&
+
+    qb_print_program(qp_2);
+
+
+    if (qp_2.num_verses == 4 &&
         strcmp(qp_2.verse_list[0].name, "nothing") == 0 &&
-        qp_2.num_poems == 2 &&
-        strcmp(qp_2.poem_list[1].name, "poem_check") == 0 &&
-        qp_2.num_stanzas == 2 &&
+        qp_2.num_poems == 4 &&
+        strcmp(qp_2.poem_list[3].name, "poem_check") == 0 &&
+        qp_2.num_stanzas == 4 &&
         strcmp(qp_2.stanza_list[0].name, "nothing") == 0 ){
         printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_create_program\n");
     }
@@ -195,6 +199,6 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_create_program\n");
     }
 
-    qb_print_program(qp_2);
+
     qb_free_program(qp_2);
 }

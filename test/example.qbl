@@ -6,6 +6,14 @@ __verse nothing(){}
 __stanza nothing(){}
 __poem nothing(){}
 
+__verse no_args(){// do stuff verse}
+__stanza no_args(){// do stuff stanza}
+__poem no_args(){// do stuff poem}
+
+__verse no_body(a){}
+__stanza no_body(a){}
+__poem no_body(a){}
+
 __verse mult_by(a | factor = 8;){
     a[_idx] *= factor;
 }
