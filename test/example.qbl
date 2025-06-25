@@ -14,20 +14,19 @@ __verse no_body(a){}
 __stanza no_body(a){}
 __poem no_body(a){}
 
-__verse mult_by(a | factor = 8;){
+__verse mult_by(float *a | float factor = 8;){
     a[_idx] *= factor;
 }
 
 void is_this_found(){};
 
-__stanza stanza_check(a, b, c | r = a*b;){
+__stanza stanza_check(float *a, float *b, float *c | float r = 1.0;){
     c[idx] = a[idx] + b[idx];
     __split_stanza();
     c[idx] += 1;
 }
 
-__poem poem_check(a, b, c, stanza_num){
-    idx = get_global_id(0);
+__poem poem_check(float *a, float *b, float *c, stanza_num){
     if (stanza_num == 0){
         @SCALL stanza_check(a, b, c){
             @VCALL mult_by(c | factor = 2;);
