@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ -z ${XDG_CONFIG_HOME+x} ]; \
     then config_dir="$HOME/.config/quibble"; echo "XDG_CONFIG_HOME is unset, attempting to clean $config_dir"; \
     else config_dir="$XDG_CONFIG_HOME/quibble"; echo "attempting to clean $config_dir..."; \

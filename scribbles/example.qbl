@@ -31,5 +31,6 @@ __poem poem_check(float *a, float *b, float *c, stanza_num){
         @SCALL stanza_check(a, b, c){
             @VCALL mult_by(c | factor = 2;);
         }
+        @VCALL mult_by(c | factor = 0.5;);
     }
 }

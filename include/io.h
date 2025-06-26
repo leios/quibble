@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <png.h>
+#include <stdlib.h>
 
 typedef struct {
     unsigned char red;
@@ -14,6 +15,8 @@ typedef struct {
 
 quibble_pixel qb_zero_pixel(void);
 quibble_pixel *qb_create_pixel_array(int height, int width);
+
+char *qb_config_file(char *path);
 
 // String Manipulation
 bool qb_is_space(char a);

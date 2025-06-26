@@ -26,6 +26,21 @@ quibble_pixel *qb_create_pixel_array(int height, int width){
     return qpa;
 }
 
+char *qb_config_file(char *path){
+    char *ret = (char *)calloc(256, sizeof(char));
+    if (getenv("XDG_CONFIG_HOME") == NULL){
+        strcat(ret, getenv("HOME"));
+        strcat(ret, "/.config/quibble/");
+    }
+    else {
+        strcat(ret, getenv("XDG_CONFIG_HOME"));
+        strcat(ret, "/");
+    }
+    strcat(ret, path);
+    printf("PATH:%s\n", ret);
+    return ret;
+}
+
 /*----------------------------------------------------------------------------//
 FILE IO WORK
 //----------------------------------------------------------------------------*/
