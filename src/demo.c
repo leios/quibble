@@ -11,7 +11,6 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include "../include/macros.h"
 #include <CL/cl.h>
 
-#include "../include/demo_functions.h"
 #include "../include/errors.h"
 #include "../include/quibble_canvas.h"
 #include "../include/quibble_program.h"

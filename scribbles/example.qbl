@@ -21,7 +21,7 @@ __verse mult_by(float *a | float factor = 8;){
 void is_this_found(){};
 
 __stanza stanza_check(float *a, float *b, float *c | float r = 1.0;){
-    c[idx] = a[idx] + b[idx];
+    c[_idx] = a[_idx] + b[_idx];
     __split_stanza();
     c[idx] += 1;
 }

@@ -35,9 +35,6 @@ add_executable(
     include/quibble_program.h
     src/quibble_program.c
 
-    include/demo_functions.h
-    src/demo_functions.c
-
     test/tests.h
     test/io_tests.c
     test/program_tests.c
@@ -66,3 +63,5 @@ add_executable(
 )
 
 target_link_libraries(qbinfo asan OpenCL::OpenCL)
+
+execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/configure)

@@ -182,7 +182,7 @@ void quibble_program_tests(){
 
     qb_free_program(qp_check);
 
-    quibble_program qp_2 = qb_create_program("../test/example.qbl");
+    quibble_program qp_2 = qb_create_program("../scribbles/example.qbl");
 
     qb_print_program(qp_2);
 
