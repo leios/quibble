@@ -32,7 +32,13 @@ add_executable(
     include/quibble_canvas.h
     src/quibble_canvas.c
 
+    include/quibble_args.h
+    src/quibble_args.c
+
     include/quibble_program.h
+    src/quibble_verses.c
+    src/quibble_stanzas.c
+    src/quibble_poems.c
     src/quibble_program.c
 
     test/tests.h

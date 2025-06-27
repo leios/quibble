@@ -223,3 +223,13 @@ void qb_preprocess_content(char *content){
     }
 }
 
+bool qb_is_inlined(char *verse){
+    char substr[23] = "// QBINLINE GENERATED\n";
+    for (int i = 0; i < 22; ++i){
+        if (verse[i] != substr[i]){
+            return false;
+        }
+    }
+
+    return true;
+}

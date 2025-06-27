@@ -8,16 +8,8 @@
 
 #include "macros.h"
 #include "io.h"
+#include "quibble_args.h"
 #include "quibble_inputs.h"
-
-typedef struct{
-    char *variable;
-} quibble_arg;
-
-typedef struct{
-    char *variable;
-    char *value;
-} quibble_kwarg;
 
 typedef struct{
     char *body;
@@ -81,16 +73,6 @@ int qb_find_verse_index(quibble_program qp, char *verse_name);
 int qb_find_stanza_index(quibble_program qp, char *stanza_name);
 int qb_find_poem_index(quibble_program qp, char *poem_name);
 
-// Args / Kwargs
-int qb_find_number_of_kwargs(char *config);
-int qb_find_number_of_args(char *config);
-
-quibble_arg *qb_parse_args(char *config, int num_entries);
-quibble_kwarg *qb_parse_kwargs(char *config, int num_entries);
-
-int qb_find_arg_index(quibble_arg *arg, int n, char *variable);
-int qb_find_kwarg_index(quibble_kwarg *qk, int n, char *variable);
-
 // Parsing from file
 quibble_stanza qb_parse_stanza(char *stanza);
 quibble_poem qb_parse_poem(char *stanza);
@@ -107,6 +89,8 @@ char *qb_expand_stanza(quibble_program qp,
                        char* stanza_name, char *prologue, char *body);
 char *qb_expand_poem(quibble_program qp, int index);
 
+void qb_rebuild_program(quibble_program *qp);
+void qb_build_program(quibble_program *qp);
 
 // Free
 void qb_free_arg(quibble_arg arg);
