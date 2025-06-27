@@ -183,7 +183,7 @@ void quibble_program_tests(){
     qb_free_program(qp_check);
 
     char *filename = qb_config_file("scribbles/example.qbl");
-    quibble_program qp_2 = qb_create_program(filename);
+    quibble_program qp_2 = qb_parse_program_file(filename);
     free(filename);
 
     qb_print_program(qp_2);
@@ -195,10 +195,10 @@ void quibble_program_tests(){
         strcmp(qp_2.poem_list[3].name, "poem_check") == 0 &&
         qp_2.num_stanzas == 4 &&
         strcmp(qp_2.stanza_list[0].name, "nothing") == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_create_program\n");
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_program_file\n");
     }
     else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_create_program\n");
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program_file\n");
     }
 
 

@@ -16,7 +16,7 @@
     PROGRAM GENERATION
 //----------------------------------------------------------------------------*/
 // Reads an input file and parses everything into verses or OCL functions
-quibble_program qb_create_program(char *filename){
+quibble_program qb_parse_program_file(char *filename){
 
     // Opening file
     FILE* fileptr;
@@ -1321,7 +1321,12 @@ char *qb_create_prologue(char *config, char *name,
 
             value = qkwargs[i].value;
             for (int j  = 0; j < num_config_kwargs; ++j){
-                if(strcmp(temp_kwargs[j].variable, qkwargs[i].variable) == 0){
+                // Note that the + strlen(temp_kwargs[j].variable) offsets the
+                // pointer so we will grab only the variable name and not the
+                // type definition, so we are comparing x == ~float ~x
+                if (strcmp(temp_kwargs[j].variable,
+                       qkwargs[i].variable + strlen(temp_kwargs[j].variable)
+                          ) == 0){
                     value = temp_kwargs[i].value;
                 }
             }

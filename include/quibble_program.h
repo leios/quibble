@@ -1,5 +1,5 @@
-#ifndef QUIBBLE_VERSES_H
-#define QUIBBLE_VERSES_H
+#ifndef QUIBBLE_PROGRAM_H
+#define QUIBBLE_PROGRAM_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -59,6 +59,8 @@ typedef struct{
 
 // TODO
 void qb_configure_program(quibble_program *qp, int n, ...);
+void qb_set_args(quibble_program *qp, char *poem, int n, ...);
+void qb_set_device(quibble_program *qp, int platform, int device);
 // Remove echoes
 void qb_configure_verse(quibble_verse *qv, int n, ...);
 quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
@@ -71,7 +73,7 @@ bool qb_is_verse(char *verse, int offset);
 
 // Reads an input file and parses everything into verses or OCL functions
 quibble_program qb_parse_program(char *buffer);
-quibble_program qb_create_program(char *filename);
+quibble_program qb_parse_program_file(char *filename);
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name);
 quibble_stanza qb_find_stanza(quibble_program qp, char *stanza_name);
 quibble_poem qb_find_poem(quibble_program qp, char *poem_name);
