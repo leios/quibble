@@ -7,9 +7,10 @@
 #include <stdarg.h>
 
 #include "macros.h"
+#include <CL/cl.h>
 #include "io.h"
+#include "errors.h"
 #include "quibble_args.h"
-#include "quibble_inputs.h"
 
 typedef struct{
     char *body;
@@ -18,7 +19,6 @@ typedef struct{
     quibble_arg *args;
     int num_kwargs;
     int num_args;
-    bool echo;
 } quibble_verse;
 
 typedef struct{
@@ -47,16 +47,28 @@ typedef struct{
     int num_verses;
     int num_stanzas;
     int num_poems;
+
+    // CL stuff
+    cl_platform_id *platform_ids;
+    cl_device_id *device_ids;
+    cl_uint num_devices;
+    cl_uint num_platforms;
+    int chosen_platform;
+    int chosen_device;
+    cl_context context;
+    cl_command_queue command_queue;
+    cl_program program;
+    cl_kernel kernel;
+    size_t global_item_size;
+    size_t local_item_size;
+    int stage;
+
 } quibble_program;
 
 // TODO
 void qb_configure_program(quibble_program *qp, int n, ...);
 void qb_set_args(quibble_program *qp, char *poem, int n, ...);
 void qb_set_device(quibble_program *qp, int platform, int device);
-// Remove echoes
-void qb_configure_verse(quibble_verse *qv, int n, ...);
-quibble_verse qb_echo_verse(quibble_verse qv, int n, ...);
-
 
 // string manip
 bool qb_is_stanza(char *stanza, int offset);

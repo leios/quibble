@@ -83,11 +83,11 @@ quibble_verse qb_parse_verse(char *verse){
         final_verse.body = NULL;
     }
     final_verse.name = qb_strip_spaces(verse, offset, config_start-2);
-    final_verse.echo = false;
 
     return final_verse;
 }
 
+/*
 // Configures prologues of existing verses
 // The variadic function takes triples after the initial verse and number of
 // kwargs being modified:
@@ -186,6 +186,7 @@ quibble_verse qb_echo_verse(quibble_verse qv, int n, ...){
 
     return final_qv;
 }
+*/
 
 char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
 
@@ -221,10 +222,8 @@ char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
 }
 
 void qb_free_verse(quibble_verse qv){
-    if (qv.echo == false){
-        free(qv.body);
-        free(qv.name);
-    }
+    free(qv.body);
+    free(qv.name);
     qb_free_kwarg_array(qv.kwargs, qv.num_kwargs);
     qb_free_arg_array(qv.args, qv.num_args);
 }

@@ -23,14 +23,8 @@ add_executable(
     include/errors.h
     src/errors.c
 
-    include/quibble_inputs.h
-    src/quibble_inputs.c
-
     include/io.h
     src/io.c
-
-    include/quibble_canvas.h
-    src/quibble_canvas.c
 
     include/quibble_args.h
     src/quibble_args.c
@@ -54,17 +48,11 @@ target_link_libraries(quibble asan OpenCL::OpenCL)
 
 add_executable(
     qbinfo
-    include/macros.h
 
     include/errors.h
     src/errors.c
 
-    include/quibble_inputs.h
-    src/quibble_inputs.c
-
-    include/quibble_canvas.h
-    src/quibble_canvas.c
-
+    include/qbinfo.h
     src/qbinfo.c
 )
 
