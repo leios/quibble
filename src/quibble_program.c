@@ -567,3 +567,33 @@ void qb_run(quibble_program qp, char *kernel_name,
     );
 
 }
+
+void qb_set_arg(quibble_program *qp, char *poem, char *arg, size_t object_size,
+                void *data){
+    int poem_index = qb_find_poem_index(*qp, poem);
+    int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
+                                      qp->poem_list[poem_index].num_args,
+                                      arg);
+    clSetKernelArg(qp->kernels[poem_index],
+                   arg_index,
+                   object_size,
+                   (void *)&data);
+}
+
+void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
+    for (int i = 0; i < n; ++i){
+        char *curr_arg = va_arg(args, char *);
+        size_t curr_size = va_arg(args, size_t);
+        void *curr_data = va_arg(args, void *);
+        qb_set_arg(qp, poem, curr_arg, curr_size, curr_data);
+    }
+}
+
+void qb_set_args(quibble_program *qp, char *poem, int n, ...){
+    va_list args;
+    va_start(args, n);
+
+    qb_set_args_variadic(qp, poem, n, args);
+ 
+    va_end(args);
+}
