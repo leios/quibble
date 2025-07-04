@@ -397,10 +397,10 @@ void qb_free_program(quibble_program qp){
         cl_check(clFinish(qp.command_queue));
         cl_check(clReleaseCommandQueue(qp.command_queue));
         cl_check(clReleaseContext(qp.context));
+        cl_check(clReleaseProgram(qp.program));
 
         for (int i = 0; i < qp.num_poems; ++i){
             cl_check(clReleaseKernel(qp.kernels[i]));
-            cl_check(clReleaseProgram(qp.programs[i]));
         }
     }
 }
@@ -519,29 +519,29 @@ void qb_configure_program(quibble_program *qp, int platform, int device){
     cl_check(err);
 
     // Create program
-    qp->programs = (cl_program *)malloc(sizeof(cl_kernel)*qp->num_poems);
+    size_t kernel_size = strlen(qp->body);
+    qp->program = clCreateProgramWithSource(
+        qp->context,
+        1,
+        (const char**)&qp->body,
+        (const size_t *)&kernel_size,
+        &err
+    );
+    cl_check(err);
+
+    err = clBuildProgram(qp->program,
+                         1,
+                         &qp->device_ids[qp->chosen_device],
+                         NULL,
+                         NULL,
+                         NULL);
+    cl_check_program(err, qp->program,
+                     qp->device_ids[qp->chosen_device]);
+
     qp->kernels = (cl_kernel *)malloc(sizeof(cl_kernel)*qp->num_poems);
     for (int i = 0; i < qp->num_poems; ++i){
-        size_t kernel_size = strlen(qp->poem_list[i].body);
-        qp->programs[i] = clCreateProgramWithSource(
-            qp->context,
-            1,
-            (const char**)&qp->poem_list[i].body,
-            (const size_t *)&kernel_size,
-            &err
-        );
-        cl_check(err);
 
-        err = clBuildProgram(qp->programs[i],
-                              1,
-                              &qp->device_ids[qp->chosen_device],
-                              NULL,
-                              NULL,
-                              NULL);
-        cl_check_program(err, qp->programs[i],
-                         qp->device_ids[qp->chosen_device]);
-
-        qp->kernels[i] = clCreateKernel(qp->programs[i], 
+        qp->kernels[i] = clCreateKernel(qp->program, 
                                         qp->poem_list[i].name, &err);
         cl_check(err);
     }

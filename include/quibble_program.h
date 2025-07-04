@@ -57,13 +57,15 @@ typedef struct{
     int chosen_device;
     cl_context context;
     cl_command_queue command_queue;
-    cl_program *programs;
+    cl_program program;
     cl_kernel *kernels;
-    size_t global_item_size;
-    size_t local_item_size;
     bool configured;
 
 } quibble_program;
+
+// TODO
+void qb_set_arg(quibble_program *qp, char *poem, int n, ...);
+void qb_set_args(quibble_program *qp, char *poem, int n, ...);
 
 // OpenCL Interface
 char *get_device_name(cl_device_id device_id);
@@ -71,8 +73,10 @@ char *get_platform_name(cl_platform_id platform_id);
 void qb_find_platforms(quibble_program *qp);
 void qb_find_devices(quibble_program *qp);
 void qb_configure_program(quibble_program *qp, int platform, int device);
+void qb_run(quibble_program qp, char *kernel_name,
+            size_t global_item_size,
+            size_t local_item_size);
 
-void qb_set_args(quibble_program *qp, char *poem, int n, ...);
 
 // string manip
 bool qb_is_stanza(char *stanza, int offset);
