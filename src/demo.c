@@ -12,7 +12,6 @@ Purpose: This file is a quick example of how we might read function fragments in
 #include <CL/cl.h>
 
 #include "../include/errors.h"
-#include "../include/quibble_canvas.h"
 #include "../include/quibble_program.h"
 #include "../test/tests.h"
 

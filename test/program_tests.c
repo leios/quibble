@@ -165,8 +165,6 @@ void quibble_program_tests(){
 
     quibble_program qp_check = qb_parse_program(simple_program);
 
-    qb_print_program(qp_check);
-
     if (qp_check.num_verses == 1 &&
         qp_check.everything_else == NULL &&
         strcmp(qp_check.verse_list[0].name, "check") == 0 &&
@@ -185,9 +183,6 @@ void quibble_program_tests(){
     char *filename = qb_config_file("scribbles/example.qbl");
     quibble_program qp_2 = qb_parse_program_file(filename);
     free(filename);
-
-    qb_print_program(qp_2);
-
 
     if (qp_2.num_verses == 4 &&
         strcmp(qp_2.verse_list[0].name, "nothing") == 0 &&

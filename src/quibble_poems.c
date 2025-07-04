@@ -244,12 +244,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
         final_body[i] = tmp_body[i];
     }
 
-    printf(tmp_body);
-    printf("\n\n");
-    printf(final_body);
-    printf("\n\n");
     free(tmp_body);
-
     return final_body;
 
 }

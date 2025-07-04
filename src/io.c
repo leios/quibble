@@ -37,7 +37,7 @@ char *qb_config_file(char *path){
         strcat(ret, "/");
     }
     strcat(ret, path);
-    printf("PATH:%s\n", ret);
+
     return ret;
 }
 
