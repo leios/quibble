@@ -42,6 +42,12 @@ quibble_program qb_parse_program_file(char *filename){
     fclose(fileptr);
     quibble_program qp = qb_parse_program(buffer);
 
+    // Setting default to 0,0
+    qb_find_platforms(&qp);
+    qb_find_devices(&qp);
+
+    qp.configured = false;
+
     return qp;
 }
 
@@ -382,6 +388,21 @@ void qb_free_program(quibble_program qp){
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
+
+    // OpenCL freeing
+    free(qp.platform_ids);
+    free(qp.device_ids);
+    if (qp.configured){
+        cl_check(clFlush(qp.command_queue));
+        cl_check(clFinish(qp.command_queue));
+        cl_check(clReleaseCommandQueue(qp.command_queue));
+        cl_check(clReleaseContext(qp.context));
+
+        for (int i = 0; i < qp.num_poems; ++i){
+            cl_check(clReleaseKernel(qp.kernels[i]));
+            cl_check(clReleaseProgram(qp.programs[i]));
+        }
+    }
 }
 
 void qb_print_program(quibble_program qp){
@@ -400,4 +421,149 @@ void qb_print_program(quibble_program qp){
     for (int i = 0; i < qp.num_verses; ++i){
         qb_print_verse(qp.verse_list[i]);
     }
+
+    print_cl_info(qp);
+}
+
+/*----------------------------------------------------------------------------//
+    OpenCL Interface
+//----------------------------------------------------------------------------*/
+
+char *get_device_name(cl_device_id device_id){
+    size_t size;
+    clGetDeviceInfo(device_id, CL_DEVICE_NAME, 0, NULL, &size);
+    char *str = (char *)malloc(size);
+    clGetDeviceInfo(device_id, CL_DEVICE_NAME, size, str, NULL);
+    return str;
+}
+
+char *get_platform_name(cl_platform_id platform_id){
+    size_t size;
+    clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, 0, NULL, &size);
+    char *str = (char *)malloc(size);
+    clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, size, str, NULL);
+    return str;
+}
+
+void print_cl_info(quibble_program qp){
+    char *platform_name =
+        get_platform_name(qp.platform_ids[qp.chosen_platform]);
+    char *device_name = get_device_name(qp.device_ids[qp.chosen_device]);
+
+    printf("Platform: %s\nDevice: %s\n\n", platform_name, device_name);
+    free(platform_name);
+    free(device_name);
+}
+
+void qb_find_platforms(quibble_program *qp){
+    // 10 is arbitrary, but should be high enough for almost any task
+    // This finds &qp->num_platforms
+    cl_check(
+        clGetPlatformIDs(10, NULL, &qp->num_platforms)
+    );
+
+    qp->platform_ids = (cl_platform_id *)malloc(qp->num_platforms *
+                                                sizeof(cl_platform_id));
+
+    // This finds qp->platform_ids,
+    cl_check(
+        clGetPlatformIDs(qp->num_platforms, qp->platform_ids, NULL)
+    );
+}
+
+void qb_find_devices(quibble_program *qp){
+
+    // finds &qp->num_devices
+    cl_check(
+        clGetDeviceIDs(qp->platform_ids[qp->chosen_platform],
+                       CL_DEVICE_TYPE_ALL,
+                       0,
+                       NULL,
+                       &qp->num_devices)
+    );
+
+    qp->device_ids = (cl_device_id *)malloc(qp->num_devices *
+                                            sizeof(cl_device_id));
+
+    // finds &qp->num_devices
+    cl_check(
+        clGetDeviceIDs(qp->platform_ids[qp->chosen_platform],
+                       CL_DEVICE_TYPE_ALL,
+                       qp->num_devices,
+                       qp->device_ids,
+                       &qp->num_devices)
+    );
+
+}
+
+void qb_configure_program(quibble_program *qp, int platform, int device){
+    qp->chosen_platform = platform;
+    qp->chosen_device = device;
+
+    cl_int err;
+
+    qp->context = clCreateContext(NULL,
+                                  1,
+                                  &qp->device_ids[qp->chosen_device],
+                                  NULL,
+                                  NULL,
+                                  &err);
+    cl_check(err);
+
+    qp->command_queue = clCreateCommandQueueWithProperties(
+         qp->context,
+         qp->device_ids[qp->chosen_device],
+         0,
+         &err
+    );
+    cl_check(err);
+
+    // Create program
+    qp->programs = (cl_program *)malloc(sizeof(cl_kernel)*qp->num_poems);
+    qp->kernels = (cl_kernel *)malloc(sizeof(cl_kernel)*qp->num_poems);
+    for (int i = 0; i < qp->num_poems; ++i){
+        size_t kernel_size = strlen(qp->poem_list[i].body);
+        qp->programs[i] = clCreateProgramWithSource(
+            qp->context,
+            1,
+            (const char**)&qp->poem_list[i].body,
+            (const size_t *)&kernel_size,
+            &err
+        );
+        cl_check(err);
+
+        err = clBuildProgram(qp->programs[i],
+                              1,
+                              &qp->device_ids[qp->chosen_device],
+                              NULL,
+                              NULL,
+                              NULL);
+        cl_check_program(err, qp->programs[i],
+                         qp->device_ids[qp->chosen_device]);
+
+        qp->kernels[i] = clCreateKernel(qp->programs[i], 
+                                        qp->poem_list[i].name, &err);
+        cl_check(err);
+    }
+
+    qp->configured = true;
+
+}
+
+void qb_run(quibble_program qp, char *kernel_name,
+            size_t global_item_size,
+            size_t local_item_size){
+    int kernel_num = qb_find_poem_index(qp, kernel_name);
+    cl_check(
+        clEnqueueNDRangeKernel(qp.command_queue,
+                               qp.kernels[kernel_num],
+                               1,
+                               NULL,
+                               &global_item_size,
+                               &local_item_size,
+                               0,
+                               NULL,
+                               NULL)
+    );
+
 }
