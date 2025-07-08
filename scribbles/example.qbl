@@ -2,31 +2,36 @@ void simple_print(){
     printf("printing from kernel...\n");
 }
 
-__verse nothing(){}
-__stanza nothing(){}
-__poem nothing(){}
+__verse nothing(void){}
+__stanza nothing(void){}
+__poem nothing(void){}
 
-__verse no_args(){// do stuff verse}
-__stanza no_args(){// do stuff stanza}
-__poem no_args(){// do stuff poem}
+__verse no_args(void){// do stuff verse}
+__stanza no_args(void){// do stuff stanza}
+__poem no_args(void){// do stuff poem}
 
-__verse no_body(a){}
-__stanza no_body(a){}
-__poem no_body(a){}
+__verse no_body(int a){}
+__stanza no_body(int a){}
+__poem no_body(int a){}
 
-__verse mult_by(float *a | float factor = 8;){
+__verse mult_by(__global float *a | float factor = 8;){
     a[_idx] *= factor;
 }
 
 void is_this_found(){};
 
-__stanza stanza_check(float *a, float *b, float *c | float r = 1.0;){
+__stanza stanza_check(__global float *a,
+                      __global float *b,
+                      __global float *c | float r = 1.0;){
     c[_idx] = a[_idx] + b[_idx];
     __split_stanza();
-    c[idx] += 1;
+    c[_idx] += 1;
 }
 
-__poem poem_check(float *a, float *b, float *c, stanza_num){
+__poem poem_check(__global float *a,
+                  __global float *b,
+                  __global float *c,
+                  int stanza_num){
     if (stanza_num == 0){
         @SCALL stanza_check(a, b, c){
             @VCALL mult_by(c | factor = 2;);

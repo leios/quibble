@@ -196,6 +196,19 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program_file\n");
     }
 
+    qb_configure_program(&qp_2, 0, 0);
+    int stanza_num = 0;
+    qb_set_arg(&qp_2, "poem_check", "stanza_num", sizeof(int), &stanza_num);
+/*
+    void qb_set_arg(quibble_program *qp, char *poem, char *arg, size_t object_size,
+                    void *data);
+    void qb_set_args(quibble_program *qp, char *poem, int n, ...);
+    void qb_run(quibble_program qp, char *kernel_name,
+                size_t global_item_size,
+                size_t local_item_size);
+*/
 
+
+    qb_print_program(qp_2);
     qb_free_program(qp_2);
 }
