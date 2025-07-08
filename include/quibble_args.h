@@ -9,13 +9,18 @@
 #include "io.h"
 
 typedef struct{
+    char *type;
     char *variable;
 } quibble_arg;
 
 typedef struct{
+    char *type;
     char *variable;
     char *value;
 } quibble_kwarg;
+
+void qb_parse_arg(quibble_arg *qa, char *arg);
+void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs);
 
 // Args / Kwargs
 int qb_find_number_of_kwargs(char *config);

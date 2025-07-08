@@ -6,6 +6,63 @@
 
 #include "../include/quibble_args.h"
 
+void qb_parse_arg(quibble_arg *qa, char *arg){
+    int len = strlen(arg);
+    bool iterate = true;
+    int index = len-1;
+
+    while (iterate){
+        if (arg[index] == '*' || qb_is_space(arg[index])){
+            iterate = false;
+        }
+        index -= 1;
+        if (index < 0){
+            iterate = false;
+        }
+    }
+
+    if (index < 0){
+        qa->type = NULL;
+        qa->variable = arg;
+    }
+    else {
+        qa->type = qb_strip_spaces(arg, 0, index);
+        qa->variable = qb_strip_spaces(arg, index, len);
+        free(arg);
+    }
+
+}
+
+void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs){
+
+    int len = strlen(lhs);
+    bool iterate = true;
+    int index = len-1;
+
+    while (iterate){
+        if (lhs[index] == '*' || qb_is_space(lhs[index])){
+            iterate = false;
+        }
+        index -= 1;
+        if (index < 0){
+            iterate = false;
+        }
+    }
+
+    if (index < 0){
+        qk->type = NULL;
+        qk->variable = lhs;
+    }
+    else {
+        qk->type = qb_strip_spaces(lhs, 0, index);
+        qk->variable = qb_strip_spaces(lhs, index, len);
+        free(lhs);
+    }
+
+    qk->value = rhs;
+}
+
+
 int qb_find_number_of_args(char *config){
 
     int config_size = strlen(config);
@@ -101,6 +158,7 @@ int qb_find_number_of_kwargs(char *config){
     return num_entries;
 
 }
+
 int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
     if (n <= 0){
         return -1;
@@ -151,8 +209,8 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
             if (next_comma < 0){
                 next_comma = config_size;
             }
-            final_args[curr_entry].variable =
-                qb_strip_spaces(config, i, next_comma-1);
+            qb_parse_arg(&final_args[curr_entry],
+                         qb_strip_spaces(config, i, next_comma-1));
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
@@ -195,11 +253,11 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries){
             next_equal = qb_find_next_char(config, i, '=');
             next_semicolon = qb_find_next_char(config, i, ';');
 
-            final_kwargs[curr_entry].variable =
-                qb_strip_spaces(config, i, next_equal-1);
-
-            final_kwargs[curr_entry].value =
-                qb_strip_spaces(config, next_equal+1, next_semicolon-1);
+            qb_parse_kwarg(&final_kwargs[curr_entry],
+                           qb_strip_spaces(config, i, next_equal-1),
+                           qb_strip_spaces(config,
+                                           next_equal+1,
+                                           next_semicolon-1));
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
@@ -235,6 +293,9 @@ char *qb_create_prologue(char *config, char *name,
     if (num_config_args == num_args){
         quibble_arg *temp_args = qb_parse_args(config, num_args);
         for (int i = 0; i < num_args; ++i){
+            if (qargs[i].type != NULL){
+                strcat(temp, qargs[i].type);
+            }
             strcat(temp, qargs[i].variable);
             strcat(temp, " = ");
             strcat(temp, temp_args[i].variable);
@@ -268,6 +329,9 @@ char *qb_create_prologue(char *config, char *name,
                 }
             }
 
+            if (qkwargs[i].type != NULL){
+                strcat(temp, qkwargs[i].type);
+            }
             strcat(temp, qkwargs[i].variable);
             strcat(temp, " = ");
             strcat(temp, value);
@@ -300,10 +364,12 @@ char *qb_create_prologue(char *config, char *name,
 //----------------------------------------------------------------------------*/
 
 void qb_free_arg(quibble_arg qarg){
+    free(qarg.type);
     free(qarg.variable);
 }
 
 void qb_free_kwarg(quibble_kwarg qkwarg){
+    free(qkwarg.type);
     free(qkwarg.variable);
     free(qkwarg.value);
 }
