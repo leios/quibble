@@ -21,13 +21,15 @@ void qb_parse_arg(quibble_arg *qa, char *arg){
         }
     }
 
+    // `index` should be just before the last character of the type or -1
     if (index < 0){
         qa->type = NULL;
         qa->variable = arg;
     }
     else {
+        index++;
         qa->type = qb_strip_spaces(arg, 0, index);
-        qa->variable = qb_strip_spaces(arg, index, len);
+        qa->variable = qb_strip_spaces(arg, index+1, len);
         free(arg);
     }
 
@@ -49,13 +51,15 @@ void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs){
         }
     }
 
+    // `index` should be just before the last character of the type or -1
     if (index < 0){
         qk->type = NULL;
         qk->variable = lhs;
     }
     else {
+        index++;
         qk->type = qb_strip_spaces(lhs, 0, index);
-        qk->variable = qb_strip_spaces(lhs, index, len);
+        qk->variable = qb_strip_spaces(lhs, index+1, len);
         free(lhs);
     }
 
@@ -331,6 +335,7 @@ char *qb_create_prologue(char *config, char *name,
 
             if (qkwargs[i].type != NULL){
                 strcat(temp, qkwargs[i].type);
+                strcat(temp, " ");
             }
             strcat(temp, qkwargs[i].variable);
             strcat(temp, " = ");
@@ -341,6 +346,10 @@ char *qb_create_prologue(char *config, char *name,
     }
     else {
         for (int i = 0; i < num_kwargs; ++i){
+            if (qkwargs[i].type != NULL){
+                strcat(temp, qkwargs[i].type);
+                strcat(temp, " ");
+            }
             strcat(temp, qkwargs[i].variable);
             strcat(temp, " = ");
             strcat(temp, qkwargs[i].value);

@@ -98,6 +98,11 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     if (qp.poem_list[poem_index].num_args > 0){
         //strcat(tmp_body, ", ");
         for (int i = 0; i < qp.poem_list[poem_index].num_args; ++i){
+
+            if (qp.poem_list[poem_index].args[i].type != NULL){
+                strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
+                strcat(tmp_body, " ");
+            }
             strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
             if (i == qp.poem_list[poem_index].num_args - 1){
                 strcat(tmp_body, "){\n");

@@ -4,9 +4,9 @@ void quibble_arg_parsing_tests(void){
 
     printf("Arg / Kwarg Parsing Tests...\n");
     // qb_parse_kwargs
-    char prologue_1[10] = " | x = 5;";
-    char prologue_2[30] = "a , b, c | x = 5; y = 2*x+3;";
-    char prologue_3[60] = "\t\n a, \t b, \n c \n | \t\n variable\t\n = \t\t\n whatever\n\n\t ;";
+    char prologue_1[20] = " | float *x = 5;";
+    char prologue_2[100] = "float *a , int b, double c | x = 5; y = 2*x+3;";
+    char prologue_3[100] = "\t\n a, \t b, \n int c \n | \t\n int variable\t\n = \t\t\n whatever\n\n\t ;";
     char prologue_4[10] = "a,b,c";
     char prologue_5[10] = "meh| ";
     char prologue_6[10] = "a=6;";
@@ -54,6 +54,7 @@ void quibble_arg_parsing_tests(void){
         qb_parse_kwargs(prologue_7, num_kwargs_7);
 
     if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
+        strcmp(check_kwargs_1[0].type, "float *") == 0 &&
         strcmp(check_kwargs_1[0].value, "5") == 0 &&
         strcmp(check_kwargs_2[0].variable, "x") == 0 &&
         strcmp(check_kwargs_2[0].value, "5") == 0 &&
@@ -61,10 +62,12 @@ void quibble_arg_parsing_tests(void){
         strcmp(check_kwargs_2[1].value, "2*x+3") == 0 &&
         strcmp(check_kwargs_3[0].variable, "variable") == 0 &&
         strcmp(check_kwargs_3[0].value, "whatever") == 0 &&
+        strcmp(check_kwargs_3[0].type, "int") == 0 &&
         check_kwargs_4 == NULL && check_kwargs_5 == NULL &&
         check_kwargs_7 == NULL &&
         strcmp(check_kwargs_6[0].variable, "a") == 0 &&
-        strcmp(check_kwargs_6[0].value, "6") == 0 ){
+        strcmp(check_kwargs_6[0].value, "6") == 0 &&
+        check_kwargs_6[0].type == NULL ){
         printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_kwargs\n");
     }
     else {
@@ -119,11 +122,14 @@ void quibble_arg_parsing_tests(void){
 
     if (check_args_1 == NULL &&
         strcmp(check_args_2[0].variable, "a") == 0 &&
+        strcmp(check_args_2[0].type, "float *") == 0 &&
         strcmp(check_args_2[1].variable, "b") == 0 &&
+        strcmp(check_args_2[1].type, "int") == 0 &&
         strcmp(check_args_2[2].variable, "c") == 0 &&
         strcmp(check_args_3[0].variable, "a") == 0 &&
         strcmp(check_args_3[1].variable, "b") == 0 &&
         strcmp(check_args_3[2].variable, "c") == 0 &&
+        strcmp(check_args_3[2].type, "int") == 0 &&
         strcmp(check_args_4[0].variable, "a") == 0 &&
         strcmp(check_args_4[1].variable, "b") == 0 &&
         strcmp(check_args_4[2].variable, "c") == 0 &&
