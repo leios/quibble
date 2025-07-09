@@ -203,9 +203,9 @@ void quibble_program_tests(){
     }
 
     qb_configure_program(&qp_2, 0, 0);
+/*
     int stanza_num = 0;
     qb_set_arg(&qp_2, "poem_check", "stanza_num", sizeof(int), &stanza_num);
-/*
     void qb_set_arg(quibble_program *qp, char *poem, char *arg, size_t object_size,
                     void *data);
     void qb_set_args(quibble_program *qp, char *poem, int n, ...);

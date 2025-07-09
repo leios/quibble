@@ -42,10 +42,6 @@ quibble_program qb_parse_program_file(char *filename){
     fclose(fileptr);
     quibble_program qp = qb_parse_program(buffer);
 
-    // Setting default to 0,0
-    qb_find_platforms(&qp);
-    qb_find_devices(&qp);
-
     qp.configured = false;
 
     return qp;
@@ -390,9 +386,9 @@ void qb_free_program(quibble_program qp){
     free(qp.poem_list);
 
     // OpenCL freeing
-    free(qp.platform_ids);
-    free(qp.device_ids);
     if (qp.configured){
+        free(qp.platform_ids);
+        free(qp.device_ids);
         cl_check(clFlush(qp.command_queue));
         cl_check(clFinish(qp.command_queue));
         cl_check(clReleaseCommandQueue(qp.command_queue));
@@ -402,6 +398,7 @@ void qb_free_program(quibble_program qp){
         for (int i = 0; i < qp.num_poems; ++i){
             cl_check(clReleaseKernel(qp.kernels[i]));
         }
+        free(qp.kernels);
     }
 }
 
@@ -500,6 +497,9 @@ void qb_configure_program(quibble_program *qp, int platform, int device){
     qp->chosen_platform = platform;
     qp->chosen_device = device;
 
+    qb_find_platforms(qp);
+    qb_find_devices(qp);
+
     cl_int err;
 
     qp->context = clCreateContext(NULL,
@@ -547,7 +547,6 @@ void qb_configure_program(quibble_program *qp, int platform, int device){
     }
 
     qp->configured = true;
-
 }
 
 void qb_run(quibble_program qp, char *kernel_name,
