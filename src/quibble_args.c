@@ -6,7 +6,7 @@
 
 #include "../include/quibble_args.h"
 
-void qb_parse_arg(quibble_arg *qa, char *arg){
+void qb_find_type_arg(char *arg, char **type, char **variable){
     int len = strlen(arg);
     bool iterate = true;
     int index = len-1;
@@ -23,45 +23,26 @@ void qb_parse_arg(quibble_arg *qa, char *arg){
 
     // `index` should be just before the last character of the type or -1
     if (index < 0){
-        qa->type = NULL;
-        qa->variable = arg;
+        type[0] = NULL;
+        variable[0] = arg;
     }
     else {
         index++;
-        qa->type = qb_strip_spaces(arg, 0, index);
-        qa->variable = qb_strip_spaces(arg, index+1, len);
+        type[0] = qb_strip_spaces(arg, 0, index);
+        variable[0] = qb_strip_spaces(arg, index+1, len);
         free(arg);
     }
 
 }
 
+void qb_parse_arg(quibble_arg *qa, char *arg){
+    qb_find_type_arg(arg, &qa->type, &qa->variable);
+
+}
+
 void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs){
 
-    int len = strlen(lhs);
-    bool iterate = true;
-    int index = len-1;
-
-    while (iterate){
-        if (lhs[index] == '*' || qb_is_space(lhs[index])){
-            iterate = false;
-        }
-        index -= 1;
-        if (index < 0){
-            iterate = false;
-        }
-    }
-
-    // `index` should be just before the last character of the type or -1
-    if (index < 0){
-        qk->type = NULL;
-        qk->variable = lhs;
-    }
-    else {
-        index++;
-        qk->type = qb_strip_spaces(lhs, 0, index);
-        qk->variable = qb_strip_spaces(lhs, index+1, len);
-        free(lhs);
-    }
+    qb_find_type_arg(lhs, &qk->type, &qk->variable);
 
     qk->value = rhs;
 }

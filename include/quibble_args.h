@@ -19,6 +19,7 @@ typedef struct{
     char *value;
 } quibble_kwarg;
 
+void qb_find_type_arg(char *arg, char **type, char **variable);
 void qb_parse_arg(quibble_arg *qa, char *arg);
 void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs);
 
