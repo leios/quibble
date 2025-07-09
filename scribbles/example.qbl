@@ -23,19 +23,24 @@ void is_this_found(){};
 __stanza stanza_check(__global float *a,
                       __global float *b,
                       __global float *c | float r = 1.0;){
-    c[_idx] = a[_idx] + b[_idx];
-    __split_stanza();
-    c[_idx] += 1;
+    if (_idx < array_size){
+        c[_idx] = a[_idx] + b[_idx];
+        __split_stanza();
+        c[_idx] += 1; // checking comments
+    } // checking comments
 }
 
 __poem poem_check(__global float *a,
                   __global float *b,
                   __global float *c,
-                  int stanza_num){
+                  int stanza_num, 
+                  int array_size){
     if (stanza_num == 0){
         @SCALL stanza_check(a, b, c){
             @VCALL mult_by(c | factor = 2;);
         }
-        @VCALL mult_by(c | factor = 0.5;);
+        if (_idx < array_size){
+            @VCALL mult_by(c | factor = 0.5;);
+        }
     }
 }

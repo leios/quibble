@@ -419,7 +419,9 @@ void qb_print_program(quibble_program qp){
         qb_print_verse(qp.verse_list[i]);
     }
 
-    print_cl_info(qp);
+    if (qp.configured){
+        print_cl_info(qp);
+    }
 }
 
 /*----------------------------------------------------------------------------//
@@ -538,21 +540,23 @@ void qb_configure_program(quibble_program *qp, int platform, int device){
     cl_check_program(err, qp->program,
                      qp->device_ids[qp->chosen_device]);
 
-    qp->kernels = (cl_kernel *)malloc(sizeof(cl_kernel)*qp->num_poems);
+    cl_kernel *kernels = (cl_kernel *)malloc(sizeof(cl_kernel)*qp->num_poems);
     for (int i = 0; i < qp->num_poems; ++i){
 
-        qp->kernels[i] = clCreateKernel(qp->program, 
-                                        qp->poem_list[i].name, &err);
+        kernels[i] = clCreateKernel(qp->program, qp->poem_list[i].name, &err);
         cl_check(err);
     }
 
+    qp->kernels = kernels;
     qp->configured = true;
 }
 
 void qb_run(quibble_program qp, char *kernel_name,
             size_t global_item_size,
             size_t local_item_size){
+
     int kernel_num = qb_find_poem_index(qp, kernel_name);
+
     cl_check(
         clEnqueueNDRangeKernel(qp.command_queue,
                                qp.kernels[kernel_num],
@@ -573,10 +577,12 @@ void qb_set_arg(quibble_program *qp, char *poem, char *arg, size_t object_size,
     int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
                                       qp->poem_list[poem_index].num_args,
                                       arg);
-    clSetKernelArg(qp->kernels[poem_index],
-                   arg_index,
-                   object_size,
-                   (void *)&data);
+    cl_check(
+        clSetKernelArg(qp->kernels[poem_index],
+                       arg_index,
+                       object_size,
+                       (void *)data)
+    );
 }
 
 void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
@@ -590,7 +596,7 @@ void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
 
 void qb_set_args(quibble_program *qp, char *poem, int n, ...){
     va_list args;
-    va_start(args, n);
+    va_start(args, 3*n);
 
     qb_set_args_variadic(qp, poem, n, args);
  

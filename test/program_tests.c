@@ -202,19 +202,99 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program_file\n");
     }
 
-    qb_configure_program(&qp_2, 0, 0);
-/*
-    int stanza_num = 0;
-    qb_set_arg(&qp_2, "poem_check", "stanza_num", sizeof(int), &stanza_num);
-    void qb_set_arg(quibble_program *qp, char *poem, char *arg, size_t object_size,
-                    void *data);
-    void qb_set_args(quibble_program *qp, char *poem, int n, ...);
-    void qb_run(quibble_program qp, char *kernel_name,
-                size_t global_item_size,
-                size_t local_item_size);
-*/
-
-
     qb_print_program(qp_2);
+    qb_configure_program(&qp_2, 0, 0);
+    int stanza_num = 0;
+
+    int array_size = 10; 
+
+    // Getting the arrays ready
+    cl_int err;
+
+    float *a = (float*)malloc(sizeof(float)*array_size);
+    float *b = (float*)malloc(sizeof(float)*array_size);
+    float *c = (float*)malloc(sizeof(float)*array_size);
+
+    for (int i = 0; i < array_size; ++i){
+        a[i] = 1;
+        b[i] = 1;
+        c[i] = 0;
+    }
+
+    cl_mem d_a = clCreateBuffer(qp_2.context,
+                                CL_MEM_READ_WRITE,
+                                array_size * sizeof(float),
+                                NULL,
+                                &err);
+
+    cl_check(err);
+
+    cl_mem d_b = clCreateBuffer(qp_2.context,
+                                CL_MEM_READ_WRITE,
+                                array_size * sizeof(float),
+                                NULL,
+                                &err);
+
+    cl_check(err);
+
+    cl_mem d_c = clCreateBuffer(qp_2.context,
+                                CL_MEM_READ_WRITE,
+                                array_size * sizeof(float),
+                                NULL,
+                                &err);
+
+    cl_check(err);
+
+    cl_check(
+        clEnqueueWriteBuffer(qp_2.command_queue,
+                             d_a,
+                             CL_TRUE,
+                             0,
+                             array_size * sizeof(float),
+                             a,
+                             0,
+                             NULL,
+                             NULL)
+    );
+
+    cl_check(
+        clEnqueueWriteBuffer(qp_2.command_queue,
+                             d_b,
+                             CL_TRUE,
+                             0,
+                             array_size * sizeof(float),
+                             b,
+                             0,
+                             NULL,
+                             NULL)
+    );
+
+    cl_check(
+        clEnqueueWriteBuffer(qp_2.command_queue,
+                             d_c,
+                             CL_TRUE,
+                             0,
+                             array_size * sizeof(float),
+                             c,
+                             0,
+                             NULL,
+                             NULL)
+    );
+
+    qb_set_args(&qp_2, "poem_check", 3, "a", sizeof(cl_mem), &d_a,
+                                        "b", sizeof(cl_mem), &d_b,
+                                        "c", sizeof(cl_mem), &d_c);
+    qb_set_arg(&qp_2, "poem_check", "stanza_num", sizeof(int), &stanza_num);
+    qb_set_arg(&qp_2, "poem_check", "array_size", sizeof(int), &array_size);
+
+    qb_run(qp_2, "poem_check", array_size, array_size);
+
+    //qb_print_program(qp_2);
+    free(a);
+    free(b);
+    free(c);
+    cl_check(clReleaseMemObject(d_a));
+    cl_check(clReleaseMemObject(d_b));
+    cl_check(clReleaseMemObject(d_c));
     qb_free_program(qp_2);
 }

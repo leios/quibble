@@ -69,9 +69,11 @@ quibble_stanza qb_parse_stanza(char *stanza){
     int prologue_end =
         qb_find_next_string(stanza, prologue_start, "__split_stanza();");
 
+    // No split found
     if (prologue_end < 0){
         is_split = false;
-        prologue_end = qb_find_next_char(stanza, prologue_start-1, '}');
+        prologue_end = qb_find_matching_char(stanza, stanza_size, 
+                                             prologue_start-1, '{', '}');
     }
 
     if (prologue_end-prologue_start > 0 && prologue_end > 0){
@@ -92,7 +94,8 @@ quibble_stanza qb_parse_stanza(char *stanza){
 
     if (is_split){
         int epilogue_start = prologue_end + 18;
-        int epilogue_end = qb_find_next_char(stanza, epilogue_start-1, '}');
+        int epilogue_end = qb_find_matching_char(stanza, stanza_size, 
+                                                 prologue_start-1, '{', '}');
 
         if (epilogue_end-epilogue_start > 0){
             char *epilogue = (char *)calloc((epilogue_end-epilogue_start)+1,
