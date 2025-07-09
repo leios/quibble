@@ -18,6 +18,8 @@ quibble_pixel *qb_create_pixel_array(int height, int width);
 
 char *qb_config_file(char *path);
 
+size_t qb_find_type_size(char *type);
+
 // String Manipulation
 bool qb_is_space(char a);
 char *qb_copy(char *buffer);

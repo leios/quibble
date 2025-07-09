@@ -281,11 +281,11 @@ void quibble_program_tests(){
                              NULL)
     );
 
-    qb_set_args(&qp_2, "poem_check", 3, "a", sizeof(cl_mem), &d_a,
-                                        "b", sizeof(cl_mem), &d_b,
-                                        "c", sizeof(cl_mem), &d_c);
-    qb_set_arg(&qp_2, "poem_check", "stanza_num", sizeof(int), &stanza_num);
-    qb_set_arg(&qp_2, "poem_check", "array_size", sizeof(int), &array_size);
+    qb_set_args(&qp_2, "poem_check", 3, "cl_mem a", &d_a,
+                                        "cl_mem b", &d_b,
+                                        "cl_mem c", &d_c);
+    qb_set_arg(&qp_2, "poem_check", "int stanza_num", &stanza_num);
+    qb_set_arg(&qp_2, "poem_check", "int array_size", &array_size);
 
     qb_run(qp_2, "poem_check", array_size, array_size);
 

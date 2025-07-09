@@ -122,4 +122,43 @@ void quibble_io_tests(void){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_matching_char\n");
     }
 
+    if (qb_find_type_size("bool") == sizeof(char) &&
+        qb_find_type_size("char") == sizeof(char) &&
+        qb_find_type_size("signed char") == sizeof(signed char) &&
+        qb_find_type_size("unsigned char") == sizeof(unsigned char) &&
+        qb_find_type_size("short") == sizeof(short) &&
+        qb_find_type_size("short int") == sizeof(short int) &&
+        qb_find_type_size("signed short") == sizeof(signed short) &&
+        qb_find_type_size("signed short int") == sizeof(signed short int) &&
+        qb_find_type_size("unsigned short") == sizeof(unsigned short) &&
+        qb_find_type_size("unsigned short int") == sizeof(unsigned short int) &&
+        qb_find_type_size("int") == sizeof(int) &&
+        qb_find_type_size("signed") == sizeof(signed) &&
+        qb_find_type_size("signed int") == sizeof(signed int) &&
+        qb_find_type_size("unsigned") == sizeof(unsigned) &&
+        qb_find_type_size("unsigned int") == sizeof(unsigned int) &&
+        qb_find_type_size("long") == sizeof(long) &&
+        qb_find_type_size("long int") == sizeof(long int) &&
+        qb_find_type_size("signed long") == sizeof(signed long) &&
+        qb_find_type_size("signed long int") == sizeof(signed long int) &&
+        qb_find_type_size("unsigned long") == sizeof(unsigned long) &&
+        qb_find_type_size("unsigned long int") == sizeof(unsigned long int) &&
+        qb_find_type_size("long long") == sizeof(long long) &&
+        qb_find_type_size("long long int") == sizeof(long long int) &&
+        qb_find_type_size("signed long long") == sizeof(signed long long) &&
+        qb_find_type_size("signed long long int") == sizeof(signed long long int) &&
+        qb_find_type_size("unsigned long long") == sizeof(unsigned long long) &&
+        qb_find_type_size("unsigned long long int") == sizeof(unsigned long long int) &&
+        qb_find_type_size("float") == sizeof(float) &&
+        qb_find_type_size("double") == sizeof(double) &&
+        qb_find_type_size("long double") == sizeof(long double) &&
+        qb_find_type_size("meh") == sizeof(int) &&
+        qb_find_type_size("char *") == sizeof(char *)){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_type_size\n");
+    }
+    else{
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_type_size\n");
+    }
+
+
 }
