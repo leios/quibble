@@ -202,7 +202,6 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program_file\n");
     }
 
-    qb_print_program(qp_2);
     qb_configure_program(&qp_2, 0, 0);
     int stanza_num = 0;
 
@@ -289,7 +288,33 @@ void quibble_program_tests(){
 
     qb_run(qp_2, "poem_check", array_size, array_size);
 
-    //qb_print_program(qp_2);
+    cl_check(
+        clEnqueueReadBuffer(qp_2.command_queue,
+                            d_c,
+                            CL_TRUE,
+                            0,
+                            array_size * sizeof(float),
+                            c,
+                            0,
+                            NULL,
+                            NULL)
+    );
+
+    bool result = true;
+    for (int i = 0; i < array_size; ++i){
+        if (c[i] != 2.5){
+            result = false;
+        }
+    }
+
+    if (result){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_configure_program\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_configure_program\n");
+    }
+
+
     free(a);
     free(b);
     free(c);

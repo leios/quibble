@@ -215,7 +215,9 @@ char *qb_expand_stanza(quibble_program qp,
     }
 
 
-    strcat(tmp_body, qp.stanza_list[idx].epilogue);
+    if (qp.stanza_list[idx].epilogue != NULL){
+        strcat(tmp_body, qp.stanza_list[idx].epilogue);
+    }
 
     int len = strlen(tmp_body);
     char *final_body = (char *)calloc(len+5, sizeof(char));

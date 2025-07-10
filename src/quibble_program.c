@@ -6,8 +6,6 @@
    Notes: Some unnecessary code duplication here, but... meh
           Make sure to allocate NULL when num_anything == 0
 
-    TODO: qp_parse_program should also build!!!
-
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
@@ -42,8 +40,6 @@ quibble_program qb_parse_program_file(char *filename){
     fclose(fileptr);
     quibble_program qp = qb_parse_program(buffer);
 
-    qp.configured = false;
-
     return qp;
 }
 
@@ -57,6 +53,7 @@ quibble_program qb_parse_program(char *program){
 
     // creating program and populating verses and everything else
     quibble_program qp;
+    qp.configured = false;
 
     qp.num_verses = num_verses;
     qp.num_stanzas = num_stanzas;
