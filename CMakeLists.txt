@@ -7,7 +7,7 @@ find_package(OpenCL REQUIRED)
 if (MSVC)
     add_compile_options(/W4)
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-varargs -fsanitize=address)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-varargs)
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -42,7 +42,7 @@ add_executable(
     src/demo.c
 )
 
-target_link_libraries(quibble asan OpenCL::OpenCL)
+target_link_libraries(quibble OpenCL::OpenCL)
 
 # QBINFO
 
@@ -56,6 +56,6 @@ add_executable(
     src/qbinfo.c
 )
 
-target_link_libraries(qbinfo asan OpenCL::OpenCL)
+target_link_libraries(qbinfo OpenCL::OpenCL)
 
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/configure)
