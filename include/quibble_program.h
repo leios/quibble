@@ -97,6 +97,10 @@ quibble_poem qb_parse_poem(char *stanza);
 quibble_verse qb_parse_verse(char *verse);
 
 // Build / expansion
+bool qb_find_keyword(quibble_program qp, char *keyword);
+bool qb_find_keyword_in_verses(quibble_program qp, char *keyword);
+bool qb_find_keyword_in_stanzas(quibble_program qp, char *keyword);
+bool qb_find_keyword_in_poems(quibble_program qp, char *keyword);
 char *qb_create_prologue(char *config, char *name,
                          quibble_arg *args, int num_args,
                          quibble_kwarg *qkwargs, int num_kwargs);

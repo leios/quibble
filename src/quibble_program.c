@@ -428,6 +428,21 @@ void qb_print_program(quibble_program qp){
     OpenCL Interface
 //----------------------------------------------------------------------------*/
 
+bool qb_find_keyword(quibble_program qp, char *keyword){
+
+    if(qb_find_keyword_in_poems(qp, keyword)){
+        return true;
+    }
+    if(qb_find_keyword_in_stanzas(qp, keyword)){
+        return true;
+    }
+    if(qb_find_keyword_in_verses(qp, keyword)){
+        return true;
+    }
+
+    return false;
+}
+
 char *get_device_name(cl_device_id device_id){
     size_t size;
     clGetDeviceInfo(device_id, CL_DEVICE_NAME, 0, NULL, &size);

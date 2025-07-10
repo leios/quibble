@@ -147,6 +147,10 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
 }
 
 int qb_find_next_char(char *body, int current_index, char a){
+    if (body == NULL){
+        return -1;
+    }
+
     char *ptr = strchr(&body[current_index], a);
     if (ptr != NULL){
         return ptr - body;
@@ -156,6 +160,9 @@ int qb_find_next_char(char *body, int current_index, char a){
 }
 
 int qb_find_next_string(char *body, int current_index, char *a){
+    if (body == NULL){
+        return -1;
+    }
 
     char *ptr = strstr(&body[current_index], a);
     if (ptr != NULL){

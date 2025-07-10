@@ -17,6 +17,23 @@ bool qb_is_stanza(char *stanza, int offset){
     return true;
 }
 
+bool qb_find_keyword_in_stanzas(quibble_program qp, char *keyword){
+    int found_index = -1;
+
+    for (int i = 0; i < qp.num_stanzas; ++i){
+        found_index = qb_find_next_string(qp.stanza_list[i].prologue,
+                                          0,
+                                          keyword);
+        found_index = qb_find_next_string(qp.stanza_list[i].epilogue,
+                                          0,
+                                          keyword);
+    }
+    if (found_index >= 0){
+        return true;
+    }
+    return false;
+}
+
 quibble_stanza qb_parse_stanza(char *stanza){
     int stanza_size = strlen(stanza);
     int offset = 0;

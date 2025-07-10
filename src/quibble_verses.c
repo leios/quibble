@@ -18,6 +18,17 @@ bool qb_is_verse(char *verse, int offset){
     return true;
 }
 
+bool qb_find_keyword_in_verses(quibble_program qp, char *keyword){
+    int found_index = -1;
+    for (int i = 0; i < qp.num_verses; ++i){
+        found_index = qb_find_next_string(qp.verse_list[i].body, 0, keyword);
+    }
+    if (found_index >= 0){
+        return true;
+    }
+    return false;
+}
+
 quibble_verse qb_parse_verse(char *verse){
     int verse_size = strlen(verse);
     int offset = 0;

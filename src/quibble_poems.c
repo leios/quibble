@@ -17,6 +17,18 @@ bool qb_is_poem(char *poem, int offset){
     return true;
 }
 
+bool qb_find_keyword_in_poems(quibble_program qp, char *keyword){
+    int found_index = -1;
+    for (int i = 0; i < qp.num_poems; ++i){
+        found_index = qb_find_next_string(qp.poem_list[i].body, 0, keyword);
+    }
+    if (found_index >= 0){
+        return true;
+    }
+    return false;
+
+}
+
 quibble_poem qb_parse_poem(char *poem){
     int poem_size = strlen(poem);
     int offset = 0;
@@ -118,7 +130,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     }
 
     if (do_expansion){
-        if (qb_find_next_string(body, 0, "_idx") > 0){
+        if (qb_find_keyword(qp, "_idx")){
             strcat(tmp_body, "    int _idx = get_global_id(0);\n");
         }
 
