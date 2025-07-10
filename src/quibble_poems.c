@@ -86,6 +86,7 @@ quibble_poem qb_parse_poem(char *poem){
 char *qb_expand_poem(quibble_program qp, int poem_index){
 
     bool do_expansion = true;
+
     if (qp.poem_list[poem_index].body == NULL){
         do_expansion = false;
     }
@@ -117,7 +118,9 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     }
 
     if (do_expansion){
-        strcat(tmp_body, "    int _idx = get_global_id(0);\n");
+        if (qb_find_next_string(body, 0, "_idx") > 0){
+            strcat(tmp_body, "    int _idx = get_global_id(0);\n");
+        }
 
         // Parse verse content
         int index = 0;

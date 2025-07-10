@@ -573,13 +573,15 @@ void qb_run(quibble_program qp, char *kernel_name,
 
 void qb_set_arg(quibble_program *qp, char *poem, char *arg, void *data){
     int poem_index = qb_find_poem_index(*qp, poem);
-    int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
-                                      qp->poem_list[poem_index].num_args,
-                                      arg);
+
     char *type;
     char *variable;
 
     qb_find_type_arg(arg, &type, &variable);
+
+    int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
+                                      qp->poem_list[poem_index].num_args,
+                                      variable);
 
     size_t object_size = qb_find_type_size(type);
 

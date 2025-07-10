@@ -24,25 +24,28 @@ void qb_find_type_arg(char *arg, char **type, char **variable){
     // `index` should be just before the last character of the type or -1
     if (index < 0){
         type[0] = NULL;
-        variable[0] = arg;
+        char *tmp_variable = (char *)malloc((strlen(arg)+1)*sizeof(char));
+        strcpy(tmp_variable, arg);
+        variable[0] = tmp_variable;
     }
     else {
         index++;
         type[0] = qb_strip_spaces(arg, 0, index);
         variable[0] = qb_strip_spaces(arg, index+1, len);
-        free(arg);
     }
 
 }
 
 void qb_parse_arg(quibble_arg *qa, char *arg){
     qb_find_type_arg(arg, &qa->type, &qa->variable);
+    free(arg);
 
 }
 
 void qb_parse_kwarg(quibble_kwarg *qk, char *lhs, char *rhs){
 
     qb_find_type_arg(lhs, &qk->type, &qk->variable);
+    free(lhs);
 
     qk->value = rhs;
 }
