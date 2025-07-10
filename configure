@@ -1,0 +1,11 @@
+#!/bin/bash
+cd $(dirname $0)
+if [ -z ${XDG_CONFIG_HOME+x} ]; \
+    then config_dir="$HOME/.config/quibble"; echo "XDG_CONFIG_HOME is unset, using $config_dir"; \
+    else config_dir="$XDG_CONFIG_HOME/quibble"; echo "using $config_dir..."; \
+fi
+
+mkdir -p $config_dir/scribbles
+cp scribbles/* $config_dir/scribbles/.
+
+echo "done!"
