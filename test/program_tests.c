@@ -342,7 +342,6 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_combine_program_array\n");
     }
 
-
     free(a);
     free(b);
     free(c);

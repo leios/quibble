@@ -45,6 +45,7 @@ quibble_program qb_parse_program_file(char *filename){
 
 quibble_program qb_parse_program(char *program){
 
+    int num_includes = qb_find_occurrences("@include", program);
     int num_verses = qb_find_occurrences("__verse", program);
     int num_stanzas = qb_find_occurrences("__stanza", program);
     int num_poems = qb_find_occurrences("__poem", program);
@@ -58,6 +59,15 @@ quibble_program qb_parse_program(char *program){
     qp.num_verses = num_verses;
     qp.num_stanzas = num_stanzas;
     qp.num_poems = num_poems;
+
+    quibble_program *other_programs = NULL;
+    if (num_includes > 0){
+       other_programs =
+           (quibble_program *)malloc(sizeof(quibble_program)*num_includes);
+    }
+    else {
+        qp.verse_list = NULL;
+    }
 
     if (num_verses > 0){
         qp.verse_list =
@@ -82,11 +92,14 @@ quibble_program qb_parse_program(char *program){
         qp.poem_list = NULL;
     }
 
-    if (num_verses > 0 ||
-        num_stanzas > 0 ||
+    if (num_includes > 0 ||
+        num_verses > 0   ||
+        num_stanzas > 0  ||
         num_poems > 0){
         char *tmp_everything_else =
             (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+
+        char *path;
 
         char *tmp_verse = NULL;
         if (num_verses > 0){
@@ -114,27 +127,68 @@ quibble_program qb_parse_program(char *program){
             qb_preprocess_content(buffer);
         }
 
+        int include_match_count = 0;
         int verse_match_count = 0;
         int stanza_match_count = 0;
         int poem_match_count = 0;
 
+        int curr_include = 0;
         int curr_verse = 0;
         int curr_poem = 0;
         int curr_stanza = 0;
 
+        int include_start = 0;
         int verse_start = 0;
         int poem_start = 0;
         int stanza_start = 0;
 
+        int include_end = 0;
         int verse_end = 0;
         int poem_end = 0;
         int stanza_end = 0;
 
+        char *include_string = "@include";
         char *verse_string = "__verse";
         char *stanza_string = "__stanza";
         char *poem_string = "__poem";
 
         while (index < filesize){
+            if (buffer[index] == include_string[include_match_count] &&
+                curr_include < num_includes){
+                ++include_match_count;
+                if (include_match_count == 8){
+                    include_start =
+                        qb_find_next_char(buffer, include_start, '"');
+                    include_end = qb_find_matching_char(
+                        buffer, filesize, include_start, '"', '"');
+
+                    // strips " on either side
+                    include_start++;
+                    include_end--;
+
+                    path = qb_find_path(
+                        qb_strip_spaces(buffer, include_start, include_end)
+                    );
+
+                    other_programs[curr_include] = qb_parse_program_file(path);
+
+                    ++curr_include;
+
+                    // setting everything back
+                    index = qb_find_next_char(buffer, include_end, '\n') + 1;
+                    include_match_count = 0;
+                    everything_else_index -= 7;
+                    memset(tmp_everything_else+everything_else_index, 0,
+                           7*sizeof(char));
+                    free(path);
+                    include_end = 0;
+                    include_start = 0;
+                }
+            }
+            else if (include_match_count != 0){
+                include_match_count = 0;
+            }
+
             if (buffer[index] == poem_string[poem_match_count] &&
                 curr_poem < num_poems){
                 ++poem_match_count;
@@ -262,10 +316,24 @@ quibble_program qb_parse_program(char *program){
         qp.everything_else = program;
     }
 
-    qb_build_program(&qp);
+    if (num_includes <= 0){
+        qb_build_program(&qp);
+        return qp;
+    }
+    else {
+        quibble_program tmp_qp =
+            qb_combine_program_array(other_programs, num_includes);
+        quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
 
-
-    return qp;
+        qb_build_program(&final_qp);
+        qb_shallow_free_program(qp);
+        qb_shallow_free_program(tmp_qp);
+        for (int i = 0; i < num_includes; ++i){
+            qb_shallow_free_program(other_programs[i]);
+        }
+        free(other_programs);
+        return(final_qp);
+    }
 }
 
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){

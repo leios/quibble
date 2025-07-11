@@ -67,6 +67,15 @@ size_t qb_find_type_size(char *type){
     return 4;
 }
 
+char *qb_find_path(char *path){
+    if (path[0] == 'Q' && path[1] == 'B'){
+        char *ret = qb_config_file(path+3);
+        free(path);
+        return ret;
+    }
+    return path;
+}
+
 char *qb_config_file(char *path){
     char *ret = (char *)calloc(256, sizeof(char));
     if (getenv("XDG_CONFIG_HOME") == NULL){
