@@ -306,12 +306,21 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
 
     qp.configured = false;
 
-    int everything_else_size =
-        strlen(qp_1.everything_else) + strlen(qp_2.everything_else) + 1;
+    int everything_else_size = 1;
+    if (qp_1.everything_else != NULL){
+        everything_else_size += strlen(qp_1.everything_else);
+    }
+    if (qp_2.everything_else != NULL){
+        everything_else_size += strlen(qp_2.everything_else);
+    }
 
     qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
-    strcat(qp.everything_else, qp_1.everything_else);
-    strcat(qp.everything_else, qp_2.everything_else);
+    if (qp_1.everything_else != NULL){
+        strcat(qp.everything_else, qp_1.everything_else);
+    }
+    if (qp_2.everything_else != NULL){
+        strcat(qp.everything_else, qp_2.everything_else);
+    }
 
     qp.num_verses = qp_1.num_verses + qp_2.num_verses;
     qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
@@ -357,8 +366,6 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
 
     int everything_else_size = 1;
 
-    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
-
     qp.num_verses = 0;
     qp.num_stanzas = 0;
     qp.num_poems = 0;
@@ -368,8 +375,12 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
         qp.num_stanzas += qps[i].num_stanzas;
         qp.num_poems += qps[i].num_poems;
 
-        everything_else_size += strlen(qps[i].everything_else);
+        if (qps[i].everything_else != NULL){
+            everything_else_size += strlen(qps[i].everything_else);
+        }
     }
+
+    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
 
     qp.verse_list =
         (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
@@ -383,22 +394,24 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
     int poem_count = 0;
 
     for (int i = 0; i < n; ++i){
-        for (int j = 0; j < qps[i].num_verses; ++i){
+        for (int j = 0; j < qps[i].num_verses; ++j){
             qp.verse_list[j+verse_count] = qps[i].verse_list[j];
         }
         verse_count += qps[i].num_verses;
 
-        for (int j = 0; j < qps[i].num_stanzas; ++i){
+        for (int j = 0; j < qps[i].num_stanzas; ++j){
             qp.stanza_list[j+stanza_count] = qps[i].stanza_list[j];
         }
         stanza_count += qps[i].num_stanzas;
 
-        for (int j = 0; j < qps[i].num_poems; ++i){
+        for (int j = 0; j < qps[i].num_poems; ++j){
             qp.poem_list[j+poem_count] = qps[i].poem_list[j];
         }
         poem_count += qps[i].num_poems;
 
-        strcat(qp.everything_else, qps[i].everything_else);
+        if (qps[i].everything_else != NULL){
+            strcat(qp.everything_else, qps[i].everything_else);
+        }
     }
 
     qb_build_program(&qp);

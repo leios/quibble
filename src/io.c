@@ -114,7 +114,7 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
             return final_str;
         }
         else {
-            return NULL;
+            return final_str;
         }
     }
 

@@ -313,6 +313,35 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_configure_program\n");
     }
 
+    quibble_program qp_sum = qb_combine_programs(qp_check, qp_2);
+
+    if (qp_sum.num_verses == qp_2.num_verses + 1 &&
+        qp_sum.num_stanzas == qp_2.num_stanzas + 1 &&
+        qp_sum.num_poems == qp_2.num_poems + 1 &&
+        strcmp(qp_sum.verse_list[1].name, "nothing") == 0 &&
+        strcmp(qp_sum.stanza_list[1].name, "nothing") == 0 &&
+        strcmp(qp_sum.poem_list[1].name, "nothing") == 0){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_combine_programs\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_combine_programs\n");
+    }
+
+    quibble_program both_programs[2];
+    both_programs[0] = qp_check;
+    both_programs[1] = qp_2;
+    quibble_program qp_array_sum = qb_combine_program_array(both_programs, 2);
+
+    if (qp_sum.num_verses == qp_array_sum.num_verses &&
+        qp_sum.num_stanzas == qp_array_sum.num_stanzas &&
+        qp_sum.num_poems == qp_array_sum.num_poems &&
+        strcmp(qp_sum.everything_else, qp_array_sum.everything_else) == 0){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_combine_program_array\n");
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_combine_program_array\n");
+    }
+
 
     free(a);
     free(b);
@@ -320,6 +349,8 @@ void quibble_program_tests(){
     cl_check(clReleaseMemObject(d_a));
     cl_check(clReleaseMemObject(d_b));
     cl_check(clReleaseMemObject(d_c));
-    qb_free_program(qp_check);
-    qb_free_program(qp_2);
+    qb_shallow_free_program(qp_check);
+    qb_shallow_free_program(qp_2);
+    qb_shallow_free_program(qp_sum);
+    qb_free_program(qp_array_sum);
 }
