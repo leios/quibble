@@ -173,7 +173,6 @@ quibble_program qb_parse_program(char *program, char *path){
                         qb_strip_spaces(buffer, include_start, include_end);
                     full_path = qb_expand_path(short_path, path);
 
-
                     other_programs[curr_include] =
                         qb_parse_program_file(full_path);
 
