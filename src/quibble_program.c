@@ -161,9 +161,9 @@ quibble_program qb_parse_program(char *program, char *path){
                 ++include_match_count;
                 if (include_match_count == 8){
                     include_start =
-                        qb_find_next_char(buffer, include_start, '"');
-                    include_end = qb_find_matching_char(
-                        buffer, filesize, include_start, '"', '"');
+                        qb_find_next_char(buffer, index, '"');
+                    include_end =
+                        qb_find_next_char(buffer, include_start+1, '"');
 
                     // strips " on either side
                     include_start++;
@@ -179,7 +179,7 @@ quibble_program qb_parse_program(char *program, char *path){
                     ++curr_include;
 
                     // setting everything back
-                    index = qb_find_next_char(buffer, include_end, '\n') + 1;
+                    index = qb_find_next_char(buffer, include_end, '\n');
                     include_match_count = 0;
                     everything_else_index -= 7;
                     memset(tmp_everything_else+everything_else_index, 0,
@@ -330,13 +330,13 @@ quibble_program qb_parse_program(char *program, char *path){
             qb_combine_program_array(other_programs, num_includes);
         quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
 
-        qb_build_program(&final_qp);
         qb_shallow_free_program(qp);
         qb_shallow_free_program(tmp_qp);
         for (int i = 0; i < num_includes; ++i){
             qb_shallow_free_program(other_programs[i]);
         }
         free(other_programs);
+
         return(final_qp);
     }
 }
@@ -547,7 +547,6 @@ void qb_build_program(quibble_program *qp){
         }
         free(temp_poem);
     }
-
 
     int len = strlen(body)+1;
     char *final_body = (char *)calloc(len, sizeof(char));
