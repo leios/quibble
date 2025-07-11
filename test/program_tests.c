@@ -184,7 +184,6 @@ void quibble_program_tests(){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program\n");
     }
 
-    qb_free_program(qp_check);
 
     char *filename = qb_config_file("scribbles/example.qbl");
     quibble_program qp_2 = qb_parse_program_file(filename);
@@ -321,5 +320,6 @@ void quibble_program_tests(){
     cl_check(clReleaseMemObject(d_a));
     cl_check(clReleaseMemObject(d_b));
     cl_check(clReleaseMemObject(d_c));
+    qb_free_program(qp_check);
     qb_free_program(qp_2);
 }

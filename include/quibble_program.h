@@ -65,7 +65,7 @@ typedef struct{
 
 // program functions
 quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2);
-quibble_program qb_combine_program_array(quibble_program *qps);
+quibble_program qb_combine_program_array(quibble_program *qps, int n);
 
 // OpenCL Interface
 char *get_device_name(cl_device_id device_id);
@@ -128,6 +128,7 @@ void qb_free_poem(quibble_poem qp);
 void qb_free_kwarg_array(quibble_kwarg *qkwargs, int n);
 void qb_free_arg_array(quibble_arg *args, int n);
 void qb_free_program(quibble_program qp);
+void qb_shallow_free_program(quibble_program qp);
 
 // Printing
 void qb_print_arg(quibble_arg qa);

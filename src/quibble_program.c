@@ -301,6 +301,112 @@ quibble_poem qb_find_poem(quibble_program qp, char *poem_name){
     exit(1);
 }
 
+quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
+    quibble_program qp;
+
+    qp.configured = false;
+
+    int everything_else_size =
+        strlen(qp_1.everything_else) + strlen(qp_2.everything_else) + 1;
+
+    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
+    strcat(qp.everything_else, qp_1.everything_else);
+    strcat(qp.everything_else, qp_2.everything_else);
+
+    qp.num_verses = qp_1.num_verses + qp_2.num_verses;
+    qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
+    qp.num_poems = qp_1.num_poems + qp_2.num_poems;
+
+    qp.verse_list =
+        (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
+    qp.stanza_list =
+        (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
+    qp.poem_list =
+        (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+
+    for (int i = 0; i < qp_1.num_verses; ++i){
+        qp.verse_list[i] = qp_1.verse_list[i];
+    }
+    for (int i = 0; i < qp_2.num_verses; ++i){
+        qp.verse_list[i+qp_1.num_verses] = qp_2.verse_list[i];
+    }
+
+    for (int i = 0; i < qp_1.num_stanzas; ++i){
+        qp.stanza_list[i] = qp_1.stanza_list[i];
+    }
+    for (int i = 0; i < qp_2.num_verses; ++i){
+        qp.stanza_list[i+qp_1.num_stanzas] = qp_2.stanza_list[i];
+    }
+
+    for (int i = 0; i < qp_1.num_poems; ++i){
+        qp.poem_list[i] = qp_1.poem_list[i];
+    }
+    for (int i = 0; i < qp_2.num_poems; ++i){
+        qp.poem_list[i+qp_1.num_poems] = qp_2.poem_list[i];
+    }
+
+    qb_build_program(&qp);
+
+    return qp;
+    
+}
+quibble_program qb_combine_program_array(quibble_program *qps, int n){
+    quibble_program qp;
+
+    qp.configured = false;
+
+    int everything_else_size = 1;
+
+    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
+
+    qp.num_verses = 0;
+    qp.num_stanzas = 0;
+    qp.num_poems = 0;
+
+    for (int i = 0; i < n; ++i){
+        qp.num_verses += qps[i].num_verses;
+        qp.num_stanzas += qps[i].num_stanzas;
+        qp.num_poems += qps[i].num_poems;
+
+        everything_else_size += strlen(qps[i].everything_else);
+    }
+
+    qp.verse_list =
+        (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
+    qp.stanza_list =
+        (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
+    qp.poem_list =
+        (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+
+    int verse_count = 0;
+    int stanza_count = 0;
+    int poem_count = 0;
+
+    for (int i = 0; i < n; ++i){
+        for (int j = 0; j < qps[i].num_verses; ++i){
+            qp.verse_list[j+verse_count] = qps[i].verse_list[j];
+        }
+        verse_count += qps[i].num_verses;
+
+        for (int j = 0; j < qps[i].num_stanzas; ++i){
+            qp.stanza_list[j+stanza_count] = qps[i].stanza_list[j];
+        }
+        stanza_count += qps[i].num_stanzas;
+
+        for (int j = 0; j < qps[i].num_poems; ++i){
+            qp.poem_list[j+poem_count] = qps[i].poem_list[j];
+        }
+        poem_count += qps[i].num_poems;
+
+        strcat(qp.everything_else, qps[i].everything_else);
+    }
+
+    qb_build_program(&qp);
+
+    return qp;
+
+}
+
 /*----------------------------------------------------------------------------//
 CONFIGURATION
 //----------------------------------------------------------------------------*/
@@ -366,18 +472,9 @@ void qb_build_program(quibble_program *qp){
     free(body);
 }
 
-void qb_free_program(quibble_program qp){
+void qb_shallow_free_program(quibble_program qp){
     free(qp.everything_else);
     free(qp.body);
-    for (int i = 0; i < qp.num_verses; ++i){
-        qb_free_verse(qp.verse_list[i]);
-    }
-    for (int i = 0; i < qp.num_stanzas; ++i){
-        qb_free_stanza(qp.stanza_list[i]);
-    }
-    for (int i = 0; i < qp.num_poems; ++i){
-        qb_free_poem(qp.poem_list[i]);
-    }
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
@@ -397,6 +494,20 @@ void qb_free_program(quibble_program qp){
         }
         free(qp.kernels);
     }
+
+}
+
+void qb_free_program(quibble_program qp){
+    for (int i = 0; i < qp.num_verses; ++i){
+        qb_free_verse(qp.verse_list[i]);
+    }
+    for (int i = 0; i < qp.num_stanzas; ++i){
+        qb_free_stanza(qp.stanza_list[i]);
+    }
+    for (int i = 0; i < qp.num_poems; ++i){
+        qb_free_poem(qp.poem_list[i]);
+    }
+    qb_shallow_free_program(qp);
 }
 
 void qb_print_program(quibble_program qp){
