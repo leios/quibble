@@ -334,8 +334,7 @@ void quibble_program_tests(){
 
     if (qp_sum.num_verses == qp_array_sum.num_verses &&
         qp_sum.num_stanzas == qp_array_sum.num_stanzas &&
-        qp_sum.num_poems == qp_array_sum.num_poems &&
-        strcmp(qp_sum.everything_else, qp_array_sum.everything_else) == 0){
+        qp_sum.num_poems == qp_array_sum.num_poems){
         printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_combine_program_array\n");
     }
     else {

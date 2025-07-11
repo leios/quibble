@@ -176,14 +176,24 @@ quibble_program qb_parse_program(char *program, char *path){
                     other_programs[curr_include] =
                         qb_parse_program_file(full_path);
 
+                    everything_else_index -= 7;
+
+                    memset(tmp_everything_else+everything_else_index, 0,
+                           7*sizeof(char));
+
+                    if (other_programs[curr_include].everything_else != NULL){
+                        everything_else_index +=
+                            strlen(other_programs[curr_include].everything_else);
+
+                        strcat(tmp_everything_else,
+                               other_programs[curr_include].everything_else);
+                    }
+
                     ++curr_include;
 
                     // setting everything back
                     index = qb_find_next_char(buffer, include_end, '\n');
                     include_match_count = 0;
-                    everything_else_index -= 7;
-                    memset(tmp_everything_else+everything_else_index, 0,
-                           7*sizeof(char));
                     free(full_path);
                     free(short_path);
                     include_end = 0;
@@ -328,7 +338,13 @@ quibble_program qb_parse_program(char *program, char *path){
     else {
         quibble_program tmp_qp =
             qb_combine_program_array(other_programs, num_includes);
+
         quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
+
+        final_qp.everything_else = qp.everything_else;
+        qp.everything_else = NULL;
+
+        qb_build_program(&final_qp);
 
         qb_shallow_free_program(qp);
         qb_shallow_free_program(tmp_qp);
@@ -378,22 +394,8 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
     quibble_program qp;
 
     qp.configured = false;
-
-    int everything_else_size = 1;
-    if (qp_1.everything_else != NULL){
-        everything_else_size += strlen(qp_1.everything_else);
-    }
-    if (qp_2.everything_else != NULL){
-        everything_else_size += strlen(qp_2.everything_else);
-    }
-
-    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
-    if (qp_1.everything_else != NULL){
-        strcat(qp.everything_else, qp_1.everything_else);
-    }
-    if (qp_2.everything_else != NULL){
-        strcat(qp.everything_else, qp_2.everything_else);
-    }
+    qp.everything_else = NULL;
+    qp.body = NULL;
 
     qp.num_verses = qp_1.num_verses + qp_2.num_verses;
     qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
@@ -427,8 +429,6 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
         qp.poem_list[i+qp_1.num_poems] = qp_2.poem_list[i];
     }
 
-    qb_build_program(&qp);
-
     return qp;
     
 }
@@ -436,8 +436,8 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
     quibble_program qp;
 
     qp.configured = false;
-
-    int everything_else_size = 1;
+    qp.everything_else = NULL;
+    qp.body = NULL;
 
     qp.num_verses = 0;
     qp.num_stanzas = 0;
@@ -447,13 +447,7 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
         qp.num_verses += qps[i].num_verses;
         qp.num_stanzas += qps[i].num_stanzas;
         qp.num_poems += qps[i].num_poems;
-
-        if (qps[i].everything_else != NULL){
-            everything_else_size += strlen(qps[i].everything_else);
-        }
     }
-
-    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
 
     qp.verse_list =
         (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
@@ -482,12 +476,7 @@ quibble_program qb_combine_program_array(quibble_program *qps, int n){
         }
         poem_count += qps[i].num_poems;
 
-        if (qps[i].everything_else != NULL){
-            strcat(qp.everything_else, qps[i].everything_else);
-        }
     }
-
-    qb_build_program(&qp);
 
     return qp;
 
@@ -558,6 +547,7 @@ void qb_build_program(quibble_program *qp){
 }
 
 void qb_shallow_free_program(quibble_program qp){
+
     free(qp.everything_else);
     free(qp.body);
     free(qp.verse_list);
