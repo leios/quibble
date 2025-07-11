@@ -16,7 +16,8 @@ typedef struct {
 quibble_pixel qb_zero_pixel(void);
 quibble_pixel *qb_create_pixel_array(int height, int width);
 
-char *qb_find_path(char *path);
+char *qb_expand_path(char *path, char *base_path);
+char *qb_find_path(char *filename);
 char *qb_config_file(char *path);
 
 size_t qb_find_type_size(char *type);

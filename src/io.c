@@ -67,13 +67,35 @@ size_t qb_find_type_size(char *type){
     return 4;
 }
 
-char *qb_find_path(char *path){
+char *qb_expand_path(char *path, char *base_path){
+    char *ret = NULL;
     if (path[0] == 'Q' && path[1] == 'B'){
-        char *ret = qb_config_file(path+3);
-        free(path);
-        return ret;
+        ret = qb_config_file(path+3);
     }
-    return path;
+    else {
+        int total_length = strlen(path) + strlen(base_path) + 1;
+        ret = (char *)calloc(total_length, sizeof(char));
+        strcat(ret, base_path);
+        strcat(ret, path);
+    }
+    return ret;
+}
+
+char *qb_find_path(char *filename){
+    int idx = strlen(filename);
+    bool found_slash = false;
+    while (!found_slash && idx > 0){
+        idx--;
+        if (filename[idx] == '/'){
+            found_slash = true;
+        }
+    }
+    if(idx >= 0){
+        return qb_strip_spaces(filename, 0, idx);
+    }
+    else {
+        return NULL;
+    }
 }
 
 char *qb_config_file(char *path){

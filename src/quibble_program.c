@@ -38,12 +38,14 @@ quibble_program qb_parse_program_file(char *filename){
     }
 
     fclose(fileptr);
-    quibble_program qp = qb_parse_program(buffer);
+    char *path = qb_find_path(filename);
+    quibble_program qp = qb_parse_program(buffer, path);
+    free(path);
 
     return qp;
 }
 
-quibble_program qb_parse_program(char *program){
+quibble_program qb_parse_program(char *program, char *path){
 
     int num_includes = qb_find_occurrences("@include", program);
     int num_verses = qb_find_occurrences("__verse", program);
@@ -99,7 +101,8 @@ quibble_program qb_parse_program(char *program){
         char *tmp_everything_else =
             (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
 
-        char *path;
+        char *short_path;
+        char *full_path;
 
         char *tmp_verse = NULL;
         if (num_verses > 0){
@@ -166,11 +169,13 @@ quibble_program qb_parse_program(char *program){
                     include_start++;
                     include_end--;
 
-                    path = qb_find_path(
-                        qb_strip_spaces(buffer, include_start, include_end)
-                    );
+                    short_path =
+                        qb_strip_spaces(buffer, include_start, include_end);
+                    full_path = qb_expand_path(short_path, path);
 
-                    other_programs[curr_include] = qb_parse_program_file(path);
+
+                    other_programs[curr_include] =
+                        qb_parse_program_file(full_path);
 
                     ++curr_include;
 
@@ -180,7 +185,8 @@ quibble_program qb_parse_program(char *program){
                     everything_else_index -= 7;
                     memset(tmp_everything_else+everything_else_index, 0,
                            7*sizeof(char));
-                    free(path);
+                    free(full_path);
+                    free(short_path);
                     include_end = 0;
                     include_start = 0;
                 }

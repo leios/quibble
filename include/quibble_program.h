@@ -85,7 +85,7 @@ bool qb_is_stanza(char *stanza, int offset);
 bool qb_is_poem(char *poem, int offset);
 bool qb_is_verse(char *verse, int offset);
 
-quibble_program qb_parse_program(char *buffer);
+quibble_program qb_parse_program(char *buffer, char *path);
 quibble_program qb_parse_program_file(char *filename);
 
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name);

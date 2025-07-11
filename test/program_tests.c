@@ -169,7 +169,7 @@ void quibble_program_tests(){
         __poem check(){}
     );
 
-    quibble_program qp_check = qb_parse_program(simple_program);
+    quibble_program qp_check = qb_parse_program(simple_program, "");
 
     if (qp_check.num_verses == 1 &&
         qp_check.everything_else == NULL &&
