@@ -38,13 +38,16 @@ quibble_program qb_parse_program_file(char *filename){
     }
 
     fclose(fileptr);
-    quibble_program qp = qb_parse_program(buffer);
+    char *path = qb_find_path(filename);
+    quibble_program qp = qb_parse_program(buffer, path);
+    free(path);
 
     return qp;
 }
 
-quibble_program qb_parse_program(char *program){
+quibble_program qb_parse_program(char *program, char *path){
 
+    int num_includes = qb_find_occurrences("@include", program);
     int num_verses = qb_find_occurrences("__verse", program);
     int num_stanzas = qb_find_occurrences("__stanza", program);
     int num_poems = qb_find_occurrences("__poem", program);
@@ -58,6 +61,15 @@ quibble_program qb_parse_program(char *program){
     qp.num_verses = num_verses;
     qp.num_stanzas = num_stanzas;
     qp.num_poems = num_poems;
+
+    quibble_program *other_programs = NULL;
+    if (num_includes > 0){
+       other_programs =
+           (quibble_program *)malloc(sizeof(quibble_program)*num_includes);
+    }
+    else {
+        qp.verse_list = NULL;
+    }
 
     if (num_verses > 0){
         qp.verse_list =
@@ -82,11 +94,15 @@ quibble_program qb_parse_program(char *program){
         qp.poem_list = NULL;
     }
 
-    if (num_verses > 0 ||
-        num_stanzas > 0 ||
+    if (num_includes > 0 ||
+        num_verses > 0   ||
+        num_stanzas > 0  ||
         num_poems > 0){
         char *tmp_everything_else =
             (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+
+        char *short_path;
+        char *full_path;
 
         char *tmp_verse = NULL;
         if (num_verses > 0){
@@ -114,27 +130,70 @@ quibble_program qb_parse_program(char *program){
             qb_preprocess_content(buffer);
         }
 
+        int include_match_count = 0;
         int verse_match_count = 0;
         int stanza_match_count = 0;
         int poem_match_count = 0;
 
+        int curr_include = 0;
         int curr_verse = 0;
         int curr_poem = 0;
         int curr_stanza = 0;
 
+        int include_start = 0;
         int verse_start = 0;
         int poem_start = 0;
         int stanza_start = 0;
 
+        int include_end = 0;
         int verse_end = 0;
         int poem_end = 0;
         int stanza_end = 0;
 
+        char *include_string = "@include";
         char *verse_string = "__verse";
         char *stanza_string = "__stanza";
         char *poem_string = "__poem";
 
         while (index < filesize){
+            if (buffer[index] == include_string[include_match_count] &&
+                curr_include < num_includes){
+                ++include_match_count;
+                if (include_match_count == 8){
+                    include_start =
+                        qb_find_next_char(buffer, index, '"');
+                    include_end =
+                        qb_find_next_char(buffer, include_start+1, '"');
+
+                    // strips " on either side
+                    include_start++;
+                    include_end--;
+
+                    short_path =
+                        qb_strip_spaces(buffer, include_start, include_end);
+                    full_path = qb_expand_path(short_path, path);
+
+                    other_programs[curr_include] =
+                        qb_parse_program_file(full_path);
+
+                    ++curr_include;
+
+                    // setting everything back
+                    index = qb_find_next_char(buffer, include_end, '\n');
+                    include_match_count = 0;
+                    everything_else_index -= 7;
+                    memset(tmp_everything_else+everything_else_index, 0,
+                           7*sizeof(char));
+                    free(full_path);
+                    free(short_path);
+                    include_end = 0;
+                    include_start = 0;
+                }
+            }
+            else if (include_match_count != 0){
+                include_match_count = 0;
+            }
+
             if (buffer[index] == poem_string[poem_match_count] &&
                 curr_poem < num_poems){
                 ++poem_match_count;
@@ -262,10 +321,24 @@ quibble_program qb_parse_program(char *program){
         qp.everything_else = program;
     }
 
-    qb_build_program(&qp);
+    if (num_includes <= 0){
+        qb_build_program(&qp);
+        return qp;
+    }
+    else {
+        quibble_program tmp_qp =
+            qb_combine_program_array(other_programs, num_includes);
+        quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
 
+        qb_shallow_free_program(qp);
+        qb_shallow_free_program(tmp_qp);
+        for (int i = 0; i < num_includes; ++i){
+            qb_shallow_free_program(other_programs[i]);
+        }
+        free(other_programs);
 
-    return qp;
+        return(final_qp);
+    }
 }
 
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name){
@@ -299,6 +372,125 @@ quibble_poem qb_find_poem(quibble_program qp, char *poem_name){
     }
     fprintf(stderr, "No poem %s found!\n", poem_name);
     exit(1);
+}
+
+quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
+    quibble_program qp;
+
+    qp.configured = false;
+
+    int everything_else_size = 1;
+    if (qp_1.everything_else != NULL){
+        everything_else_size += strlen(qp_1.everything_else);
+    }
+    if (qp_2.everything_else != NULL){
+        everything_else_size += strlen(qp_2.everything_else);
+    }
+
+    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
+    if (qp_1.everything_else != NULL){
+        strcat(qp.everything_else, qp_1.everything_else);
+    }
+    if (qp_2.everything_else != NULL){
+        strcat(qp.everything_else, qp_2.everything_else);
+    }
+
+    qp.num_verses = qp_1.num_verses + qp_2.num_verses;
+    qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
+    qp.num_poems = qp_1.num_poems + qp_2.num_poems;
+
+    qp.verse_list =
+        (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
+    qp.stanza_list =
+        (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
+    qp.poem_list =
+        (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+
+    for (int i = 0; i < qp_1.num_verses; ++i){
+        qp.verse_list[i] = qp_1.verse_list[i];
+    }
+    for (int i = 0; i < qp_2.num_verses; ++i){
+        qp.verse_list[i+qp_1.num_verses] = qp_2.verse_list[i];
+    }
+
+    for (int i = 0; i < qp_1.num_stanzas; ++i){
+        qp.stanza_list[i] = qp_1.stanza_list[i];
+    }
+    for (int i = 0; i < qp_2.num_verses; ++i){
+        qp.stanza_list[i+qp_1.num_stanzas] = qp_2.stanza_list[i];
+    }
+
+    for (int i = 0; i < qp_1.num_poems; ++i){
+        qp.poem_list[i] = qp_1.poem_list[i];
+    }
+    for (int i = 0; i < qp_2.num_poems; ++i){
+        qp.poem_list[i+qp_1.num_poems] = qp_2.poem_list[i];
+    }
+
+    qb_build_program(&qp);
+
+    return qp;
+    
+}
+quibble_program qb_combine_program_array(quibble_program *qps, int n){
+    quibble_program qp;
+
+    qp.configured = false;
+
+    int everything_else_size = 1;
+
+    qp.num_verses = 0;
+    qp.num_stanzas = 0;
+    qp.num_poems = 0;
+
+    for (int i = 0; i < n; ++i){
+        qp.num_verses += qps[i].num_verses;
+        qp.num_stanzas += qps[i].num_stanzas;
+        qp.num_poems += qps[i].num_poems;
+
+        if (qps[i].everything_else != NULL){
+            everything_else_size += strlen(qps[i].everything_else);
+        }
+    }
+
+    qp.everything_else = (char *)calloc(everything_else_size, sizeof(char));
+
+    qp.verse_list =
+        (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
+    qp.stanza_list =
+        (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
+    qp.poem_list =
+        (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+
+    int verse_count = 0;
+    int stanza_count = 0;
+    int poem_count = 0;
+
+    for (int i = 0; i < n; ++i){
+        for (int j = 0; j < qps[i].num_verses; ++j){
+            qp.verse_list[j+verse_count] = qps[i].verse_list[j];
+        }
+        verse_count += qps[i].num_verses;
+
+        for (int j = 0; j < qps[i].num_stanzas; ++j){
+            qp.stanza_list[j+stanza_count] = qps[i].stanza_list[j];
+        }
+        stanza_count += qps[i].num_stanzas;
+
+        for (int j = 0; j < qps[i].num_poems; ++j){
+            qp.poem_list[j+poem_count] = qps[i].poem_list[j];
+        }
+        poem_count += qps[i].num_poems;
+
+        if (qps[i].everything_else != NULL){
+            strcat(qp.everything_else, qps[i].everything_else);
+        }
+    }
+
+    qb_build_program(&qp);
+
+    return qp;
+
 }
 
 /*----------------------------------------------------------------------------//
@@ -356,7 +548,6 @@ void qb_build_program(quibble_program *qp){
         free(temp_poem);
     }
 
-
     int len = strlen(body)+1;
     char *final_body = (char *)calloc(len, sizeof(char));
     for (int i = 0; i < len; ++i){
@@ -366,18 +557,9 @@ void qb_build_program(quibble_program *qp){
     free(body);
 }
 
-void qb_free_program(quibble_program qp){
+void qb_shallow_free_program(quibble_program qp){
     free(qp.everything_else);
     free(qp.body);
-    for (int i = 0; i < qp.num_verses; ++i){
-        qb_free_verse(qp.verse_list[i]);
-    }
-    for (int i = 0; i < qp.num_stanzas; ++i){
-        qb_free_stanza(qp.stanza_list[i]);
-    }
-    for (int i = 0; i < qp.num_poems; ++i){
-        qb_free_poem(qp.poem_list[i]);
-    }
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
@@ -397,6 +579,20 @@ void qb_free_program(quibble_program qp){
         }
         free(qp.kernels);
     }
+
+}
+
+void qb_free_program(quibble_program qp){
+    for (int i = 0; i < qp.num_verses; ++i){
+        qb_free_verse(qp.verse_list[i]);
+    }
+    for (int i = 0; i < qp.num_stanzas; ++i){
+        qb_free_stanza(qp.stanza_list[i]);
+    }
+    for (int i = 0; i < qp.num_poems; ++i){
+        qb_free_poem(qp.poem_list[i]);
+    }
+    qb_shallow_free_program(qp);
 }
 
 void qb_print_program(quibble_program qp){

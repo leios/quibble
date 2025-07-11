@@ -67,6 +67,64 @@ size_t qb_find_type_size(char *type){
     return 4;
 }
 
+char *qb_expand_path(char *path, char *base_path){
+    if (path == NULL){
+        return NULL;
+    }
+
+    char *ret = NULL;
+    if (path[0] == 'Q' && path[1] == 'B'){
+        char *scribble_path = "scribbles/";
+
+        int total_length = strlen(scribble_path) + strlen(path+3) + 1;
+
+        char *tmp_path = (char *)calloc(total_length, sizeof(char));
+
+        strcat(tmp_path, scribble_path);
+        strcat(tmp_path, path+3);
+
+        ret = qb_config_file(tmp_path);
+        free(tmp_path);
+        return ret;
+       
+    }
+    else {
+        int total_length = strlen(path) + 1;
+        if (base_path != NULL){
+            total_length += strlen(base_path);
+        }
+
+        ret = (char *)calloc(total_length, sizeof(char));
+
+        if (base_path != NULL){
+            strcat(ret, base_path);
+        }
+        strcat(ret, path);
+    }
+    return ret;
+}
+
+char *qb_find_path(char *filename){
+    if (filename == NULL){
+        return NULL;
+    }
+
+    int idx = strlen(filename);
+    bool found_slash = false;
+    while (!found_slash && idx > 0){
+        idx--;
+        if (filename[idx] == '/'){
+            found_slash = true;
+        }
+    }
+    if(idx >= 0){
+        return qb_strip_spaces(filename, 0, idx);
+    }
+    else {
+        return NULL;
+    }
+}
+
 char *qb_config_file(char *path){
     char *ret = (char *)calloc(256, sizeof(char));
     if (getenv("XDG_CONFIG_HOME") == NULL){
@@ -77,7 +135,9 @@ char *qb_config_file(char *path){
         strcat(ret, getenv("XDG_CONFIG_HOME"));
         strcat(ret, "/");
     }
-    strcat(ret, path);
+    if (path != NULL){
+        strcat(ret, path);
+    }
 
     return ret;
 }
@@ -114,7 +174,7 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
             return final_str;
         }
         else {
-            return NULL;
+            return final_str;
         }
     }
 

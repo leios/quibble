@@ -2,17 +2,9 @@ void simple_print(){
     printf("printing from kernel...\n");
 }
 
-__verse nothing(void){}
-__stanza nothing(void){}
-__poem nothing(void){}
-
-__verse no_args(void){// do stuff verse}
-__stanza no_args(void){// do stuff stanza}
-__poem no_args(void){// do stuff poem}
-
-__verse no_body(int a){}
-__stanza no_body(int a){}
-__poem no_body(int a){}
+@include "QB/nothings.qbl"
+@include "no_args.qbl"
+@include "no_bodies.qbl"
 
 __verse mult_by(__global float *verse_a | float factor = 8;){
     verse_a[_idx] *= factor;

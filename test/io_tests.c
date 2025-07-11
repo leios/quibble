@@ -160,5 +160,30 @@ void quibble_io_tests(void){
         printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_type_size\n");
     }
 
+    char *path = qb_find_path("meh/../meh/hey.qbl");
+    if (strcmp(path, "meh/../meh/") == 0){
+        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_find_path\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_find_path\n");
+    }
 
+    char *short_path_1 = "QB/check.qbl";
+    char *short_path_2 = "ok???";
+
+    char *full_path_1 = qb_expand_path(short_path_1, path);
+    char *full_path_2 = qb_expand_path(short_path_2, path);
+
+    // full_path_1 is different per system, uncomment to print what it shows.
+    // printf("%s\n", full_path_1);
+    if (strcmp(full_path_2, "meh/../meh/ok???") == 0){
+        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_expand_path\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_expand_path\n");
+    }
+
+    free(full_path_1);
+    free(full_path_2);
+    free(path);
 }

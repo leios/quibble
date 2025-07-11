@@ -63,6 +63,10 @@ typedef struct{
 
 } quibble_program;
 
+// program functions
+quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2);
+quibble_program qb_combine_program_array(quibble_program *qps, int n);
+
 // OpenCL Interface
 char *get_device_name(cl_device_id device_id);
 char *get_platform_name(cl_platform_id platform_id);
@@ -81,12 +85,13 @@ bool qb_is_stanza(char *stanza, int offset);
 bool qb_is_poem(char *poem, int offset);
 bool qb_is_verse(char *verse, int offset);
 
-// Reads an input file and parses everything into verses or OCL functions
-quibble_program qb_parse_program(char *buffer);
+quibble_program qb_parse_program(char *buffer, char *path);
 quibble_program qb_parse_program_file(char *filename);
+
 quibble_verse qb_find_verse(quibble_program qp, char *verse_name);
 quibble_stanza qb_find_stanza(quibble_program qp, char *stanza_name);
 quibble_poem qb_find_poem(quibble_program qp, char *poem_name);
+
 int qb_find_verse_index(quibble_program qp, char *verse_name);
 int qb_find_stanza_index(quibble_program qp, char *stanza_name);
 int qb_find_poem_index(quibble_program qp, char *poem_name);
@@ -123,6 +128,7 @@ void qb_free_poem(quibble_poem qp);
 void qb_free_kwarg_array(quibble_kwarg *qkwargs, int n);
 void qb_free_arg_array(quibble_arg *args, int n);
 void qb_free_program(quibble_program qp);
+void qb_shallow_free_program(quibble_program qp);
 
 // Printing
 void qb_print_arg(quibble_arg qa);

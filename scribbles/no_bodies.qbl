@@ -1,0 +1,3 @@
+__verse no_body(int a){}
+__stanza no_body(int a){}
+__poem no_body(int a){}

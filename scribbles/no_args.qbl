@@ -1,0 +1,3 @@
+__verse no_args(void){// do stuff verse}
+__stanza no_args(void){// do stuff stanza}
+__poem no_args(void){// do stuff poem}
