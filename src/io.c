@@ -26,6 +26,9 @@ quibble_pixel *qb_create_pixel_array(int height, int width){
     return qpa;
 }
 
+void *qb_string_to_void(char *type, char *value){
+}
+
 size_t qb_find_type_size(char *type){
 
     if (type == NULL){

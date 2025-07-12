@@ -147,11 +147,41 @@ int qb_find_number_of_kwargs(char *config){
 
 }
 
+int qb_find_any_index(quibble_arg *args, int n,
+                      quibble_kwarg *kwargs, int k_n,
+                      char *variable){
+
+    if (n <= 0 && k_n <= 0){
+        return -1;
+    }
+
+    for (int i = 0; i < n; ++i){
+        if (strcmp(args[i].variable, variable) == 0){
+            return i;
+        }
+    }
+
+    for (int i = 0; i < k_n; ++i){
+        if (strcmp(kwargs[i].variable, variable) == 0){
+            if (n > 0){
+                return i+n;
+            }
+            else{
+                return i;
+            }
+        }
+    }
+
+    fprintf(stderr, "%s is not an argument or keyword argument!\n", variable);
+    exit(1);
+
+
+}
+
 int qb_find_arg_index(quibble_arg *qa, int n, char *variable){
     if (n <= 0){
         return -1;
     }
-
 
     for (int i = 0; i < n; ++i){
         if (strcmp(qa[i].variable, variable) == 0){

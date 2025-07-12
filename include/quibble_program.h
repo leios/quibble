@@ -34,6 +34,8 @@ typedef struct{
 typedef struct{
     quibble_arg *args;
     int num_args;
+    quibble_kwarg *kwargs;
+    int num_kwargs;
     char *body;
     char *name;
 } quibble_poem;

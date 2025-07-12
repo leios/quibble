@@ -742,6 +742,17 @@ void qb_configure_program(quibble_program *qp, int platform, int device){
     for (int i = 0; i < qp->num_poems; ++i){
 
         kernels[i] = clCreateKernel(qp->program, qp->poem_list[i].name, &err);
+        if (qp->poem_list[i].num_kwargs > 0){
+            for (int j = 0; j < qp->poem_list[i].num_kwargs; ++j){
+                void *data = qb_string_to_void(
+                    qp->poem_list[i].kwargs[j].type,
+                    qp->poem_list[i].kwargs[j].value
+                );
+                qb_set_arg(qp, qp->poem_list[i].name,
+                           qp->poem_list[i].kwargs[j].variable, 
+                           data);
+            }
+        }
         cl_check(err);
     }
 
@@ -777,8 +788,10 @@ void qb_set_arg(quibble_program *qp, char *poem, char *arg, void *data){
 
     qb_find_type_arg(arg, &type, &variable);
 
-    int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
+    int arg_index = qb_find_any_index(qp->poem_list[poem_index].args,
                                       qp->poem_list[poem_index].num_args,
+                                      qp->poem_list[poem_index].kwargs,
+                                      qp->poem_list[poem_index].num_kwargs,
                                       variable);
 
     size_t object_size = qb_find_type_size(type);
