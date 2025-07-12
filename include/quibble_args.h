@@ -32,6 +32,9 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries);
 
 int qb_find_arg_index(quibble_arg *arg, int n, char *variable);
 int qb_find_kwarg_index(quibble_kwarg *qk, int n, char *variable);
+int qb_find_any_index(quibble_arg *args, int n,
+                      quibble_kwarg *kwargs, int k_n,
+                      char *variable);
 
 // prologue
 char *qb_create_prologue(char *config, char *name,

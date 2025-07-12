@@ -21,6 +21,7 @@ char *qb_find_path(char *filename);
 char *qb_config_file(char *path);
 
 size_t qb_find_type_size(char *type);
+void *qb_string_to_void(char *type, char *value);
 
 // String Manipulation
 bool qb_is_space(char a);

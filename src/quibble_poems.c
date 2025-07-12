@@ -64,13 +64,18 @@ quibble_poem qb_parse_poem(char *poem){
         final_poem.args =
             qb_parse_args(config, final_poem.num_args);
 
+        final_poem.num_kwargs = qb_find_number_of_kwargs(config);
+        final_poem.kwargs =
+            qb_parse_kwargs(config, final_poem.num_kwargs);
+
         free(config);
     }
     else {
         final_poem.args = NULL;
         final_poem.num_args = 0;
+        final_poem.kwargs = NULL;
+        final_poem.num_kwargs = 0;
     }
-
 
     int body_start = qb_find_next_char(poem, offset, '{')+1;
     int body_end = qb_find_matching_char(poem, poem_size, body_start-1, '{', '}');
@@ -108,24 +113,38 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     strcat(tmp_body, "__kernel void ");
     strcat(tmp_body, qp.poem_list[poem_index].name);
     strcat(tmp_body, "(");
-    if (qp.poem_list[poem_index].num_args > 0){
-        //strcat(tmp_body, ", ");
-        for (int i = 0; i < qp.poem_list[poem_index].num_args; ++i){
+    for (int i = 0; i < qp.poem_list[poem_index].num_args; ++i){
 
-            if (qp.poem_list[poem_index].args[i].type != NULL){
-                strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
-                strcat(tmp_body, " ");
-            }
-            strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
-            if (i == qp.poem_list[poem_index].num_args - 1){
-                strcat(tmp_body, "){\n");
-            }
-            else{
-                strcat(tmp_body, ", ");
-            }
+        if (qp.poem_list[poem_index].args[i].type != NULL){
+            strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
+            strcat(tmp_body, " ");
+        }
+        strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
+        if (i == qp.poem_list[poem_index].num_args - 1 &&
+            qp.poem_list[poem_index].num_kwargs <= 0){
+            strcat(tmp_body, "){\n");
+        }
+        else{
+            strcat(tmp_body, ", ");
         }
     }
-    else {
+    for (int i = 0; i < qp.poem_list[poem_index].num_kwargs; ++i){
+
+        if (qp.poem_list[poem_index].kwargs[i].type != NULL){
+            strcat(tmp_body, qp.poem_list[poem_index].kwargs[i].type);
+            strcat(tmp_body, " ");
+        }
+        strcat(tmp_body, qp.poem_list[poem_index].kwargs[i].variable);
+        if (i == qp.poem_list[poem_index].num_kwargs - 1){
+            strcat(tmp_body, "){\n");
+        }
+        else{
+            strcat(tmp_body, ", ");
+        }
+    }
+
+    if (qp.poem_list[poem_index].num_kwargs <= 0 &&
+        qp.poem_list[poem_index].num_args <= 0){
         strcat(tmp_body, "){\n");
     }
 
@@ -276,6 +295,7 @@ void qb_free_poem(quibble_poem qp){
     free(qp.body);
     free(qp.name);
     qb_free_arg_array(qp.args, qp.num_args);
+    qb_free_kwarg_array(qp.kwargs, qp.num_kwargs);
 }
 
 void qb_print_poem(quibble_poem qp){
