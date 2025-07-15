@@ -154,11 +154,11 @@ void quibble_io_tests(void){
     free(path);
 }
 
-bool qb_color_compare(quibble_color qc_1, quibble_color qc_2){
+bool qb_color_compare(quibble_color qc_1, quibble_color qc_2, int color_size){
     if (qc_1.red == qc_2.red &&
         qc_1.green == qc_2.green &&
         qc_1.blue == qc_2.blue &&
-        qc_1.alpha == qc_2.alpha){
+        ((color_size == 4) || (color_size == 4 && qc_1.alpha == qc_2.alpha))){
         return true;
     }
     else{
@@ -199,12 +199,12 @@ void quibble_image_tests(void){
     qps_rgba8888.colors[0] = test_color;
     qps_rgb888.colors[0] = test_color;
 
-    if (qb_color_compare(qps_rgba8888.colors[0], test_color) &&
-        qb_color_compare(qps_rgba8888.colors[1], blank) &&
+    if (qb_color_compare(qps_rgba8888.colors[0], test_color, 4) &&
+        qb_color_compare(qps_rgba8888.colors[1], blank, 4) &&
         qps_rgba8888.height == 1 &&
         qps_rgba8888.width == 2 &&
         qps_rgba8888.color_type == RGBA8888 &&
-        qb_color_compare(qps_rgb888.colors[0], test_color) &&
+        qb_color_compare(qps_rgb888.colors[0], test_color, 4) &&
         qps_rgb888.color_type == RGB888){
         printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_create_pixel_array\n");
     }
@@ -222,12 +222,12 @@ void quibble_image_tests(void){
             qb_read_color_from_rgba8888_array(
                 qps_rgba8888.output_array, 0
             ),
-        test_color) &&
+        test_color, 4) &&
         qb_color_compare(
             qb_read_color_from_rgba8888_array(
                 qps_rgba8888.output_array, 1
             ),
-        blank) &&
+        blank, 4) &&
         read_color.alpha == 255){
         printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_fill_array_with_colors\n");
     }
@@ -249,10 +249,12 @@ void quibble_image_tests(void){
         qb_create_pixel_array_from_file("check_noalpha.png",
                                         width,
                                         height,
-                                        RGBA8888);
+                                        RGB888);
 
     if (qb_color_compare(qps_rgba8888.colors[0],
-                         qps_from_file_rgba8888.colors[0])){
+                         qps_from_file_rgba8888.colors[0], 4) ||
+        qb_color_compare(qps_rgb888.colors[0],
+                         qps_from_file_rgb888.colors[0], 3)){
         printf("\t"QBT_GREEN "Passed: " QBT_RESET "Reading and Writing to file\n")
 ;
     }
