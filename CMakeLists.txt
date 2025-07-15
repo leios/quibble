@@ -42,7 +42,7 @@ add_executable(
     src/demo.c
 )
 
-target_link_libraries(quibble OpenCL::OpenCL)
+target_link_libraries(quibble m OpenCL::OpenCL)
 
 # QBINFO
 

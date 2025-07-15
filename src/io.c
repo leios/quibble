@@ -7,8 +7,17 @@ Purpose: This file is meant to define most of what is needed for
 
 #include "../include/io.h"
 
-quibble_pixel qb_zero_pixel(void){
-    quibble_pixel qp;
+#define STB_IMAGE_IMPLEMENTATION
+#include "../extern/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../extern/stb_image_write.h"
+
+/*----------------------------------------------------------------------------//
+    IMAGE IO
+//----------------------------------------------------------------------------*/
+
+quibble_color qb_zero_color(void){
+    quibble_color qp;
     qp.red = 0;
     qp.green = 0;
     qp.blue = 0;
@@ -16,16 +25,124 @@ quibble_pixel qb_zero_pixel(void){
     return qp;
 }
 
-quibble_pixel *qb_create_pixel_array(int height, int width){
-    quibble_pixel *qpa =
-        (quibble_pixel *)malloc(sizeof(quibble_pixel)*width*height);
-
-    for (int i = 0; i < width * height; ++i){
-        qpa[i] = qb_zero_pixel();
+int qb_get_color_size(int color_type){
+    if (color_type == RGBA8888){
+        return 4;
     }
-    return qpa;
+    else if (color_type == RGB888){
+        return 3;
+    }
+    else {
+        fprintf(stderr, "Color type %d not found!", color_type);
+        exit(1);
+    }
+
 }
 
+quibble_pixels qb_create_pixel_array_from_file(char *filename,
+                                               int width,
+                                               int height,
+                                               int color_type){
+    quibble_pixels qps = qb_create_pixel_array(width, height, color_type);
+    qps.output_array = read_file(filename, width, height, color_type);
+    return qps;
+}
+
+quibble_pixels qb_create_pixel_array(int width, int height, int color_type){
+    quibble_pixels qps;
+    qps.height = height;
+    qps.width = width;
+
+    qps.output_array = NULL;
+
+    qps.color_type = color_type;
+    qps.colors =
+        (quibble_color *)malloc(sizeof(quibble_color)*width*height);
+
+    for (int i = 0; i < width * height; ++i){
+        qps.colors[i] = qb_zero_color();
+    }
+
+    return qps;
+}
+
+quibble_color read_color_from_rgba8888_array(unsigned char *a, int i){
+    quibble_color qc;
+    qc.red = a[i*4 + 0];
+    qc.green = a[i*4 + 1];
+    qc.blue = a[i*4 + 2];
+    qc.alpha = a[i*4 + 3];
+    return qc;
+}
+
+quibble_color read_color_from_rgb888_array(unsigned char *a, int i){
+    quibble_color qc;
+    qc.red = a[i*4 + 0];
+    qc.green = a[i*4 + 1];
+    qc.blue = a[i*4 + 2];
+    qc.alpha = 1;
+    return qc;
+}
+
+void write_color_to_rgba8888_array(unsigned char *a, int i, quibble_color qc){
+    a[i*4 + 0] = qc.red;
+    a[i*4 + 1] = qc.green;
+    a[i*4 + 2] = qc.blue;
+    a[i*4 + 3] = qc.alpha;
+}
+
+void write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc){
+    a[i*4 + 0] = qc.red;
+    a[i*4 + 1] = qc.green;
+    a[i*4 + 2] = qc.blue;
+}
+
+void fill_array_with_colors(quibble_pixels qps){
+
+    int index;
+    for (int i = 0; i < qps.height; ++i){
+        for (int j = 0; j < qps.width; ++j){
+            index = i*qps.width + j;
+            if (qps.color_type == RGBA8888){
+                write_color_to_rgba8888_array(qps.output_array,
+                                              index,
+                                              qps.colors[index]);
+            }
+            else if (qps.color_type == RGB888){
+                write_color_to_rgb888_array(qps.output_array,
+                                            index,
+                                            qps.colors[index]);
+            }
+            else {
+                fprintf(stderr, "Color type %d not found!", qps.color_type);
+                exit(1);
+            }
+        }
+    }
+
+}
+
+unsigned char *read_file(char *filename, int width, int height, int color_type){
+    int color_size = qb_get_color_size(color_type);
+
+    unsigned char *data = stbi_load(filename, &width, &height, &color_size, 0);
+    return data;
+
+}
+
+void write_file(char *filename, quibble_pixels qps){
+    fill_array_with_colors(qps);
+    stbi_write_png(filename,
+                   qps.width,
+                   qps.height,
+                   qps.color_type,
+                   qps.output_array,
+                   qps.width*qb_get_color_size(qps.color_type));
+}
+
+/*----------------------------------------------------------------------------//
+    STRING MANIP
+//----------------------------------------------------------------------------*/
 size_t qb_find_type_size(char *type){
 
     if (type == NULL){
