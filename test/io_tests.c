@@ -153,3 +153,119 @@ void quibble_io_tests(void){
     free(full_path_2);
     free(path);
 }
+
+bool qb_color_compare(quibble_color qc_1, quibble_color qc_2){
+    if (qc_1.red == qc_2.red &&
+        qc_1.green == qc_2.green &&
+        qc_1.blue == qc_2.blue &&
+        qc_1.alpha == qc_2.alpha){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void quibble_image_tests(void){
+    printf("Quibble Image tests...\n");
+
+    quibble_color blank = qb_zero_color();
+    if (blank.red == 0 &&
+        blank.blue == 0 &&
+        blank.green == 0 &&
+        blank.alpha == 0){
+        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_zero_color\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_zero_color\n");
+    }
+
+    quibble_color test_color = qb_color(1, 0.5, 0, 0.125);
+
+    if (test_color.blue == 0 &&
+        test_color.red == 255){ 
+        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_color\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_color\n");
+    }
+
+
+    int width = 2;
+    int height = 1;
+    quibble_pixels qps_rgba8888 = qb_create_pixel_array(width,height,RGBA8888);
+    quibble_pixels qps_rgb888 = qb_create_pixel_array(width,height,RGB888);
+
+    qps_rgba8888.colors[0] = test_color;
+    qps_rgb888.colors[0] = test_color;
+
+    if (qb_color_compare(qps_rgba8888.colors[0], test_color) &&
+        qb_color_compare(qps_rgba8888.colors[1], blank) &&
+        qps_rgba8888.height == 1 &&
+        qps_rgba8888.width == 2 &&
+        qps_rgba8888.color_type == RGBA8888 &&
+        qb_color_compare(qps_rgb888.colors[0], test_color) &&
+        qps_rgb888.color_type == RGB888){
+        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_create_pixel_array\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_create_pixel_array\n");
+    }
+
+    qb_fill_array_with_colors(qps_rgba8888);
+    qb_fill_array_with_colors(qps_rgb888);
+
+    quibble_color read_color = qb_read_color_from_rgb888_array(
+        qps_rgb888.output_array, 0);
+
+    if (qb_color_compare(
+            qb_read_color_from_rgba8888_array(
+                qps_rgba8888.output_array, 0
+            ),
+        test_color) &&
+        qb_color_compare(
+            qb_read_color_from_rgba8888_array(
+                qps_rgba8888.output_array, 1
+            ),
+        blank) &&
+        read_color.alpha == 255){
+        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_fill_array_with_colors\n");
+    }
+    else{
+        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_fill_array_with_colors\n");
+    }
+
+    // Checked by hand in gimp...
+    // probably should have a better way to do it though
+    qb_write_png_file("check_alpha.png", qps_rgba8888);
+    qb_write_png_file("check_noalpha.png", qps_rgb888);
+
+    quibble_pixels qps_from_file_rgba8888 =
+        qb_create_pixel_array_from_file("check_alpha.png",
+                                        width,
+                                        height,
+                                        RGBA8888);
+    quibble_pixels qps_from_file_rgb888 =
+        qb_create_pixel_array_from_file("check_noalpha.png",
+                                        width,
+                                        height,
+                                        RGBA8888);
+
+    if (qb_color_compare(qps_rgba8888.colors[0],
+                         qps_from_file_rgba8888.colors[0])){
+        printf("\t"QBT_GREEN "Passed: " QBT_RESET "Reading and Writing to file\n")
+;
+    }
+    else{
+        printf("\t"QBT_RED "Failed: " QBT_RESET "Reading and Writing to file\n");
+    }
+
+    qb_free_pixels(qps_rgba8888);
+    qb_free_pixels(qps_rgb888);
+    qb_free_pixels(qps_from_file_rgba8888);
+    qb_free_pixels(qps_from_file_rgb888);
+
+    remove("check_alpha.png");
+    remove("check_noalpha.png");
+
+}

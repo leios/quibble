@@ -26,7 +26,15 @@ typedef struct {
 } quibble_pixels;
 
 // Image IO
+unsigned char qb_color_clamp(float value,
+                             float min_value,
+                             float max_value);
+quibble_color qb_color(float red, float green, float blue, float alpha);
 quibble_color qb_zero_color(void);
+
+quibble_pixels qb_create_blank_pixel_array(int width,
+                                           int height,
+                                           int color_type);
 quibble_pixels qb_create_pixel_array(int width, int height, int color_type);
 quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                int width,
@@ -35,14 +43,22 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
 
 int qb_get_color_size(int color_type);
 
-quibble_color read_color_from_rgb888_array(unsigned char *a, int i);
-quibble_color read_color_from_rgba8888_array(unsigned char *a, int i);
-void write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc);
-void write_color_to_rgba8888_array(unsigned char *a, int i, quibble_color qc);
+quibble_color qb_read_color_from_rgb888_array(unsigned char *a, int i);
+quibble_color qb_read_color_from_rgba8888_array(unsigned char *a, int i);
+void qb_write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc);
+void qb_write_color_to_rgba8888_array(unsigned char *a,
+                                      int i,
+                                      quibble_color qc);
 
-void fill_array_with_colors(quibble_pixels qps);
-unsigned char *read_file(char *filename, int width, int height, int color_type);
-void write_file(char *filename, quibble_pixels qps);
+void qb_fill_array_with_colors(quibble_pixels qps);
+void qb_fill_colors_from_array(quibble_pixels qps);
+unsigned char *qb_read_file(char *filename,
+                            int width,
+                            int height,
+                            int color_type);
+void qb_write_png_file(char *filename, quibble_pixels qps);
+
+void qb_free_pixels(quibble_pixels qps);
 
 // String Manip
 char *qb_expand_path(char *path, char *base_path);
