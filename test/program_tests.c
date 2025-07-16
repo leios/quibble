@@ -2,6 +2,8 @@
 
 void quibble_arg_parsing_tests(void){
 
+    bool test_value = false;
+
     printf("Arg / Kwarg Parsing Tests...\n");
     // qb_parse_kwargs
     char prologue_1[20] = " | float *x = 5;";
@@ -19,18 +21,14 @@ void quibble_arg_parsing_tests(void){
     int num_kwargs_6 = qb_find_number_of_kwargs(prologue_6);
     int num_kwargs_7 = qb_find_number_of_kwargs(prologue_7);
 
-    if (num_kwargs_1 == 1 &&
-        num_kwargs_2 == 2 &&
-        num_kwargs_3 == 1 &&
-        num_kwargs_4 == 0 &&
-        num_kwargs_5 == 0 &&
-        num_kwargs_6 == 1 &&
-        num_kwargs_7 == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_number_of_kwargs\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_number_of_kwargs\n");
-    }
+    test_value = (num_kwargs_1 == 1 &&
+                  num_kwargs_2 == 2 &&
+                  num_kwargs_3 == 1 &&
+                  num_kwargs_4 == 0 &&
+                  num_kwargs_5 == 0 &&
+                  num_kwargs_6 == 1 &&
+                  num_kwargs_7 == 0 );
+    qb_check(test_value, "qb_find_number_of_kwargs");
 
     quibble_kwarg *check_kwargs_1 =
         qb_parse_kwargs(prologue_1, num_kwargs_1);
@@ -53,7 +51,8 @@ void quibble_arg_parsing_tests(void){
     quibble_kwarg *check_kwargs_7 =
         qb_parse_kwargs(prologue_7, num_kwargs_7);
 
-    if (strcmp(check_kwargs_1[0].variable, "x") == 0 &&
+    test_value = (
+        strcmp(check_kwargs_1[0].variable, "x") == 0 &&
         strcmp(check_kwargs_1[0].type, "float *") == 0 &&
         strcmp(check_kwargs_1[0].value, "5") == 0 &&
         strcmp(check_kwargs_2[0].variable, "x") == 0 &&
@@ -67,21 +66,16 @@ void quibble_arg_parsing_tests(void){
         check_kwargs_7 == NULL &&
         strcmp(check_kwargs_6[0].variable, "a") == 0 &&
         strcmp(check_kwargs_6[0].value, "6") == 0 &&
-        check_kwargs_6[0].type == NULL ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_kwargs\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_kwargs\n");
-    }
+        check_kwargs_6[0].type == NULL
+    );
+    qb_check(test_value, "qb_parse_kwargs");
 
-    if (qb_find_kwarg_index(check_kwargs_2, num_kwargs_2, "x") == 0 &&
+    test_value = (
+        qb_find_kwarg_index(check_kwargs_2, num_kwargs_2, "x") == 0 &&
         qb_find_kwarg_index(check_kwargs_7, num_kwargs_7, "x") == -1 &&
-        qb_find_kwarg_index(check_kwargs_3, num_kwargs_3, "variable") == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_kwarg_index\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_kwarg_index\n");
-    }
+        qb_find_kwarg_index(check_kwargs_3, num_kwargs_3, "variable") == 0
+    );
+    qb_check(test_value, "qb_find_kwarg_index");
 
     qb_free_kwarg_array(check_kwargs_1, num_kwargs_1);
     qb_free_kwarg_array(check_kwargs_2, num_kwargs_2);
@@ -99,18 +93,16 @@ void quibble_arg_parsing_tests(void){
     int num_args_6 = qb_find_number_of_args(prologue_6);
     int num_args_7 = qb_find_number_of_args(prologue_6);
 
-    if (num_args_1 == 0 &&
+    test_value = (
+        num_args_1 == 0 &&
         num_args_2 == 3 &&
         num_args_3 == 3 &&
         num_args_4 == 3 &&
         num_args_5 == 1 &&
         num_args_6 == 0 &&
-        num_args_7 == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_number_of_args\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_number_of_args\n");
-    }
+        num_args_7 == 0
+    );
+    qb_check(test_value, "qb_find_number_of_args");
 
     quibble_arg *check_args_1 = qb_parse_args(prologue_1, num_args_1);
     quibble_arg *check_args_2 = qb_parse_args(prologue_2, num_args_2);
@@ -120,7 +112,8 @@ void quibble_arg_parsing_tests(void){
     quibble_arg *check_args_6 = qb_parse_args(prologue_6, num_args_6);
     quibble_arg *check_args_7 = qb_parse_args(prologue_7, num_args_7);
 
-    if (check_args_1 == NULL &&
+    test_value = (
+        check_args_1 == NULL &&
         strcmp(check_args_2[0].variable, "a") == 0 &&
         strcmp(check_args_2[0].type, "float *") == 0 &&
         strcmp(check_args_2[1].variable, "b") == 0 &&
@@ -134,21 +127,16 @@ void quibble_arg_parsing_tests(void){
         strcmp(check_args_4[1].variable, "b") == 0 &&
         strcmp(check_args_4[2].variable, "c") == 0 &&
         strcmp(check_args_5[0].variable, "meh") == 0 &&
-        check_args_6 == NULL && check_args_7 == NULL){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_args\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_args\n");
-    }
+        check_args_6 == NULL && check_args_7 == NULL
+    );
+    qb_check(test_value, "qb_parse_args");
 
-    if (qb_find_arg_index(check_args_5, num_args_5, "meh") == 0 &&
+    test_value = (
+        qb_find_arg_index(check_args_5, num_args_5, "meh") == 0 &&
         qb_find_arg_index(check_args_7, num_args_7, "x") == -1 &&
-        qb_find_arg_index(check_args_3, num_args_3, "b") == 1 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_arg_index\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_arg_index\n");
-    }
+        qb_find_arg_index(check_args_3, num_args_3, "b") == 1
+    );
+    qb_check(test_value, "qb_find_arg_index");
 
     qb_free_arg_array(check_args_1, num_args_1);
     qb_free_arg_array(check_args_2, num_args_2);
@@ -160,7 +148,9 @@ void quibble_arg_parsing_tests(void){
     
 }
 
-void quibble_program_tests(){
+void quibble_program_tests(void){
+    bool test_value = false;
+
     printf("Program Parsing Tests...\n");
 
     char *simple_program = QBINLINE(
@@ -171,35 +161,30 @@ void quibble_program_tests(){
 
     quibble_program qp_check = qb_parse_program(simple_program, "");
 
-    if (qp_check.num_verses == 1 &&
+    test_value = (
+        qp_check.num_verses == 1 &&
         qp_check.everything_else == NULL &&
         strcmp(qp_check.verse_list[0].name, "check") == 0 &&
         qp_check.num_poems == 1 &&
         strcmp(qp_check.poem_list[0].name, "check") == 0 &&
         qp_check.num_stanzas == 1 &&
-        strcmp(qp_check.stanza_list[0].name, "check") == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_program\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program\n");
-    }
-
+        strcmp(qp_check.stanza_list[0].name, "check") == 0
+    );
+    qb_check(test_value, "qb_parse_program");
 
     char *filename = qb_config_file("scribbles/example.qbl");
     quibble_program qp_2 = qb_parse_program_file(filename);
     free(filename);
 
-    if (qp_2.num_verses == 4 &&
+    test_value = (
+        qp_2.num_verses == 4 &&
         strcmp(qp_2.verse_list[0].name, "nothing") == 0 &&
         qp_2.num_poems == 4 &&
         strcmp(qp_2.poem_list[3].name, "poem_check") == 0 &&
         qp_2.num_stanzas == 4 &&
-        strcmp(qp_2.stanza_list[0].name, "nothing") == 0 ){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_parse_program_file\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_parse_program_file\n");
-    }
+        strcmp(qp_2.stanza_list[0].name, "nothing") == 0
+    );
+    qb_check(test_value, "qb_parse_program_file");
 
     qb_configure_program(&qp_2, 0, 0);
     int stanza_num = 0;
@@ -299,47 +284,38 @@ void quibble_program_tests(){
                             NULL)
     );
 
-    bool result = true;
+    test_value = true;
     for (int i = 0; i < array_size; ++i){
         if (c[i] != 2.5){
-            result = false;
+            test_value = false;
         }
     }
 
-    if (result){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_configure_program\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_configure_program\n");
-    }
+    qb_check(test_value, "qb_configure_program");
 
     quibble_program qp_sum = qb_combine_programs(qp_check, qp_2);
 
-    if (qp_sum.num_verses == qp_2.num_verses + 1 &&
+    test_value = (
+        qp_sum.num_verses == qp_2.num_verses + 1 &&
         qp_sum.num_stanzas == qp_2.num_stanzas + 1 &&
         qp_sum.num_poems == qp_2.num_poems + 1 &&
         strcmp(qp_sum.verse_list[1].name, "nothing") == 0 &&
         strcmp(qp_sum.stanza_list[1].name, "nothing") == 0 &&
-        strcmp(qp_sum.poem_list[1].name, "nothing") == 0){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_combine_programs\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_combine_programs\n");
-    }
+        strcmp(qp_sum.poem_list[1].name, "nothing") == 0
+    );
+    qb_check(test_value, "qb_combine_programs");
 
     quibble_program both_programs[2];
     both_programs[0] = qp_check;
     both_programs[1] = qp_2;
     quibble_program qp_array_sum = qb_combine_program_array(both_programs, 2);
 
-    if (qp_sum.num_verses == qp_array_sum.num_verses &&
+    test_value = (
+        qp_sum.num_verses == qp_array_sum.num_verses &&
         qp_sum.num_stanzas == qp_array_sum.num_stanzas &&
-        qp_sum.num_poems == qp_array_sum.num_poems){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_combine_program_array\n");
-    }
-    else {
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_combine_program_array\n");
-    }
+        qp_sum.num_poems == qp_array_sum.num_poems
+    );
+    qb_check(test_value, "qb_combine_program_array");
 
     free(a);
     free(b);

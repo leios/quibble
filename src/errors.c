@@ -5,6 +5,15 @@ Purpose: This file defines error checking for OpenCL
 //----------------------------------------------------------------------------*/
 #include "../include/errors.h"
 
+void qb_check(bool value, char *err_string){
+    if (value){
+        printf("\t"QBT_GREEN"Passed: "QBT_RESET"%s\n", err_string);
+    }
+    else {
+        printf("\t"QBT_RED"Failed: "QBT_RESET"%s\n", err_string);
+    }
+}
+
 void cl_check(cl_int error){
     if (error != CL_SUCCESS){
         fprintf(stderr, "%s\nError number: %d\n",
