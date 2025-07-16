@@ -2,6 +2,8 @@
 
 void quibble_io_tests(void){
 
+    bool test_value = false;
+
     printf("Quibble IO String tests...\n");
 
     // QBINLINE
@@ -10,25 +12,18 @@ void quibble_io_tests(void){
         }
     );
 
-    // qb_is_qbinlined
-    if (qb_is_inlined(kernel_string)){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_is_qbinlined\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_is_qbinlined\n");
-    }
+    test_value = qb_is_inlined(kernel_string);
+    qb_check(test_value, "qb_is_inlined");
 
     // qb_preprocess_content
     // QBINLINE creates a const, so copying to another container
     char *check_string = qb_copy(kernel_string);
     qb_preprocess_content(check_string);
-    if (strcmp(check_string,
-               "//\nQBINLINE\nGENERATED\n__verse\ncheck(){\n}") == 0){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_preprocess_content\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_preprocess_content\n");
-    }
+
+    test_value = (strcmp(check_string,
+                         "//\nQBINLINE\nGENERATED\n__verse\ncheck(){\n}") == 0);
+    qb_check(test_value, "qb_preprocess_content");
+
     free(check_string);
 
     // Others
@@ -36,51 +31,36 @@ void quibble_io_tests(void){
     char check[23] = "This is a test string ";
     qb_replace_char_if_proceeding(check, "test", ' ', '\n');
     qb_replace_char_if_proceeding(check, "T", ' ', '_');
-    if (strcmp(check, "This_is a test\nstring ") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_replace_char_if_proceeding\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_replace_char_if_proceeding\n");
-    }
+
+    test_value = (strcmp(check, "This_is a test\nstring ") == 0);
+    qb_check(test_value, "qb_replace_char_if_proceeding");
 
     // qb_replace_char
     qb_replace_char(check, 23, '\n', ' ');
-    if (strcmp(check, "This_is a test string ") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_replace_char\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_replace_char\n");
-    }
+
+    test_value = (strcmp(check, "This_is a test string ") == 0);
+    qb_check(test_value, "qb_replace_char");
 
     // qb_replace_next_char
     qb_replace_next_char(check, 11, ' ', '_');
-    if (strcmp(check, "This_is a test_string ") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_replace_next_char\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_replace_next_char\n");
-    }
+
+    test_value = (strcmp(check, "This_is a test_string ") == 0);
+    qb_check(test_value, "qb_replace_next_char");
 
     // qb_find_occurrences
     int occurrences = qb_find_occurrences(" ", check);
 
-    if (occurrences == 3){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_find_occurrences\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_find_occurrences\n");
-    }
+    qb_check((occurrences == 3), "qb_find_occurrences");
 
+    // qb_strip_spaces
     char *stripped_1 = qb_strip_spaces(check, 9, 14);
     char *stripped_2 = qb_strip_spaces(check, 7, 9);
-    // qb_strip_spaces
-    if (strcmp(stripped_1, "test_") == 0 &&
-        strcmp(stripped_2, "a") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_strip_spaces\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_strip_spaces\n");
-    }
+
+    test_value = (
+        strcmp(stripped_1, "test_") == 0 &&
+        strcmp(stripped_2, "a") == 0
+    );
+    qb_check(test_value, "qb_strip_spaces");
 
     free(stripped_1);
     free(stripped_2);
@@ -96,33 +76,30 @@ void quibble_io_tests(void){
     }
 
     // qb_find_next_string
-    if (qb_find_next_string(check, 0, "t") == 10 &&
+    test_value = (
+        qb_find_next_string(check, 0, "t") == 10 &&
         qb_find_next_string(check, 0, "test") == 10 &&
         qb_find_next_string(check, 0, "z") == -1 &&
         qb_find_next_string(check, 11, "test") == -1 &&
-        qb_find_next_string(check, 11, "string") == 15){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_next_string\n");
-    }
-    else{
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_next_string\n");
-    }
+        qb_find_next_string(check, 11, "string") == 15
+    );
+    qb_check(test_value, "qb_find_next_string");
 
     // qb_find_matching_char
     //                 "0123456789";
     char check_2[11] = "([]()(()))";
-        // qb_find_next_string
-    if (qb_find_matching_char(check_2, 10, 0, '(', ')') == 9 &&
+
+    test_value = (
+        qb_find_matching_char(check_2, 10, 0, '(', ')') == 9 &&
         qb_find_matching_char(check_2, 10, 1, '[', ']') == 2 &&
         qb_find_matching_char(check_2, 10, 5, '(', ')') == 8 &&
         qb_find_matching_char(check_2, 10, 7, '(', ')') == -1 &&
-        qb_find_matching_char("(()((", 5, 0, '(', ')') == -1){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_matching_char\n");
-    }
-    else{
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_matching_char\n");
-    }
+        qb_find_matching_char("(()((", 5, 0, '(', ')') == -1
+    );
+    qb_check(test_value, "qb_find_matching_char");
 
-    if (qb_find_type_size("bool") == sizeof(char) &&
+    test_value = (
+        qb_find_type_size("bool") == sizeof(char) &&
         qb_find_type_size("char") == sizeof(char) &&
         qb_find_type_size("signed char") == sizeof(signed char) &&
         qb_find_type_size("unsigned char") == sizeof(unsigned char) &&
@@ -153,20 +130,13 @@ void quibble_io_tests(void){
         qb_find_type_size("double") == sizeof(double) &&
         qb_find_type_size("long double") == sizeof(long double) &&
         qb_find_type_size("meh") == sizeof(int) &&
-        qb_find_type_size("char *") == sizeof(char *)){
-        printf("\t"QBT_GREEN"Passed: "QBT_RESET"qb_find_type_size\n");
-    }
-    else{
-        printf("\t"QBT_RED"Failed: "QBT_RESET"qb_find_type_size\n");
-    }
+        qb_find_type_size("char *") == sizeof(char *)
+    );
+    qb_check(test_value, "qb_find_type_size");
 
     char *path = qb_find_path("meh/../meh/hey.qbl");
-    if (strcmp(path, "meh/../meh/") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_find_path\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_find_path\n");
-    }
+    test_value = (strcmp(path, "meh/../meh/") == 0);
+    qb_check(test_value, "qb_find_path");
 
     char *short_path_1 = "QB/check.qbl";
     char *short_path_2 = "ok???";
@@ -176,12 +146,8 @@ void quibble_io_tests(void){
 
     // full_path_1 is different per system, uncomment to print what it shows.
     // printf("%s\n", full_path_1);
-    if (strcmp(full_path_2, "meh/../meh/ok???") == 0){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_expand_path\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_expand_path\n");
-    }
+    test_value = (strcmp(full_path_2, "meh/../meh/ok???") == 0);
+    qb_check(test_value, "qb_expand_path");
 
     free(full_path_1);
     free(full_path_2);

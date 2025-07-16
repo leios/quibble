@@ -19,6 +19,7 @@
 #define QBT_CYAN    "\x1b[36m"
 #define QBT_RESET   "\x1b[0m"
 
+void qb_check(bool value, char *err_string);
 void cl_check(cl_int error);
 
 const char *get_cl_error_string(cl_int error);
