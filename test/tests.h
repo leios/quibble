@@ -4,6 +4,7 @@
 #include "../include/quibble_program.h"  
 
 void quibble_io_tests(void);
+void quibble_image_tests(void);
 void quibble_verse_tests(void);
 void quibble_stanza_tests(void);
 void quibble_poem_tests(void);

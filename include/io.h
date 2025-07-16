@@ -3,19 +3,74 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <png.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+#define RGBA8888 4
+#define RGB888 3
 
 typedef struct {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
     unsigned char alpha;
-} quibble_pixel;
+} quibble_color;
 
-quibble_pixel qb_zero_pixel(void);
-quibble_pixel *qb_create_pixel_array(int height, int width);
+typedef struct {
+    quibble_color *colors;
+    unsigned char *output_array;
+    int color_type;
+    int height;
+    int width;
+} quibble_pixels;
 
+// Image IO
+unsigned char qb_color_clamp(float value,
+                             float min_value,
+                             float max_value);
+quibble_color qb_color(float red, float green, float blue, float alpha);
+quibble_color qb_zero_color(void);
+
+quibble_pixels qb_create_blank_pixel_array(int width,
+                                           int height,
+                                           int color_type);
+quibble_pixels qb_create_pixel_array(int width, int height, int color_type);
+quibble_pixels qb_create_pixel_array_from_file(char *filename,
+                                               int width,
+                                               int height,
+                                               int color_type);
+
+int qb_get_color_size(int color_type);
+
+quibble_color qb_read_color_from_rgb888_array(unsigned char *a, int i);
+quibble_color qb_read_color_from_rgba8888_array(unsigned char *a, int i);
+void qb_write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc);
+void qb_write_color_to_rgba8888_array(unsigned char *a,
+                                      int i,
+                                      quibble_color qc);
+
+
+void qb_fill_array_with_colors(quibble_pixels qps);
+void qb_fill_colors_from_array(quibble_pixels qps);
+
+// File Formats
+
+char *qb_find_file_extension(char* filename);
+
+unsigned char *qb_read_file(char *filename,
+                            int width,
+                            int height,
+                            int color_type);
+
+void qb_write_file(char *filename, quibble_pixels qps);
+void qb_write_png_file(char *filename, quibble_pixels qps);
+void qb_write_bmp_file(char *filename, quibble_pixels qps);
+void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality);
+
+void qb_free_pixels(quibble_pixels qps);
+
+// String Manip
 char *qb_expand_path(char *path, char *base_path);
 char *qb_find_path(char *filename);
 char *qb_config_file(char *path);
