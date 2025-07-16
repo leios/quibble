@@ -228,18 +228,43 @@ void quibble_image_tests(void){
     );
     qb_check(test_value, "qb_fill_array_with_colors");
 
+    test_value = (strcmp(qb_find_file_extension("check.png"), "png") == 0);
+    qb_check(test_value, "qb_find_file_extension");
+
     // Checked by hand in gimp...
     // probably should have a better way to do it though
     qb_write_png_file("check_alpha.png", qps_rgba8888);
-    qb_write_png_file("check_noalpha.png", qps_rgb888);
+    qb_write_file("check_noalpha.png", qps_rgb888);
+    qb_write_file("check_noalpha.jpg", qps_rgb888);
+    qb_write_file("check_noalpha.bmp", qps_rgb888);
+    qb_write_file("check_noalpha", qps_rgb888);
 
     quibble_pixels qps_from_file_rgba8888 =
         qb_create_pixel_array_from_file("check_alpha.png",
                                         width,
                                         height,
                                         RGBA8888);
+
     quibble_pixels qps_from_file_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.png",
+                                        width,
+                                        height,
+                                        RGB888);
+
+    quibble_pixels qps_from_jpg_rgb888 =
+        qb_create_pixel_array_from_file("check_noalpha.jpg",
+                                        width,
+                                        height,
+                                        RGB888);
+
+    quibble_pixels qps_from_bmp_rgb888 =
+        qb_create_pixel_array_from_file("check_noalpha.bmp",
+                                        width,
+                                        height,
+                                        RGB888);
+
+    quibble_pixels qps_from_none_rgb888 =
+        qb_create_pixel_array_from_file("check_noalpha",
                                         width,
                                         height,
                                         RGB888);
@@ -248,7 +273,13 @@ void quibble_image_tests(void){
         qb_color_compare(qps_rgba8888.colors[0],
                          qps_from_file_rgba8888.colors[0], 4) ||
         qb_color_compare(qps_rgb888.colors[0],
-                         qps_from_file_rgb888.colors[0], 3)
+                         qps_from_file_rgb888.colors[0], 3) ||
+        qb_color_compare(qps_rgb888.colors[0],
+                         qps_from_bmp_rgb888.colors[0], 3) ||
+        qb_color_compare(qps_rgb888.colors[0],
+                         qps_from_jpg_rgb888.colors[0], 3) ||
+        qb_color_compare(qps_rgb888.colors[0],
+                         qps_from_none_rgb888.colors[0], 3)
     );
     qb_check(test_value, "Reading and Writing to file");
 
@@ -256,8 +287,14 @@ void quibble_image_tests(void){
     qb_free_pixels(qps_rgb888);
     qb_free_pixels(qps_from_file_rgba8888);
     qb_free_pixels(qps_from_file_rgb888);
+    qb_free_pixels(qps_from_bmp_rgb888);
+    qb_free_pixels(qps_from_jpg_rgb888);
+    qb_free_pixels(qps_from_none_rgb888);
 
     remove("check_alpha.png");
     remove("check_noalpha.png");
+    remove("check_noalpha.jpg");
+    remove("check_noalpha.bmp");
+    remove("check_noalpha");
 
 }

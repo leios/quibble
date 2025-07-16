@@ -8,6 +8,12 @@ Purpose: This file is meant to define most of what is needed for
 #include "../include/io.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_GIF
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM 
 #include "../extern/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../extern/stb_image_write.h"
@@ -184,6 +190,33 @@ void qb_fill_colors_from_array(quibble_pixels qps){
 
 }
 
+/*----------------------------------------------------------------------------//
+    FILE FORMATS
+//----------------------------------------------------------------------------*/
+
+char *qb_find_file_extension(char* filename){
+    int len = strlen(filename);
+    bool iterate = true;
+    int index = len-1;
+
+    while (iterate){
+        if (filename[index] == '.'){
+            iterate = false;
+        }
+        index -= 1;
+        if (index < 0){
+            iterate = false;
+        }
+    }
+
+    if (index < 0){
+        return NULL;
+    }
+    else {
+        return &filename[index+2];
+    }
+}
+
 unsigned char *qb_read_file(char *filename,
                             int width,
                             int height,
@@ -195,6 +228,38 @@ unsigned char *qb_read_file(char *filename,
 
 }
 
+void qb_write_file(char *filename, quibble_pixels qps){
+
+    char *file_extension = qb_find_file_extension(filename);
+
+    if (file_extension == NULL){
+        printf("Warning, no file extension found!\nDefaulting to BMP!\n");
+        qb_write_bmp_file(filename, qps);
+    }
+    else if (strcmp(file_extension, "png") == 0 ||
+             strcmp(file_extension, "PNG") == 0){
+        qb_write_png_file(filename, qps);
+    }
+    else if (strcmp(file_extension, "jpg") == 0 ||
+             strcmp(file_extension, "JPG") == 0 ||
+             strcmp(file_extension, "jpeg") == 0 ||
+             strcmp(file_extension, "JPEG") == 0){
+        printf("Warning: no quality set for jpg file. Defaulting to 100!\n");
+        printf("To set quality, run `qb_write_jpg_file(filename, pixels, quality)` instead!\n");
+        qb_write_jpg_file(filename, qps, 100);
+    }
+    else if (strcmp(file_extension, "bmp") == 0 ||
+             strcmp(file_extension, "BMP") == 0){
+        qb_write_bmp_file(filename, qps);
+    }
+    else {
+        printf("Warning, file extension %s is not supported!\n",
+               file_extension);
+        printf("Defaulting to BMP!\n");
+        qb_write_bmp_file(filename, qps);
+    }
+}
+
 void qb_write_png_file(char *filename, quibble_pixels qps){
     qb_fill_array_with_colors(qps);
     stbi_write_png(filename,
@@ -203,6 +268,25 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
                    qps.color_type,
                    qps.output_array,
                    qps.width*qb_get_color_size(qps.color_type));
+}
+
+void qb_write_bmp_file(char *filename, quibble_pixels qps){
+    qb_fill_array_with_colors(qps);
+    stbi_write_bmp(filename,
+                   qps.width,
+                   qps.height,
+                   qps.color_type,
+                   qps.output_array);
+}
+
+void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
+    qb_fill_array_with_colors(qps);
+    stbi_write_jpg(filename,
+                   qps.width,
+                   qps.height,
+                   qps.color_type,
+                   qps.output_array,
+                   quality);
 }
 
 void qb_free_pixels(quibble_pixels qps){

@@ -50,13 +50,23 @@ void qb_write_color_to_rgba8888_array(unsigned char *a,
                                       int i,
                                       quibble_color qc);
 
+
 void qb_fill_array_with_colors(quibble_pixels qps);
 void qb_fill_colors_from_array(quibble_pixels qps);
+
+// File Formats
+
+char *qb_find_file_extension(char* filename);
+
 unsigned char *qb_read_file(char *filename,
                             int width,
                             int height,
                             int color_type);
+
+void qb_write_file(char *filename, quibble_pixels qps);
 void qb_write_png_file(char *filename, quibble_pixels qps);
+void qb_write_bmp_file(char *filename, quibble_pixels qps);
+void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality);
 
 void qb_free_pixels(quibble_pixels qps);
 
