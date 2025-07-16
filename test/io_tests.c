@@ -66,14 +66,12 @@ void quibble_io_tests(void){
     free(stripped_2);
 
     // qb_find_next_char
-    if (qb_find_next_char(check, 0, 't') == 10 &&
+    test_value = (
+        qb_find_next_char(check, 0, 't') == 10 &&
         qb_find_next_char(check, 0, 'z') == -1 &&
-        qb_find_next_char(check, 11, 't') == 13){
-        printf("\t"QBT_GREEN "Passed: "QBT_RESET"qb_find_next_char\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: "QBT_RESET"qb_find_next_char\n");
-    }
+        qb_find_next_char(check, 11, 't') == 13
+    );
+    qb_check(test_value, "qb_find_next_char");
 
     // qb_find_next_string
     test_value = (
@@ -167,29 +165,28 @@ bool qb_color_compare(quibble_color qc_1, quibble_color qc_2, int color_size){
 }
 
 void quibble_image_tests(void){
+
+    bool test_value = false;
+
     printf("Quibble Image tests...\n");
 
     quibble_color blank = qb_zero_color();
-    if (blank.red == 0 &&
+
+    test_value = (
+        blank.red == 0 &&
         blank.blue == 0 &&
         blank.green == 0 &&
-        blank.alpha == 0){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_zero_color\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_zero_color\n");
-    }
+        blank.alpha == 0
+    );
+    qb_check(test_value, "qb_zero_color");
 
     quibble_color test_color = qb_color(1, 0.5, 0, 0.125);
 
-    if (test_color.blue == 0 &&
-        test_color.red == 255){ 
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_color\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_color\n");
-    }
-
+    test_value = (
+        test_color.blue == 0 &&
+        test_color.red == 255
+    );
+    qb_check(test_value, "qb_color");
 
     int width = 2;
     int height = 1;
@@ -199,18 +196,16 @@ void quibble_image_tests(void){
     qps_rgba8888.colors[0] = test_color;
     qps_rgb888.colors[0] = test_color;
 
-    if (qb_color_compare(qps_rgba8888.colors[0], test_color, 4) &&
+    test_value = (
+        qb_color_compare(qps_rgba8888.colors[0], test_color, 4) &&
         qb_color_compare(qps_rgba8888.colors[1], blank, 4) &&
         qps_rgba8888.height == 1 &&
         qps_rgba8888.width == 2 &&
         qps_rgba8888.color_type == RGBA8888 &&
         qb_color_compare(qps_rgb888.colors[0], test_color, 4) &&
-        qps_rgb888.color_type == RGB888){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_create_pixel_array\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_create_pixel_array\n");
-    }
+        qps_rgb888.color_type == RGB888
+    );
+    qb_check(test_value, "qb_create_pixel_array");
 
     qb_fill_array_with_colors(qps_rgba8888);
     qb_fill_array_with_colors(qps_rgb888);
@@ -218,7 +213,8 @@ void quibble_image_tests(void){
     quibble_color read_color = qb_read_color_from_rgb888_array(
         qps_rgb888.output_array, 0);
 
-    if (qb_color_compare(
+    test_value = (
+        qb_color_compare(
             qb_read_color_from_rgba8888_array(
                 qps_rgba8888.output_array, 0
             ),
@@ -228,12 +224,9 @@ void quibble_image_tests(void){
                 qps_rgba8888.output_array, 1
             ),
         blank, 4) &&
-        read_color.alpha == 255){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "qb_fill_array_with_colors\n");
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "qb_fill_array_with_colors\n");
-    }
+        read_color.alpha == 255
+    );
+    qb_check(test_value, "qb_fill_array_with_colors");
 
     // Checked by hand in gimp...
     // probably should have a better way to do it though
@@ -251,16 +244,13 @@ void quibble_image_tests(void){
                                         height,
                                         RGB888);
 
-    if (qb_color_compare(qps_rgba8888.colors[0],
+    test_value = (
+        qb_color_compare(qps_rgba8888.colors[0],
                          qps_from_file_rgba8888.colors[0], 4) ||
         qb_color_compare(qps_rgb888.colors[0],
-                         qps_from_file_rgb888.colors[0], 3)){
-        printf("\t"QBT_GREEN "Passed: " QBT_RESET "Reading and Writing to file\n")
-;
-    }
-    else{
-        printf("\t"QBT_RED "Failed: " QBT_RESET "Reading and Writing to file\n");
-    }
+                         qps_from_file_rgb888.colors[0], 3)
+    );
+    qb_check(test_value, "Reading and Writing to file");
 
     qb_free_pixels(qps_rgba8888);
     qb_free_pixels(qps_rgb888);
