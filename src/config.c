@@ -256,7 +256,19 @@ void qb_set_args(quibble_program *qp, char *poem, int n, ...){
 }
 
 char *qb_create_pixel_args(char *variable){
+    char tmp[1000];
+    sprintf(tmp, "__global quibble_color *%s, %s_type, %s_width, %s_height,",
+            variable, variable, variable, variable);
+
+    int len = strlen(tmp);
+
+    char *ret = (char *)calloc(len+1, sizeof(char));
+
+    strcat(ret, tmp);
+
+    return ret;
 }
+
 void qb_set_pixel_args(quibble_program *qp, quibble_pixels qps){
 }
 
