@@ -87,7 +87,8 @@ int qb_get_color_size(int color_type){
 
 }
 
-quibble_pixels qb_create_blank_pixel_array(int width,
+quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
+                                           int width,
                                            int height,
                                            int color_type){
     quibble_pixels qps;
@@ -115,21 +116,38 @@ quibble_pixels qb_create_blank_pixel_array(int width,
         }
     }
 
+    qps.command_queue = qp.command_queue;
+    int array_size = color_size*qps.width*qps.height*sizeof(unsigned char);
+
+    cl_int err;
+    qps.device_data =
+        clCreateBuffer(qp.context,
+                       CL_MEM_READ_WRITE,
+                       array_size,
+                       NULL,
+                       &err);
+
     return qps;
 }
 
 
 quibble_pixels qb_create_pixel_array_from_file(char *filename,
+                                               quibble_program qp,
                                                int width,
                                                int height,
                                                int color_type){
-    quibble_pixels qps = qb_create_blank_pixel_array(width, height, color_type);
+    quibble_pixels qps =
+        qb_create_blank_pixel_array(qp, width, height, color_type);
     qps.host_data = qb_read_file(filename, width, height, color_type);
     return qps;
 }
 
-quibble_pixels qb_create_pixel_array(int width, int height, int color_type){
-    quibble_pixels qps = qb_create_blank_pixel_array(width, height, color_type);
+quibble_pixels qb_create_pixel_array(quibble_program qp,
+                                     int width,
+                                     int height,
+                                     int color_type){
+    quibble_pixels qps =
+        qb_create_blank_pixel_array(qp, width, height, color_type);
 
     int color_size = qb_get_color_size(color_type);
 
@@ -137,6 +155,43 @@ quibble_pixels qb_create_pixel_array(int width, int height, int color_type){
         (unsigned char *)calloc(width*height*color_size,
                                 sizeof(unsigned char *));
     return qps;
+}
+
+void qb_pixels_host_to_device(quibble_pixels qps){
+    int color_size = qb_get_color_size(qps.color_type);
+    int array_size = color_size*qps.width*qps.height*sizeof(unsigned char);
+
+    cl_check(clEnqueueWriteBuffer(qps.command_queue,
+                                  qps.device_data,
+                                  CL_TRUE,
+                                  0,
+                                  array_size,
+                                  qps.host_data,
+                                  0,
+                                  NULL,
+                                  NULL));
+
+}
+
+void qb_pixels_device_to_host(quibble_pixels qps){
+    int color_size = qb_get_color_size(qps.color_type);
+    int array_size = color_size*qps.width*qps.height*sizeof(unsigned char);
+
+    cl_check(clEnqueueReadBuffer(qps.command_queue,
+                                 qps.device_data,
+                                 CL_TRUE,
+                                 0,
+                                 array_size,
+                                 qps.host_data,
+                                 0,
+                                 NULL,
+                                 NULL));
+
+}
+
+void qb_free_pixels(quibble_pixels qps){
+    free(qps.host_data);
+    cl_check(clReleaseMemObject(qps.device_data));
 }
 
 /*----------------------------------------------------------------------------//
@@ -235,6 +290,3 @@ void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
                    quality);
 }
 
-void qb_free_pixels(quibble_pixels qps){
-    free(qps.host_data);
-}

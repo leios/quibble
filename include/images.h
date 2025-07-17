@@ -25,6 +25,10 @@ typedef struct {
     int color_type;
     int height;
     int width;
+
+    // CL stuff
+    cl_mem device_data;
+    cl_command_queue command_queue;
 } quibble_pixels;
 
 // Image IO
@@ -40,16 +44,24 @@ quibble_color_rgba8888 qb_color_rgba8888(float red,
                                          float alpha);
 quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue);
 
-quibble_pixels qb_create_blank_pixel_array(int width,
+quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
+                                           int width,
                                            int height,
                                            int color_type);
-quibble_pixels qb_create_pixel_array(int width, int height, int color_type);
+quibble_pixels qb_create_pixel_array(quibble_program qp,
+                                     int width,
+                                     int height,
+                                     int color_type);
 quibble_pixels qb_create_pixel_array_from_file(char *filename,
+                                               quibble_program qp,
                                                int width,
                                                int height,
                                                int color_type);
 
 int qb_get_color_size(int color_type);
+
+void qb_pixels_device_to_host(quibble_pixels qps);
+void qb_pixels_host_to_device(quibble_pixels qps);
 
 // File Formats
 
