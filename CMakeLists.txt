@@ -23,8 +23,8 @@ add_executable(
     include/errors.h
     src/errors.c
 
-    include/io.h
-    src/io.c
+    include/string_manip.h
+    src/string_manip.c
 
     include/quibble_args.h
     src/quibble_args.c
@@ -34,6 +34,9 @@ add_executable(
     src/quibble_stanzas.c
     src/quibble_poems.c
     src/quibble_program.c
+
+    include/images.h
+    src/images.c
 
     test/tests.h
     test/io_tests.c

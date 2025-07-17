@@ -8,7 +8,6 @@
 
 #include "macros.h"
 #include <CL/cl.h>
-#include "io.h"
 #include "errors.h"
 #include "quibble_args.h"
 
