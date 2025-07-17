@@ -22,12 +22,20 @@ Purpose: This file is meant to define most of what is needed for
     IMAGE IO
 //----------------------------------------------------------------------------*/
 
-quibble_color qb_zero_color(void){
-    quibble_color qp;
+quibble_color_rgba8888 qb_zero_color_rgba8888(void){
+    quibble_color_rgba8888 qp;
     qp.red = 0;
     qp.green = 0;
     qp.blue = 0;
     qp.alpha = 0;
+    return qp;
+}
+
+quibble_color_rgb888 qb_zero_color_rgb888(void){
+    quibble_color_rgb888 qp;
+    qp.red = 0;
+    qp.green = 0;
+    qp.blue = 0;
     return qp;
 }
 
@@ -45,12 +53,23 @@ unsigned char qb_color_clamp(float value,
     }
 }
 
-quibble_color qb_color(float red, float green, float blue, float alpha){
-    quibble_color qp;
+quibble_color_rgba8888 qb_color_rgba8888(float red,
+                                         float green,
+                                         float blue,
+                                         float alpha){
+    quibble_color_rgba8888 qp;
     qp.red = qb_color_clamp(red, 0, 1);
     qp.green = qb_color_clamp(green, 0, 1);
     qp.blue = qb_color_clamp(blue, 0, 1);
     qp.alpha = qb_color_clamp(alpha, 0, 1);
+    return qp;
+}
+
+quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue){
+    quibble_color_rgb888 qp;
+    qp.red = qb_color_clamp(red, 0, 1);
+    qp.green = qb_color_clamp(green, 0, 1);
+    qp.blue = qb_color_clamp(blue, 0, 1);
     return qp;
 }
 
@@ -78,11 +97,22 @@ quibble_pixels qb_create_blank_pixel_array(int width,
     qps.output_array = NULL;
 
     qps.color_type = color_type;
-    qps.colors =
-        (quibble_color *)malloc(sizeof(quibble_color)*width*height);
+    int color_size = qb_get_color_size(color_type);
+    qps.host_data =
+        (void *)malloc(sizeof(unsigned char *)*color_size*width*height);
 
-    for (int i = 0; i < width * height; ++i){
-        qps.colors[i] = qb_zero_color();
+    if (color_type == RGBA8888){
+        quibble_color_rgba8888 *vals = (quibble_color_rgba8888 *)qps.host_data;
+        for (int i = 0; i < width * height; ++i){
+            vals[i] = qb_zero_color_rgba8888();
+        }
+    }
+
+    else if (color_type == RGB888){
+        quibble_color_rgb888 *vals = (quibble_color_rgb888 *)qps.host_data;
+        for (int i = 0; i < width * height; ++i){
+            vals[i] = qb_zero_color_rgb888();
+        }
     }
 
     return qps;
@@ -94,8 +124,7 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                int height,
                                                int color_type){
     quibble_pixels qps = qb_create_blank_pixel_array(width, height, color_type);
-    qps.output_array = qb_read_file(filename, width, height, color_type);
-    qb_fill_colors_from_array(qps);
+    qps.host_data = qb_read_file(filename, width, height, color_type);
     return qps;
 }
 
@@ -108,86 +137,6 @@ quibble_pixels qb_create_pixel_array(int width, int height, int color_type){
         (unsigned char *)calloc(width*height*color_size,
                                 sizeof(unsigned char *));
     return qps;
-}
-
-quibble_color qb_read_color_from_rgba8888_array(unsigned char *a, int i){
-    quibble_color qc;
-    qc.red = a[i*4 + 0];
-    qc.green = a[i*4 + 1];
-    qc.blue = a[i*4 + 2];
-    qc.alpha = a[i*4 + 3];
-    return qc;
-}
-
-quibble_color qb_read_color_from_rgb888_array(unsigned char *a, int i){
-    quibble_color qc;
-    qc.red = a[i*3 + 0];
-    qc.green = a[i*3 + 1];
-    qc.blue = a[i*3 + 2];
-    qc.alpha = 255;
-    return qc;
-}
-
-void qb_write_color_to_rgba8888_array(unsigned char *a,
-                                      int i,
-                                      quibble_color qc){
-    a[i*4 + 0] = qc.red;
-    a[i*4 + 1] = qc.green;
-    a[i*4 + 2] = qc.blue;
-    a[i*4 + 3] = qc.alpha;
-}
-
-void qb_write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc){
-    a[i*3 + 0] = qc.red;
-    a[i*3 + 1] = qc.green;
-    a[i*3 + 2] = qc.blue;
-}
-
-void qb_fill_array_with_colors(quibble_pixels qps){
-
-    int index;
-    for (int i = 0; i < qps.height; ++i){
-        for (int j = 0; j < qps.width; ++j){
-            index = i*qps.width + j;
-            if (qps.color_type == RGBA8888){
-                qb_write_color_to_rgba8888_array(qps.output_array,
-                                              index,
-                                              qps.colors[index]);
-            }
-            else if (qps.color_type == RGB888){
-                qb_write_color_to_rgb888_array(qps.output_array,
-                                            index,
-                                            qps.colors[index]);
-            }
-            else {
-                fprintf(stderr, "Color type %d not found!", qps.color_type);
-                exit(1);
-            }
-        }
-    }
-
-}
-
-void qb_fill_colors_from_array(quibble_pixels qps){
-    int index;
-    for (int i = 0; i < qps.height; ++i){
-        for (int j = 0; j < qps.width; ++j){
-            index = i*qps.width + j;
-            if (qps.color_type == RGBA8888){
-                qps.colors[index] = 
-                    qb_read_color_from_rgba8888_array(qps.output_array, index);
-            }
-            else if (qps.color_type == RGB888){
-                qps.colors[index] = 
-                    qb_read_color_from_rgb888_array(qps.output_array, index);
-            }
-            else {
-                fprintf(stderr, "Color type %d not found!", qps.color_type);
-                exit(1);
-            }
-        }
-    }
-
 }
 
 /*----------------------------------------------------------------------------//
@@ -261,37 +210,33 @@ void qb_write_file(char *filename, quibble_pixels qps){
 }
 
 void qb_write_png_file(char *filename, quibble_pixels qps){
-    qb_fill_array_with_colors(qps);
     stbi_write_png(filename,
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.output_array,
+                   qps.host_data,
                    qps.width*qb_get_color_size(qps.color_type));
 }
 
 void qb_write_bmp_file(char *filename, quibble_pixels qps){
-    qb_fill_array_with_colors(qps);
     stbi_write_bmp(filename,
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.output_array);
+                   qps.host_data);
 }
 
 void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
-    qb_fill_array_with_colors(qps);
     stbi_write_jpg(filename,
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.output_array,
+                   qps.host_data,
                    quality);
 }
 
 void qb_free_pixels(quibble_pixels qps){
-    free(qps.colors);
-    free(qps.output_array);
+    free(qps.host_data);
 }
 
 /*----------------------------------------------------------------------------//

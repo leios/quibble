@@ -15,10 +15,16 @@ typedef struct {
     unsigned char green;
     unsigned char blue;
     unsigned char alpha;
-} quibble_color;
+} quibble_color_rgba8888;
 
 typedef struct {
-    quibble_color *colors;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+} quibble_color_rgb888;
+
+typedef struct {
+    void *host_data;
     unsigned char *output_array;
     int color_type;
     int height;
@@ -29,8 +35,14 @@ typedef struct {
 unsigned char qb_color_clamp(float value,
                              float min_value,
                              float max_value);
-quibble_color qb_color(float red, float green, float blue, float alpha);
-quibble_color qb_zero_color(void);
+quibble_color_rgba8888 qb_zero_color_rgba8888(void);
+quibble_color_rgb888 qb_zero_color_rgb888(void);
+
+quibble_color_rgba8888 qb_color_rgba8888(float red,
+                                         float green,
+                                         float blue,
+                                         float alpha);
+quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue);
 
 quibble_pixels qb_create_blank_pixel_array(int width,
                                            int height,
@@ -42,17 +54,6 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                int color_type);
 
 int qb_get_color_size(int color_type);
-
-quibble_color qb_read_color_from_rgb888_array(unsigned char *a, int i);
-quibble_color qb_read_color_from_rgba8888_array(unsigned char *a, int i);
-void qb_write_color_to_rgb888_array(unsigned char *a, int i, quibble_color qc);
-void qb_write_color_to_rgba8888_array(unsigned char *a,
-                                      int i,
-                                      quibble_color qc);
-
-
-void qb_fill_array_with_colors(quibble_pixels qps);
-void qb_fill_colors_from_array(quibble_pixels qps);
 
 // File Formats
 
