@@ -235,7 +235,7 @@ void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
         qb_find_type_arg(curr_arg_str, &type, &variable);
         if (strcmp(type, "quibble_pixels") == 0){
             quibble_pixels curr_data = va_arg(args, quibble_pixels);
-            qb_set_pixel_args(qp, curr_data);
+            qb_set_pixel_args(qp, poem, curr_data, variable);
         }
         else{
             void *curr_data = va_arg(args, void *);
@@ -257,7 +257,7 @@ void qb_set_args(quibble_program *qp, char *poem, int n, ...){
 
 char *qb_create_pixel_args(char *variable){
     char tmp[1000];
-    sprintf(tmp, "__global quibble_color *%s, %s_type, %s_width, %s_height,",
+    sprintf(tmp, "__global quibble_color *%s, %s_color_type, %s_width, %s_height,",
             variable, variable, variable, variable);
 
     int len = strlen(tmp);
@@ -269,6 +269,19 @@ char *qb_create_pixel_args(char *variable){
     return ret;
 }
 
-void qb_set_pixel_args(quibble_program *qp, quibble_pixels qps){
-}
+void qb_set_pixel_args(quibble_program *qp,
+                       char *poem,
+                       quibble_pixels qps,
+                       char *variable){
 
+    qb_set_arg(qp, poem, variable, qps.device_data);
+    char curr_var[128];
+    sprintf(curr_var, "%s_color_type", variable);
+    qb_set_arg(qp, poem, curr_var, &qps.color_type);
+
+    sprintf(curr_var, "%s_width", variable);
+    qb_set_arg(qp, poem, curr_var, &qps.width);
+
+    sprintf(curr_var, "%s_height", variable);
+    qb_set_arg(qp, poem, curr_var, &qps.height);
+}

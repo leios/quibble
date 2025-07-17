@@ -21,7 +21,6 @@ typedef struct {
 
 typedef struct {
     void *host_data;
-    unsigned char *output_array;
     int color_type;
     int height;
     int width;
@@ -44,10 +43,6 @@ quibble_color_rgba8888 qb_color_rgba8888(float red,
                                          float alpha);
 quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue);
 
-quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
-                                           int width,
-                                           int height,
-                                           int color_type);
 quibble_pixels qb_create_pixel_array(quibble_program qp,
                                      int width,
                                      int height,

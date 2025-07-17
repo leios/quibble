@@ -87,15 +87,13 @@ int qb_get_color_size(int color_type){
 
 }
 
-quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
-                                           int width,
-                                           int height,
-                                           int color_type){
+quibble_pixels qb_create_pixel_array(quibble_program qp,
+                                     int width,
+                                     int height,
+                                     int color_type){
     quibble_pixels qps;
     qps.height = height;
     qps.width = width;
-
-    qps.output_array = NULL;
 
     qps.color_type = color_type;
     int color_size = qb_get_color_size(color_type);
@@ -137,23 +135,8 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                int height,
                                                int color_type){
     quibble_pixels qps =
-        qb_create_blank_pixel_array(qp, width, height, color_type);
+        qb_create_pixel_array(qp, width, height, color_type);
     qps.host_data = qb_read_file(filename, width, height, color_type);
-    return qps;
-}
-
-quibble_pixels qb_create_pixel_array(quibble_program qp,
-                                     int width,
-                                     int height,
-                                     int color_type){
-    quibble_pixels qps =
-        qb_create_blank_pixel_array(qp, width, height, color_type);
-
-    int color_size = qb_get_color_size(color_type);
-
-    qps.output_array =
-        (unsigned char *)calloc(width*height*color_size,
-                                sizeof(unsigned char *));
     return qps;
 }
 
