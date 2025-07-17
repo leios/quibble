@@ -115,13 +115,24 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
 
             if (qp.poem_list[poem_index].args[i].type != NULL){
                 if (strcmp(qp.poem_list[poem_index].args[i].type,
-                          "quibble_pixels") == 0){
+                          "quibble_pixels_rgba8888") == 0){
                     char *pixel_config = qb_create_pixel_args(
+                        "quibble_color_rgba8888",
                         qp.poem_list[poem_index].args[i].variable
                     );
                     strcat(tmp_body, pixel_config);
                     free(pixel_config);
                 }
+                else if (strcmp(qp.poem_list[poem_index].args[i].type,
+                          "quibble_pixels_rgb888") == 0){
+                    char *pixel_config = qb_create_pixel_args(
+                        "quibble_color_rgb888",
+                        qp.poem_list[poem_index].args[i].variable
+                    );
+                    strcat(tmp_body, pixel_config);
+                    free(pixel_config);
+                }
+
                 else {
                     strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
                     strcat(tmp_body, " ");

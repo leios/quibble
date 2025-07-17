@@ -34,7 +34,7 @@ char *qb_expand_poem(quibble_program qp, int index);
 void qb_rebuild_program(quibble_program *qp);
 void qb_build_program(quibble_program *qp);
 
-char *qb_create_pixel_args(char *variable);
+char *qb_create_pixel_args(char *type, char *variable);
 void qb_set_pixel_args(quibble_program *qp,
                        char *poem,
                        quibble_pixels qps,

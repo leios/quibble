@@ -255,10 +255,11 @@ void qb_set_args(quibble_program *qp, char *poem, int n, ...){
     va_end(args);
 }
 
-char *qb_create_pixel_args(char *variable){
+char *qb_create_pixel_args(char *type, char *variable){
     char tmp[1000];
-    sprintf(tmp, "__global quibble_color *%s, %s_color_type, %s_width, %s_height,",
-            variable, variable, variable, variable);
+
+    sprintf(tmp, "__global %s *%s, %s_color_type, %s_width, %s_height,",
+            type, variable, variable, variable, variable);
 
     int len = strlen(tmp);
 

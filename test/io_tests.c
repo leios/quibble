@@ -220,6 +220,7 @@ void quibble_image_tests(void){
     qb_check(test_value, "qb_color_rgb888");
 
     char *program_string = QBINLINE(
+        @include "QB/colors.qbl"
         __poem check(quibble_pixels qp, quibble_color_rgba8888 test_color){
             qp[_idx] = test_color
         }
