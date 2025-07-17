@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
+#include "../include/config.h"
 
 bool qb_is_verse(char *verse, int offset){
     char substr[8] = "__verse";

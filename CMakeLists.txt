@@ -30,13 +30,16 @@ add_executable(
     src/quibble_args.c
 
     include/quibble_program.h
+    include/images.h
+    src/images.c
+    include/config.h
+    src/config.c
+
     src/quibble_verses.c
     src/quibble_stanzas.c
     src/quibble_poems.c
     src/quibble_program.c
 
-    include/images.h
-    src/images.c
 
     test/tests.h
     test/io_tests.c
