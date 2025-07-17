@@ -24,7 +24,7 @@ typedef struct {
 } quibble_color_rgb888;
 
 typedef struct {
-    void *colors;
+    void *host_data;
     unsigned char *output_array;
     int color_type;
     int height;
@@ -37,6 +37,7 @@ unsigned char qb_color_clamp(float value,
                              float max_value);
 quibble_color_rgba8888 qb_zero_color_rgba8888(void);
 quibble_color_rgb888 qb_zero_color_rgb888(void);
+
 quibble_color_rgba8888 qb_color_rgba8888(float red,
                                          float green,
                                          float blue,

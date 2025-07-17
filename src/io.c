@@ -73,7 +73,6 @@ quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue){
     return qp;
 }
 
-
 int qb_get_color_size(int color_type){
     if (color_type == RGBA8888){
         return 4;
@@ -99,18 +98,18 @@ quibble_pixels qb_create_blank_pixel_array(int width,
 
     qps.color_type = color_type;
     int color_size = qb_get_color_size(color_type);
-    qps.colors =
+    qps.host_data =
         (void *)malloc(sizeof(unsigned char *)*color_size*width*height);
 
     if (color_type == RGBA8888){
-        quibble_color_rgba8888 *vals = (quibble_color_rgba8888 *)qps.colors;
+        quibble_color_rgba8888 *vals = (quibble_color_rgba8888 *)qps.host_data;
         for (int i = 0; i < width * height; ++i){
             vals[i] = qb_zero_color_rgba8888();
         }
     }
 
     else if (color_type == RGB888){
-        quibble_color_rgb888 *vals = (quibble_color_rgb888 *)qps.colors;
+        quibble_color_rgb888 *vals = (quibble_color_rgb888 *)qps.host_data;
         for (int i = 0; i < width * height; ++i){
             vals[i] = qb_zero_color_rgb888();
         }
@@ -125,7 +124,7 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                int height,
                                                int color_type){
     quibble_pixels qps = qb_create_blank_pixel_array(width, height, color_type);
-    qps.colors = qb_read_file(filename, width, height, color_type);
+    qps.host_data = qb_read_file(filename, width, height, color_type);
     return qps;
 }
 
@@ -215,7 +214,7 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.colors,
+                   qps.host_data,
                    qps.width*qb_get_color_size(qps.color_type));
 }
 
@@ -224,7 +223,7 @@ void qb_write_bmp_file(char *filename, quibble_pixels qps){
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.colors);
+                   qps.host_data);
 }
 
 void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
@@ -232,12 +231,12 @@ void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
                    qps.width,
                    qps.height,
                    qps.color_type,
-                   qps.colors,
+                   qps.host_data,
                    quality);
 }
 
 void qb_free_pixels(quibble_pixels qps){
-    free(qps.colors);
+    free(qps.host_data);
 }
 
 /*----------------------------------------------------------------------------//
