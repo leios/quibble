@@ -25,6 +25,7 @@ void qb_replace_next_char(char *content, int index, char a, char b);
 void qb_replace_char_if_proceeding(char *content, char *query, char a, char b);
 
 int qb_find_occurrences(char *query, char *body);
+int qb_find_limited_occurrences(char *query, int limit, char *body);
 
 // QBINLINE
 bool qb_is_inlined(char *verse);

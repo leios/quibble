@@ -36,6 +36,84 @@ void qb_find_type_arg(char *arg, char **type, char **variable){
 
 }
 
+void qb_parse_pixel_kwarg(quibble_kwarg *qk, char *type){
+
+    char *var_name = qb_strip_spaces(qk[0].variable, 0, strlen(qk[0].variable));
+    char *val_name = qb_strip_spaces(qk[0].value, 0, strlen(qk[0].value));
+
+    qb_free_kwarg(qk[0]);
+    qk[0].type = qb_strip_spaces(type, 0, strlen(type));
+    qk[0].variable = qb_strip_spaces(var_name,0, strlen(var_name));
+    qk[0].value = qb_strip_spaces(val_name,0, strlen(val_name));
+
+    char curr_var[128];
+    char curr_val[128];
+    int len = 0;
+    int len_val = 0;
+
+    sprintf(curr_var, "%s_color_type", var_name);
+    sprintf(curr_var, "%s_color_type", val_name);
+    len = strlen(curr_var);
+    len_val = strlen(curr_val);
+    
+    qk[1].type = qb_strip_spaces("int", 0, strlen("int"));
+    qk[1].variable = qb_strip_spaces(curr_var, 0, len);
+    qk[1].value = qb_strip_spaces(curr_val, 0, len_val);
+
+    sprintf(curr_var, "%s_width", var_name);
+    sprintf(curr_var, "%s_width", val_name);
+    len = strlen(curr_var);
+    len_val = strlen(curr_val);
+
+    qk[2].type = qb_strip_spaces("int", 0, strlen("int"));
+    qk[2].variable = qb_strip_spaces(curr_var, 0, len);
+    qk[2].value = qb_strip_spaces(curr_val, 0, len_val);
+
+    sprintf(curr_var, "%s_height", var_name);
+    sprintf(curr_var, "%s_height", val_name);
+    len = strlen(curr_var);
+    len_val = strlen(curr_val);
+
+    qk[3].type = qb_strip_spaces("int", 0, strlen("int"));
+    qk[3].variable = qb_strip_spaces(curr_var, 0, len);
+    qk[3].value = qb_strip_spaces(curr_val, 0, len_val);
+
+    free(var_name);
+    free(val_name);
+}
+
+
+void qb_parse_pixel_arg(quibble_arg *qa, char *type){
+
+    char *var_name = qb_strip_spaces(qa[0].variable, 0, strlen(qa[0].variable));
+    qb_free_arg(qa[0]);
+    qa[0].type = qb_strip_spaces(type, 0, strlen(type));
+    qa[0].variable = qb_strip_spaces(var_name,0, strlen(var_name));
+
+    char curr_var[128];
+    int len = 0;
+
+    sprintf(curr_var, "%s_color_type", var_name);
+    len = strlen(curr_var);
+    
+    qa[1].type = qb_strip_spaces("int", 0, strlen("int"));
+    qa[1].variable = qb_strip_spaces(curr_var, 0, len);
+
+    sprintf(curr_var, "%s_width", var_name);
+    len = strlen(curr_var);
+
+    qa[2].type = qb_strip_spaces("int", 0, strlen("int"));
+    qa[2].variable = qb_strip_spaces(curr_var, 0, len);
+
+    sprintf(curr_var, "%s_height", var_name);
+    len = strlen(curr_var);
+
+    qa[3].type = qb_strip_spaces("int", 0, strlen("int"));
+    qa[3].variable = qb_strip_spaces(curr_var, 0, len);
+
+    free(var_name);
+}
+
 void qb_parse_arg(quibble_arg *qa, char *arg){
     qb_find_type_arg(arg, &qa->type, &qa->variable);
     free(arg);
@@ -97,7 +175,9 @@ int qb_find_number_of_args(char *config){
         next_comma = qb_find_next_char(config, i, ',');
     }
 
-    return num_entries+1;
+    int num_pixels = qb_find_limited_occurrences("quibble_pixels", config_size, config);
+
+    return num_entries+1+3*num_pixels;
 }
 
 
@@ -110,8 +190,10 @@ int qb_find_number_of_kwargs(char *config){
         return 0;
     }
 
+    int pipe_loc = 0;
     if (qb_find_next_char(config, i, '|') > 0){
-         i += qb_find_next_char(config, i, '|') + 1;
+        pipe_loc = qb_find_next_char(config, i, '|');
+        i += pipe_loc + 1;
     }
     if (qb_find_next_char(config, i, ',') > 0){
         fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
@@ -143,7 +225,9 @@ int qb_find_number_of_kwargs(char *config){
         next_semicolon = qb_find_next_char(config, i, ';');
     }
 
-    return num_entries;
+    int num_pixels = qb_find_occurrences("quibble_pixels", &config[pipe_loc]);
+
+    return num_entries+3*num_pixels;
 
 }
 
@@ -200,6 +284,21 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
             qb_parse_arg(&final_args[curr_entry],
                          qb_strip_spaces(config, i, next_comma-1));
 
+            if (final_args[curr_entry].type != NULL &&
+                strcmp(final_args[curr_entry].type,
+                       "quibble_pixels_rgba8888") == 0){
+                qb_parse_pixel_arg(&final_args[curr_entry],
+                                   "quibble_color_rgba8888 *");
+                curr_entry += 3;
+            }
+            else if (final_args[curr_entry].type != NULL &&
+                     strcmp(final_args[curr_entry].type,
+                            "quibble_pixels_rgb888") == 0){
+                qb_parse_pixel_arg(&final_args[curr_entry],
+                                   "quibble_color_rgb888 *");
+                curr_entry += 3;
+            }
+
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){
                 if (strcmp(final_args[j-1].variable,
@@ -246,6 +345,22 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries){
                            qb_strip_spaces(config,
                                            next_equal+1,
                                            next_semicolon-1));
+
+            if (final_kwargs[curr_entry].type != NULL &&
+                strcmp(final_kwargs[curr_entry].type,
+                       "quibble_pixels_rgba8888") == 0){
+                qb_parse_pixel_kwarg(&final_kwargs[curr_entry],
+                                     "quibble_color_rgba8888 *");
+                curr_entry += 3;
+            }
+            else if (final_kwargs[curr_entry].type != NULL &&
+                     strcmp(final_kwargs[curr_entry].type,
+                            "quibble_pixels_rgb888") == 0){
+                qb_parse_pixel_kwarg(&final_kwargs[curr_entry],
+                                     "quibble_color_rgb888 *");
+                curr_entry += 3;
+            }
+
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){

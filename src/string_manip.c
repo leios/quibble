@@ -197,8 +197,30 @@ int qb_find_matching_char(char *body, int body_size, int current_index,
     return i;
 }
 
-int qb_find_occurrences(char *query, char *body){
+int qb_find_limited_occurrences(char *query, int limit, char *body){
+    int index = qb_find_next_string(body, 0, query);
 
+    if (index < 0){
+        return 0;
+    }
+
+    int count = 1;
+    int query_length = strlen(query)-1;
+
+    index += query_length;
+
+    while (index >= 0 && index < limit){
+        index += qb_find_next_string(body, index, query);
+        if (index < limit){
+            count++;
+        }
+        index += query_length;
+    }
+
+    return count;
+}
+
+int qb_find_occurrences(char *query, char *body){
 
     char *temp_str = strstr(body, query);
     if (temp_str == NULL){
