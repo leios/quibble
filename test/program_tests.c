@@ -213,7 +213,7 @@ void quibble_program_tests(void){
     );
     qb_check(test_value, "qb_parse_program");
 
-    char *filename = qb_config_file("scribbles/example.qbl");
+    char *filename = qb_config_file("scribbles/test/example.qbl");
     quibble_program qp_2 = qb_parse_program_file(filename);
     free(filename);
 

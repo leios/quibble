@@ -17,7 +17,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # QUIBBLE
 
 add_executable(
-    quibble
+    qbtest
     include/macros.h
 
     include/errors.h
@@ -45,10 +45,10 @@ add_executable(
     test/io_tests.c
     test/program_tests.c
 
-    src/demo.c
+    test/test.c
 )
 
-target_link_libraries(quibble m OpenCL::OpenCL)
+target_link_libraries(qbtest m OpenCL::OpenCL)
 
 # QBINFO
 

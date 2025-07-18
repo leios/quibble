@@ -1,9 +1,3 @@
-/*-------------demo.c---------------------------------------------------------//
-
-Purpose: This file is a quick example of how we might read function fragments in
-         to construct an OpenCL kernel with Quibble.
-
-//----------------------------------------------------------------------------*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
