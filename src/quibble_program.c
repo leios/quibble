@@ -332,6 +332,7 @@ quibble_program qb_parse_program(char *program, char *path){
         qp.everything_else = program;
     }
 
+
     if (num_includes <= 0){
         qb_build_program(&qp);
         return qp;
@@ -340,6 +341,7 @@ quibble_program qb_parse_program(char *program, char *path){
         quibble_program tmp_qp =
             qb_combine_program_array(other_programs, num_includes);
 
+
         quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
 
         final_qp.everything_else = qp.everything_else;
@@ -347,6 +349,7 @@ quibble_program qb_parse_program(char *program, char *path){
 
         qb_build_program(&final_qp);
 
+        qp.body = NULL;
         qb_shallow_free_program(qp);
         qb_shallow_free_program(tmp_qp);
         for (int i = 0; i < num_includes; ++i){
@@ -541,6 +544,7 @@ void qb_shallow_free_program(quibble_program qp){
     free(qp.verse_list);
     free(qp.stanza_list);
     free(qp.poem_list);
+
 
     // OpenCL freeing
     if (qp.configured){

@@ -2,7 +2,7 @@ void simple_print(){
     printf("printing from kernel...\n");
 }
 
-@include "QB/nothings.qbl"
+@include "QB/test/nothings.qbl"
 @include "no_args.qbl"
 @include "no_bodies.qbl"
 

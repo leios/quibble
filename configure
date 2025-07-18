@@ -6,6 +6,6 @@ if [ -z ${XDG_CONFIG_HOME+x} ]; \
 fi
 
 mkdir -p $config_dir/scribbles
-cp scribbles/* $config_dir/scribbles/.
+cp -r scribbles/* $config_dir/scribbles/.
 
 echo "done!"
