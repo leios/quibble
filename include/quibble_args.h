@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #include "macros.h"
-#include "io.h"
+#include "string_manip.h"
 
 typedef struct{
     char *type;

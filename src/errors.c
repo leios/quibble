@@ -197,7 +197,7 @@ const char *get_cl_error_string(cl_int error)
             return "CL_INVALID_WORK_DIMENSION:\nspecified clEnqueueNDRangeKernel work dimension is not valid.";
             break;
         case CL_INVALID_WORK_GROUP_SIZE:
-            return "CL_INVALID_WORK_GROUP_SIZE:\nspecified clEnqueueNDRangeKerne total work-group size is not valid for the specified kernel or device.";
+            return "CL_INVALID_WORK_GROUP_SIZE:\nspecified clEnqueueNDRangeKernel total work-group size is not valid for the specified kernel or device.";
             break;
         case CL_INVALID_WORK_ITEM_SIZE:
             return "CL_INVALID_WORK_ITEM_SIZE:\nspecified clEnqueueNDRangeKernel work-group size in one dimension is not valid for the device.";

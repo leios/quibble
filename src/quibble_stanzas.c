@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
+#include "../include/config.h"
 
 bool qb_is_stanza(char *stanza, int offset){
     char substr[9] = "__stanza";

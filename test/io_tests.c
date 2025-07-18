@@ -219,16 +219,38 @@ void quibble_image_tests(void){
     );
     qb_check(test_value, "qb_color_rgb888");
 
+    char *program_string = QBINLINE(
+        @include "QB/colors.qbl"
+        __poem check(quibble_pixels_rgba8888 qps, quibble_color_rgba8888 test_color){
+            if (_idx == 0){
+                qps[_idx] = test_color;
+            }
+        }
+    );
+
+    quibble_program qp = qb_parse_program(program_string, "");
+
+    qb_configure_program(&qp, 0, 0);
+
     int width = 2;
     int height = 1;
-    quibble_pixels qps_rgba8888 = qb_create_pixel_array(width,height,RGBA8888);
-    quibble_pixels qps_rgb888 = qb_create_pixel_array(width,height,RGB888);
+    quibble_pixels qps_rgba8888 =
+        qb_create_pixel_array(qp,width,height,RGBA8888);
+    quibble_pixels qps_rgb888 = qb_create_pixel_array(qp,width,height,RGB888);
+
+    qb_set_args(&qp, "check", 2,
+                "quibble_pixels_rgba8888 qps", qps_rgba8888,
+                "quibble_color_rgba8888 test_color", &test_color_rgba8888);
+
+    qb_run(qp, "check", 2, 2);
+
+    qb_pixels_device_to_host(qps_rgba8888);
 
     quibble_color_rgba8888 *qps_rgba8888_color_array =
         (quibble_color_rgba8888 *)qps_rgba8888.host_data;
+
     quibble_color_rgb888 *qps_rgb888_color_array =
         (quibble_color_rgb888 *)qps_rgb888.host_data;
-    qps_rgba8888_color_array[0] = test_color_rgba8888;
     qps_rgb888_color_array[0] = test_color_rgb888;
 
     test_value = (
@@ -257,6 +279,7 @@ void quibble_image_tests(void){
 
     quibble_pixels qps_from_file_rgba8888 =
         qb_create_pixel_array_from_file("check_alpha.png",
+                                        qp,
                                         width,
                                         height,
                                         RGBA8888);
@@ -265,6 +288,7 @@ void quibble_image_tests(void){
 
     quibble_pixels qps_from_file_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.png",
+                                        qp,
                                         width,
                                         height,
                                         RGB888);
@@ -273,6 +297,7 @@ void quibble_image_tests(void){
 
     quibble_pixels qps_from_jpg_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.jpg",
+                                        qp,
                                         width,
                                         height,
                                         RGB888);
@@ -281,6 +306,7 @@ void quibble_image_tests(void){
 
     quibble_pixels qps_from_bmp_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.bmp",
+                                        qp,
                                         width,
                                         height,
                                         RGB888);
@@ -289,6 +315,7 @@ void quibble_image_tests(void){
 
     quibble_pixels qps_from_none_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha",
+                                        qp,
                                         width,
                                         height,
                                         RGB888);
@@ -316,6 +343,8 @@ void quibble_image_tests(void){
     qb_free_pixels(qps_from_bmp_rgb888);
     qb_free_pixels(qps_from_jpg_rgb888);
     qb_free_pixels(qps_from_none_rgb888);
+
+    qb_free_program(qp);
 
     remove("check_alpha.png");
     remove("check_noalpha.png");

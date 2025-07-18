@@ -145,7 +145,48 @@ void quibble_arg_parsing_tests(void){
     qb_free_arg_array(check_args_5, num_args_5);
     qb_free_arg_array(check_args_6, num_args_6);
     qb_free_arg_array(check_args_7, num_args_7);
+
+    char prologue_pixels[200] = "quibble_pixels_rgb888 a, quibble_pixels_rgba8888 b | quibble_pixels_rgb888 c = a; quibble_pixels_rgba8888 d = b;";
+
+    int num_args_pixels = qb_find_number_of_args(prologue_pixels);
+    int num_kwargs_pixels = qb_find_number_of_kwargs(prologue_pixels);
+
+    test_value = (
+        num_args_pixels == 8 &&
+        num_kwargs_pixels == 8
+    );
+
+    qb_check(test_value, "number_of_args / kwargs with pixels");
+
+    quibble_arg *check_args_pixels = qb_parse_args(prologue_pixels,
+                                                   num_args_pixels);
+
+    test_value = (
+        strcmp(check_args_pixels[0].variable, "a") == 0 &&
+        strcmp(check_args_pixels[1].variable, "a_color_type") == 0 &&
+        strcmp(check_args_pixels[2].variable, "a_width") == 0 &&
+        strcmp(check_args_pixels[3].variable, "a_height") == 0 &&
+        strcmp(check_args_pixels[0].type, "__global quibble_color_rgb888 *") == 0 &&
+        strcmp(check_args_pixels[4].type, "__global quibble_color_rgba8888 *") == 0 &&
+        strcmp(check_args_pixels[4].variable, "b") == 0
+    );
+
+    qb_check(test_value, "parse_args with pixels");
     
+    quibble_kwarg *check_kwargs_pixels = qb_parse_kwargs(prologue_pixels,
+                                                         num_kwargs_pixels);
+
+    test_value = (
+        strcmp(check_kwargs_pixels[0].variable, "c") == 0 &&
+        strcmp(check_kwargs_pixels[0].value, "a") == 0 &&
+        strcmp(check_kwargs_pixels[0].type, "__global quibble_color_rgb888 *") == 0 &&
+        strcmp(check_kwargs_pixels[4].type, "__global quibble_color_rgba8888 *") == 0
+    );
+
+    qb_check(test_value, "parse_kwargs with pixels");
+
+    qb_free_arg_array(check_args_pixels, num_args_pixels);
+    qb_free_kwarg_array(check_kwargs_pixels, num_kwargs_pixels);
 }
 
 void quibble_program_tests(void){

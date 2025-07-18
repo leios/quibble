@@ -1,0 +1,17 @@
+#ifndef QUIBBLE_COLORS
+#define QUIBBLE_COLORS
+
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+} quibble_color_rgba8888;
+
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+} quibble_color_rgb888;
+
+#endif

@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------*/
 
 #include "../include/quibble_program.h"
+#include "../include/config.h"
 
 bool qb_is_poem(char *poem, int offset){
     char substr[7] = "__poem";
@@ -116,6 +117,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                 strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
                 strcat(tmp_body, " ");
             }
+
             strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
             if (i == qp.poem_list[poem_index].num_args - 1){
                 strcat(tmp_body, "){\n");
@@ -128,6 +130,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     else {
         strcat(tmp_body, "){\n");
     }
+
 
     if (do_expansion){
         if (qb_find_keyword(qp, "_idx")){
