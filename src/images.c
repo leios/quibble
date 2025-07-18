@@ -124,6 +124,7 @@ quibble_pixels qb_create_pixel_array(quibble_program qp,
     qps.host_data =
         (void *)calloc(color_size*qps.width*qps.height,
                        sizeof(unsigned char *));
+    qb_pixels_host_to_device(qps);
     return qps;
 
 }
@@ -135,6 +136,7 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
     quibble_pixels qps =
         qb_create_blank_pixel_array(qp, width, height, color_type);
     qps.host_data = qb_read_file(filename, width, height, color_type);
+    qb_pixels_host_to_device(qps);
     return qps;
 }
 

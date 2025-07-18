@@ -256,6 +256,7 @@ void qb_set_arg_with_index(quibble_program *qp,
                            int arg_index,
                            void *data,
                            size_t object_size){
+
     cl_check(
         clSetKernelArg(qp->kernels[poem_index],
                        arg_index,
@@ -346,7 +347,7 @@ void qb_set_pixel_args(quibble_program *qp,
     qb_set_arg_with_index(qp,
                           poem_index,
                           arg_index,
-                          qps.device_data,
+                          &qps.device_data,
                           sizeof(qps.device_data));
 
     sprintf(curr_var, "%s_color_type", variable);

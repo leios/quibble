@@ -221,8 +221,10 @@ void quibble_image_tests(void){
 
     char *program_string = QBINLINE(
         @include "QB/colors.qbl"
-        __poem check(quibble_pixels_rgba8888 qp, quibble_color_rgba8888 test_color){
-            qp[_idx] = test_color;
+        __poem check(quibble_pixels_rgba8888 qps, quibble_color_rgba8888 test_color){
+            if (_idx == 0){
+                qps[_idx] = test_color;
+            }
         }
     );
 
@@ -230,19 +232,23 @@ void quibble_image_tests(void){
 
     qb_configure_program(&qp, 0, 0);
 
-    qb_set_args(&qp, "check", 2,
-                "quibble_pixels_rgba8888 qp", qp,
-                "quibble_color_rgba8888 test_color", &test_color_rgba8888);
-
     int width = 2;
     int height = 1;
     quibble_pixels qps_rgba8888 =
         qb_create_pixel_array(qp,width,height,RGBA8888);
     quibble_pixels qps_rgb888 = qb_create_pixel_array(qp,width,height,RGB888);
 
-    qb_run(qp, "check", 0, 0);
+    qb_set_args(&qp, "check", 2,
+                "quibble_pixels_rgba8888 qps", qps_rgba8888,
+                "quibble_color_rgba8888 test_color", &test_color_rgba8888);
+
+    qb_run(qp, "check", 2, 2);
+
+    qb_pixels_device_to_host(qps_rgba8888);
+
     quibble_color_rgba8888 *qps_rgba8888_color_array =
         (quibble_color_rgba8888 *)qps_rgba8888.host_data;
+
     quibble_color_rgb888 *qps_rgb888_color_array =
         (quibble_color_rgb888 *)qps_rgb888.host_data;
     qps_rgb888_color_array[0] = test_color_rgb888;
