@@ -223,7 +223,10 @@ void quibble_image_tests(int platform, int device){
         @include "QB/colors.qbl"
         __poem check(quibble_pixels_rgba8888 qps, quibble_color_rgba8888 test_color){
             if (_idx == 0){
-                qps[_idx] = test_color;
+                qps[_idx].red = test_color.red;
+                qps[_idx].green = test_color.green;
+                qps[_idx].blue = test_color.blue;
+                qps[_idx].alpha = test_color.alpha;
             }
         }
     );
