@@ -382,9 +382,9 @@ void qb_free_kwarg_array(quibble_kwarg *qkwargs, int n){
 //----------------------------------------------------------------------------*/
 
 void qb_print_arg(quibble_arg qa){
-    printf("%s\n", qa.variable);
+    printf("%s %s\n", qa.type, qa.variable);
 }
 
 void qb_print_kwarg(quibble_kwarg qk){
-    printf("%s = %s\n", qk.variable, qk.value);
+    printf("%s %s = %s\n", qk.type, qk.variable, qk.value);
 }

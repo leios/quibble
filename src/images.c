@@ -87,33 +87,17 @@ int qb_get_color_size(int color_type){
 
 }
 
-quibble_pixels qb_create_pixel_array(quibble_program qp,
-                                     int width,
-                                     int height,
-                                     int color_type){
+quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
+                                           int width,
+                                           int height,
+                                           int color_type){
     quibble_pixels qps;
     qps.height = height;
     qps.width = width;
 
     qps.color_type = color_type;
-    int color_size = qb_get_color_size(color_type);
-    qps.host_data =
-        (void *)malloc(sizeof(unsigned char *)*color_size*width*height);
 
-    if (color_type == RGBA8888){
-        quibble_color_rgba8888 *vals = (quibble_color_rgba8888 *)qps.host_data;
-        for (int i = 0; i < width * height; ++i){
-            vals[i] = qb_zero_color_rgba8888();
-        }
-    }
-
-    else if (color_type == RGB888){
-        quibble_color_rgb888 *vals = (quibble_color_rgb888 *)qps.host_data;
-        for (int i = 0; i < width * height; ++i){
-            vals[i] = qb_zero_color_rgb888();
-        }
-    }
-
+    int color_size = qb_get_color_size(qps.color_type);
     qps.command_queue = qp.command_queue;
     int array_size = color_size*qps.width*qps.height*sizeof(unsigned char);
 
@@ -125,17 +109,31 @@ quibble_pixels qb_create_pixel_array(quibble_program qp,
                        NULL,
                        &err);
 
+    qps.host_data = NULL;
+
     return qps;
 }
 
+quibble_pixels qb_create_pixel_array(quibble_program qp,
+                                     int width,
+                                     int height,
+                                     int color_type){
+    quibble_pixels qps =
+        qb_create_blank_pixel_array(qp, width, height, color_type);
+    int color_size = qb_get_color_size(qps.color_type);
+    qps.host_data =
+        (void *)calloc(color_size*qps.width*qps.height,
+                       sizeof(unsigned char *));
+    return qps;
 
+}
 quibble_pixels qb_create_pixel_array_from_file(char *filename,
                                                quibble_program qp,
                                                int width,
                                                int height,
                                                int color_type){
     quibble_pixels qps =
-        qb_create_pixel_array(qp, width, height, color_type);
+        qb_create_blank_pixel_array(qp, width, height, color_type);
     qps.host_data = qb_read_file(filename, width, height, color_type);
     return qps;
 }

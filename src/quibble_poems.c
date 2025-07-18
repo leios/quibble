@@ -120,6 +120,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                         "quibble_color_rgba8888",
                         qp.poem_list[poem_index].args[i].variable
                     );
+                    printf("%s\n", pixel_config);
                     strcat(tmp_body, pixel_config);
                     free(pixel_config);
                 }
@@ -136,9 +137,12 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                 else {
                     strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
                     strcat(tmp_body, " ");
+                    strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
                 }
             }
-            strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
+            else {
+                strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
+            }
             if (i == qp.poem_list[poem_index].num_args - 1){
                 strcat(tmp_body, "){\n");
             }

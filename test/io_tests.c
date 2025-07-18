@@ -221,13 +221,13 @@ void quibble_image_tests(void){
 
     char *program_string = QBINLINE(
         @include "QB/colors.qbl"
-        __poem check(quibble_pixels qp, quibble_color_rgba8888 test_color){
-            qp[_idx] = test_color
+        __poem check(quibble_pixels_rgba8888 qp, quibble_color_rgba8888 test_color){
+            qp[_idx] = test_color;
         }
     );
 
-    //quibble_program qp = qb_parse_program(program_string, "");
-    quibble_program qp = qb_parse_program("", "");
+    quibble_program qp = qb_parse_program(program_string, "");
+    //quibble_program qp = qb_parse_program("", "");
     qb_configure_program(&qp, 0, 0);
 
     int width = 2;
@@ -333,6 +333,8 @@ void quibble_image_tests(void){
     qb_free_pixels(qps_from_bmp_rgb888);
     qb_free_pixels(qps_from_jpg_rgb888);
     qb_free_pixels(qps_from_none_rgb888);
+
+    qb_free_program(qp);
 
     remove("check_alpha.png");
     remove("check_noalpha.png");

@@ -139,7 +139,10 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
 
     char *final_str = NULL;
     char curr_char;
-    if (start_index == end_index){
+    if (end_index < start_index){
+        return NULL;
+    }
+    else if (start_index == end_index){
         curr_char = body[start_index];
         if (!qb_is_space(curr_char)){
             char *tmp_str = (char *)calloc(2, sizeof(char));
@@ -148,7 +151,7 @@ char *qb_strip_spaces(char *body, int start_index, int end_index){
             return final_str;
         }
         else {
-            return final_str;
+            return NULL;
         }
     }
 

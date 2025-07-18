@@ -402,12 +402,29 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
     qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
     qp.num_poems = qp_1.num_poems + qp_2.num_poems;
 
-    qp.verse_list =
-        (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
-    qp.stanza_list =
-        (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
-    qp.poem_list =
-        (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+    if (qp.num_verses > 0){
+        qp.verse_list =
+            (quibble_verse *)malloc(sizeof(quibble_verse) * qp.num_verses);
+    }
+    else {
+        qp.verse_list = NULL;
+    }
+
+    if (qp.num_stanzas > 0){
+        qp.stanza_list =
+            (quibble_stanza *)malloc(sizeof(quibble_stanza) * qp.num_stanzas);
+    }
+    else {
+        qp.stanza_list = NULL;
+    }
+
+    if (qp.num_poems > 0){
+        qp.poem_list =
+            (quibble_poem *)malloc(sizeof(quibble_poem) * qp.num_poems);
+    }
+    else {
+        qp.poem_list = NULL;
+    }
 
     for (int i = 0; i < qp_1.num_verses; ++i){
         qp.verse_list[i] = qp_1.verse_list[i];
