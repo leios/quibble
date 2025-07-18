@@ -21,8 +21,8 @@ int main(void){
     // Tests
     quibble_io_tests();
     quibble_arg_parsing_tests();
-    //quibble_image_tests();
-    //quibble_program_tests();
+    quibble_program_tests();
+    quibble_image_tests();
 
     printf("Testing done!\n");
 

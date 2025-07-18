@@ -198,23 +198,23 @@ int qb_find_matching_char(char *body, int body_size, int current_index,
 }
 
 int qb_find_limited_occurrences(char *query, int limit, char *body){
-    int index = qb_find_next_string(body, 0, query);
+    int stride = qb_find_next_string(body, 0, query);
 
-    if (index < 0){
+    if (stride < 0){
         return 0;
     }
 
-    int count = 1;
+    int count = 0;
+    int index = 0;
     int query_length = strlen(query)-1;
 
-    index += query_length;
+    while (stride >= 0 && index < limit){
+        index = stride + query_length;
 
-    while (index >= 0 && index < limit){
-        index += qb_find_next_string(body, index, query);
+        stride = qb_find_next_string(body, index, query);
         if (index < limit){
             count++;
         }
-        index += query_length;
     }
 
     return count;

@@ -114,34 +114,11 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
         for (int i = 0; i < qp.poem_list[poem_index].num_args; ++i){
 
             if (qp.poem_list[poem_index].args[i].type != NULL){
-                if (strcmp(qp.poem_list[poem_index].args[i].type,
-                          "quibble_pixels_rgba8888") == 0){
-                    char *pixel_config = qb_create_pixel_args(
-                        "quibble_color_rgba8888",
-                        qp.poem_list[poem_index].args[i].variable
-                    );
-                    strcat(tmp_body, pixel_config);
-                    free(pixel_config);
-                }
-                else if (strcmp(qp.poem_list[poem_index].args[i].type,
-                          "quibble_pixels_rgb888") == 0){
-                    char *pixel_config = qb_create_pixel_args(
-                        "quibble_color_rgb888",
-                        qp.poem_list[poem_index].args[i].variable
-                    );
-                    strcat(tmp_body, pixel_config);
-                    free(pixel_config);
-                }
+                strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
+                strcat(tmp_body, " ");
+            }
 
-                else {
-                    strcat(tmp_body, qp.poem_list[poem_index].args[i].type);
-                    strcat(tmp_body, " ");
-                    strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
-                }
-            }
-            else {
-                strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
-            }
+            strcat(tmp_body, qp.poem_list[poem_index].args[i].variable);
             if (i == qp.poem_list[poem_index].num_args - 1){
                 strcat(tmp_body, "){\n");
             }
@@ -153,6 +130,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     else {
         strcat(tmp_body, "){\n");
     }
+
 
     if (do_expansion){
         if (qb_find_keyword(qp, "_idx")){

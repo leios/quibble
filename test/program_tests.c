@@ -166,8 +166,8 @@ void quibble_arg_parsing_tests(void){
         strcmp(check_args_pixels[1].variable, "a_color_type") == 0 &&
         strcmp(check_args_pixels[2].variable, "a_width") == 0 &&
         strcmp(check_args_pixels[3].variable, "a_height") == 0 &&
-        strcmp(check_args_pixels[0].type, "quibble_color_rgb888 *") == 0 &&
-        strcmp(check_args_pixels[4].type, "quibble_color_rgba8888 *") == 0 &&
+        strcmp(check_args_pixels[0].type, "__global quibble_color_rgb888 *") == 0 &&
+        strcmp(check_args_pixels[4].type, "__global quibble_color_rgba8888 *") == 0 &&
         strcmp(check_args_pixels[4].variable, "b") == 0
     );
 
@@ -179,8 +179,8 @@ void quibble_arg_parsing_tests(void){
     test_value = (
         strcmp(check_kwargs_pixels[0].variable, "c") == 0 &&
         strcmp(check_kwargs_pixels[0].value, "a") == 0 &&
-        strcmp(check_kwargs_pixels[0].type, "quibble_color_rgb888 *") == 0 &&
-        strcmp(check_kwargs_pixels[4].type, "quibble_color_rgba8888 *") == 0
+        strcmp(check_kwargs_pixels[0].type, "__global quibble_color_rgb888 *") == 0 &&
+        strcmp(check_kwargs_pixels[4].type, "__global quibble_color_rgba8888 *") == 0
     );
 
     qb_check(test_value, "parse_kwargs with pixels");

@@ -288,14 +288,14 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
                 strcmp(final_args[curr_entry].type,
                        "quibble_pixels_rgba8888") == 0){
                 qb_parse_pixel_arg(&final_args[curr_entry],
-                                   "quibble_color_rgba8888 *");
+                                   "__global quibble_color_rgba8888 *");
                 curr_entry += 3;
             }
             else if (final_args[curr_entry].type != NULL &&
                      strcmp(final_args[curr_entry].type,
                             "quibble_pixels_rgb888") == 0){
                 qb_parse_pixel_arg(&final_args[curr_entry],
-                                   "quibble_color_rgb888 *");
+                                   "__global quibble_color_rgb888 *");
                 curr_entry += 3;
             }
 
@@ -350,14 +350,14 @@ quibble_kwarg *qb_parse_kwargs(char *config, int num_entries){
                 strcmp(final_kwargs[curr_entry].type,
                        "quibble_pixels_rgba8888") == 0){
                 qb_parse_pixel_kwarg(&final_kwargs[curr_entry],
-                                     "quibble_color_rgba8888 *");
+                                     "__global quibble_color_rgba8888 *");
                 curr_entry += 3;
             }
             else if (final_kwargs[curr_entry].type != NULL &&
                      strcmp(final_kwargs[curr_entry].type,
                             "quibble_pixels_rgb888") == 0){
                 qb_parse_pixel_kwarg(&final_kwargs[curr_entry],
-                                     "quibble_color_rgb888 *");
+                                     "__global quibble_color_rgb888 *");
                 curr_entry += 3;
             }
 
