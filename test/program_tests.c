@@ -184,6 +184,9 @@ void quibble_arg_parsing_tests(void){
     );
 
     qb_check(test_value, "parse_kwargs with pixels");
+
+    qb_free_arg_array(check_args_pixels, num_args_pixels);
+    qb_free_kwarg_array(check_kwargs_pixels, num_kwargs_pixels);
 }
 
 void quibble_program_tests(void){
