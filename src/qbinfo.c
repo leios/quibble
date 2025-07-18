@@ -28,13 +28,12 @@ void qb_list_devices(void){
     cl_uint num_platforms;
 
     // Platforms
-        clGetPlatformIDs(10, NULL, &num_platforms);
     cl_check(
         clGetPlatformIDs(10, NULL, &num_platforms)
     );
 
     platform_ids = (cl_platform_id *)malloc(num_platforms *
-                                                sizeof(cl_platform_id));
+                                            sizeof(cl_platform_id));
     cl_check(
         clGetPlatformIDs(num_platforms, platform_ids, NULL)
     );

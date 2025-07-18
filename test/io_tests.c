@@ -178,7 +178,7 @@ bool qb_color_compare_rgb888(quibble_color_rgb888 qc_1,
 }
 
 
-void quibble_image_tests(void){
+void quibble_image_tests(int platform, int device){
 
     bool test_value = false;
 
@@ -230,7 +230,7 @@ void quibble_image_tests(void){
 
     quibble_program qp = qb_parse_program(program_string, "");
 
-    qb_configure_program(&qp, 0, 0);
+    qb_configure_program(&qp, platform, device);
 
     int width = 2;
     int height = 1;

@@ -189,7 +189,7 @@ void quibble_arg_parsing_tests(void){
     qb_free_kwarg_array(check_kwargs_pixels, num_kwargs_pixels);
 }
 
-void quibble_program_tests(void){
+void quibble_program_tests(int platform, int device){
     bool test_value = false;
 
     printf("Program Parsing Tests...\n");
@@ -227,7 +227,7 @@ void quibble_program_tests(void){
     );
     qb_check(test_value, "qb_parse_program_file");
 
-    qb_configure_program(&qp_2, 0, 0);
+    qb_configure_program(&qp_2, platform, device);
     int stanza_num = 0;
 
     int array_size = 10; 
