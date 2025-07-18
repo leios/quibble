@@ -120,7 +120,6 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                         "quibble_color_rgba8888",
                         qp.poem_list[poem_index].args[i].variable
                     );
-                    printf("%s\n", pixel_config);
                     strcat(tmp_body, pixel_config);
                     free(pixel_config);
                 }

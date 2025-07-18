@@ -17,6 +17,7 @@ void qb_set_arg(quibble_program *qp, char *poem, char *arg, void *data);
 void qb_set_args(quibble_program *qp, char *poem, int n, ...);
 
 // Build / expansion
+size_t qb_find_type_size(char *type);
 bool qb_find_keyword(quibble_program qp, char *keyword);
 bool qb_find_keyword_in_verses(quibble_program qp, char *keyword);
 bool qb_find_keyword_in_stanzas(quibble_program qp, char *keyword);

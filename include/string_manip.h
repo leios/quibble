@@ -11,8 +11,6 @@ char *qb_expand_path(char *path, char *base_path);
 char *qb_find_path(char *filename);
 char *qb_config_file(char *path);
 
-size_t qb_find_type_size(char *type);
-
 // String Manipulation
 bool qb_is_space(char a);
 char *qb_copy(char *buffer);

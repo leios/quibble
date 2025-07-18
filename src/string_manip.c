@@ -1,46 +1,5 @@
 #include "../include/string_manip.h"
 
-size_t qb_find_type_size(char *type){
-
-    if (type == NULL){
-        return 4;
-    }
-
-    if (strcmp(type, "long double") == 0){
-        return sizeof(long double);
-    }
-
-    if (qb_find_next_char(type, 0, '*') >= 0 ||
-        qb_find_next_string(type, 0, "long long") >= 0 ||
-        qb_find_next_string(type, 0, "double") >= 0 ||
-        qb_find_next_string(type, 0, "cl_mem") >= 0){
-        return 8;
-    }
-
-    if (qb_find_next_string(type, 0, "long") >= 0){
-        return sizeof(long);
-    }
-
-    if (qb_find_next_string(type, 0, "short") >= 0){
-        return 2;
-    }
-
-    if (qb_find_next_string(type, 0, "char") >= 0 ||
-        qb_find_next_string(type, 0, "bool") >= 0){
-        return 1;
-    }
-
-    if (qb_find_next_string(type, 0, "int") >= 0 ||
-        qb_find_next_string(type, 0, "signed") >= 0 ||
-        qb_find_next_string(type, 0, "unsigned") >= 0 ||
-        qb_find_next_string(type, 0, "float") >= 0){
-        return 4;
-    }
-
-    printf("Warning: type %s not found! Defaulting to int...\n", type);
-    return 4;
-}
-
 char *qb_expand_path(char *path, char *base_path){
     if (path == NULL){
         return NULL;

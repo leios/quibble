@@ -227,8 +227,12 @@ void quibble_image_tests(void){
     );
 
     quibble_program qp = qb_parse_program(program_string, "");
-    //quibble_program qp = qb_parse_program("", "");
+
     qb_configure_program(&qp, 0, 0);
+
+    qb_set_args(&qp, "check", 2,
+                "quibble_pixels_rgba8888 qp", qp,
+                "quibble_color_rgba8888 test_color", &test_color_rgba8888);
 
     int width = 2;
     int height = 1;
@@ -236,11 +240,11 @@ void quibble_image_tests(void){
         qb_create_pixel_array(qp,width,height,RGBA8888);
     quibble_pixels qps_rgb888 = qb_create_pixel_array(qp,width,height,RGB888);
 
+    qb_run(qp, "check", 0, 0);
     quibble_color_rgba8888 *qps_rgba8888_color_array =
         (quibble_color_rgba8888 *)qps_rgba8888.host_data;
     quibble_color_rgb888 *qps_rgb888_color_array =
         (quibble_color_rgb888 *)qps_rgb888.host_data;
-    qps_rgba8888_color_array[0] = test_color_rgba8888;
     qps_rgb888_color_array[0] = test_color_rgb888;
 
     test_value = (

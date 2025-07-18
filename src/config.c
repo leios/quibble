@@ -40,6 +40,55 @@ void qb_build_program(quibble_program *qp){
     free(body);
 }
 
+size_t qb_find_type_size(char *type){
+
+    if (type == NULL){
+        return 4;
+    }
+
+    if (strcmp(type, "quibble_color_rgba8888") == 0){
+        return sizeof(quibble_color_rgba8888);
+    }
+
+    if (strcmp(type, "quibble_color_rgb888") == 0){
+        return sizeof(quibble_color_rgb888);
+    }
+
+    if (strcmp(type, "long double") == 0){
+        return sizeof(long double);
+    }
+
+    if (qb_find_next_char(type, 0, '*') >= 0 ||
+        qb_find_next_string(type, 0, "long long") >= 0 ||
+        qb_find_next_string(type, 0, "double") >= 0 ||
+        qb_find_next_string(type, 0, "cl_mem") >= 0){
+        return 8;
+    }
+
+    if (qb_find_next_string(type, 0, "long") >= 0){
+        return sizeof(long);
+    }
+
+    if (qb_find_next_string(type, 0, "short") >= 0){
+        return 2;
+    }
+
+    if (qb_find_next_string(type, 0, "char") >= 0 ||
+        qb_find_next_string(type, 0, "bool") >= 0){
+        return 1;
+    }
+
+    if (qb_find_next_string(type, 0, "int") >= 0 ||
+        qb_find_next_string(type, 0, "signed") >= 0 ||
+        qb_find_next_string(type, 0, "unsigned") >= 0 ||
+        qb_find_next_string(type, 0, "float") >= 0){
+        return 4;
+    }
+
+    printf("Warning: type %s not found! Defaulting to int...\n", type);
+    return 4;
+}
+
 /*----------------------------------------------------------------------------//
     OpenCL Interface
 //----------------------------------------------------------------------------*/
@@ -202,6 +251,20 @@ void qb_run(quibble_program qp, char *kernel_name,
 
 }
 
+void qb_set_arg_with_index(quibble_program *qp,
+                           int poem_index,
+                           int arg_index,
+                           void *data,
+                           size_t object_size){
+    cl_check(
+        clSetKernelArg(qp->kernels[poem_index],
+                       arg_index,
+                       object_size,
+                       (void *)data)
+    );
+
+}
+
 void qb_set_arg(quibble_program *qp, char *poem, char *arg, void *data){
     int poem_index = qb_find_poem_index(*qp, poem);
 
@@ -216,12 +279,7 @@ void qb_set_arg(quibble_program *qp, char *poem, char *arg, void *data){
 
     size_t object_size = qb_find_type_size(type);
 
-    cl_check(
-        clSetKernelArg(qp->kernels[poem_index],
-                       arg_index,
-                       object_size,
-                       (void *)data)
-    );
+    qb_set_arg_with_index(qp, poem_index, arg_index, data, object_size);
 
     free(type);
     free(variable);
@@ -233,7 +291,8 @@ void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
         char *type;
         char *variable;
         qb_find_type_arg(curr_arg_str, &type, &variable);
-        if (strcmp(type, "quibble_pixels") == 0){
+        if (strcmp(type, "quibble_pixels_rgba8888") == 0 ||
+            strcmp(type, "quibble_pixels_rgb888") == 0){
             quibble_pixels curr_data = va_arg(args, quibble_pixels);
             qb_set_pixel_args(qp, poem, curr_data, variable);
         }
@@ -275,14 +334,40 @@ void qb_set_pixel_args(quibble_program *qp,
                        quibble_pixels qps,
                        char *variable){
 
-    qb_set_arg(qp, poem, variable, qps.device_data);
     char curr_var[128];
+
+    int poem_index = qb_find_poem_index(*qp, poem);
+    int arg_index = qb_find_arg_index(qp->poem_list[poem_index].args,
+                                      qp->poem_list[poem_index].num_args,
+                                      variable);
+
+    // Must be done by index because we do not store
+    // individual variables in poem
+    qb_set_arg_with_index(qp,
+                          poem_index,
+                          arg_index,
+                          qps.device_data,
+                          sizeof(qps.device_data));
+
     sprintf(curr_var, "%s_color_type", variable);
-    qb_set_arg(qp, poem, curr_var, &qps.color_type);
+    qb_set_arg_with_index(qp,
+                          poem_index,
+                          arg_index + 1,
+                          &qps.color_type,
+                          sizeof(qps.color_type));
 
     sprintf(curr_var, "%s_width", variable);
-    qb_set_arg(qp, poem, curr_var, &qps.width);
+    qb_set_arg_with_index(qp,
+                          poem_index,
+                          arg_index + 2,
+                          &qps.width,
+                          sizeof(qps.width));
 
     sprintf(curr_var, "%s_height", variable);
-    qb_set_arg(qp, poem, curr_var, &qps.height);
+    qb_set_arg_with_index(qp,
+                          poem_index,
+                          arg_index + 3,
+                          &qps.height,
+                          sizeof(qps.height));
+
 }
