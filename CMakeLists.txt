@@ -10,14 +10,13 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -Wno-varargs)
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # QUIBBLE
 
-add_executable(
-    quibble
+add_library(
+    quibble SHARED
     include/macros.h
 
     include/errors.h
@@ -40,15 +39,25 @@ add_executable(
     src/quibble_poems.c
     src/quibble_program.c
 
+)
+
+target_link_libraries(quibble m OpenCL::OpenCL)
+
+install(TARGETS quibble)
+
+# QBTEST
+
+add_executable(
+    qbtest
 
     test/tests.h
     test/io_tests.c
     test/program_tests.c
 
-    src/demo.c
+    test/test.c
 )
 
-target_link_libraries(quibble m OpenCL::OpenCL)
+target_link_libraries(qbtest m -L${CMAKE_BINARY_DIR}/lib quibble OpenCL::OpenCL)
 
 # QBINFO
 

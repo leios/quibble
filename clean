@@ -6,4 +6,12 @@ fi
 
 rm -r $config_dir
 
+echo "Remove /usr/local/lib/libquibble.so? [Y/n]"
+read ans
+
+if [ "$ans" = "n" ]; \
+    then echo "/usr/local/lib/libquibble.so may still be in your system!"; \
+    else echo "removing /usr/local/lib/libquibble.so!" ;sudo rm /usr/local/lib/libquibble.so;
+fi
+
 echo "done!"
