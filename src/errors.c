@@ -11,6 +11,7 @@ void qb_check(bool value, char *err_string){
     }
     else {
         printf("\t"QBT_RED"Failed: "QBT_RESET"%s\n", err_string);
+        exit(1);
     }
 }
 

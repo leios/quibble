@@ -49,28 +49,6 @@ install(TARGETS quibble)
 
 add_executable(
     qbtest
-    include/macros.h
-
-    include/errors.h
-    src/errors.c
-
-    include/string_manip.h
-    src/string_manip.c
-
-    include/quibble_args.h
-    src/quibble_args.c
-
-    include/quibble_program.h
-    include/images.h
-    src/images.c
-    include/config.h
-    src/config.c
-
-    src/quibble_verses.c
-    src/quibble_stanzas.c
-    src/quibble_poems.c
-    src/quibble_program.c
-
 
     test/tests.h
     test/io_tests.c
@@ -79,7 +57,7 @@ add_executable(
     test/test.c
 )
 
-target_link_libraries(qbtest m OpenCL::OpenCL)
+target_link_libraries(qbtest m -L${CMAKE_BINARY_DIR}/lib quibble OpenCL::OpenCL)
 
 # QBINFO
 
