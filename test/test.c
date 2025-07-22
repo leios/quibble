@@ -2,12 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../include/macros.h"
-#include <CL/cl.h>
-
-#include "../include/errors.h"
-#include "../include/quibble_program.h"
-#include "../test/tests.h"
+#include "tests.h"
 
 int main(int argc, char **argv){
     int platform = 0;

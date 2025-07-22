@@ -8,8 +8,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_program.h"
-#include "../include/config.h"
+#include "../include/quibble.h"
 
 /*----------------------------------------------------------------------------//
     PROGRAM GENERATION
@@ -100,24 +99,24 @@ quibble_program qb_parse_program(char *program, char *path){
         num_stanzas > 0  ||
         num_poems > 0){
         char *tmp_everything_else =
-            (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+            (char *)calloc(QB_MAX_SOURCE_SIZE, sizeof(char));
 
         char *short_path;
         char *full_path;
 
         char *tmp_verse = NULL;
         if (num_verses > 0){
-            tmp_verse = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+            tmp_verse = (char *)calloc(QB_MAX_SOURCE_SIZE, sizeof(char));
         }
 
         char *tmp_poem = NULL;
         if (num_poems > 0){
-            tmp_poem = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+            tmp_poem = (char *)calloc(QB_MAX_SOURCE_SIZE, sizeof(char));
         }
 
         char *tmp_stanza = NULL;
         if (num_stanzas > 0){
-            tmp_stanza = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+            tmp_stanza = (char *)calloc(QB_MAX_SOURCE_SIZE, sizeof(char));
         }
 
         int index = 0;

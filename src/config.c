@@ -4,7 +4,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/config.h"
+#include "../include/quibble.h"
 
 /*----------------------------------------------------------------------------//
 CONFIGURATION
@@ -16,7 +16,7 @@ void qb_rebuild_program(quibble_program *qp){
 }
 
 void qb_build_program(quibble_program *qp){
-    char *body = (char *)calloc(MAX_SOURCE_SIZE, sizeof(char));
+    char *body = (char *)calloc(QB_MAX_SOURCE_SIZE, sizeof(char));
     if (qp->everything_else != NULL){
         strcat(body, qp->everything_else);
         strcat(body, "\n\n");
