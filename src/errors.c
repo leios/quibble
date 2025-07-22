@@ -3,7 +3,7 @@
 Purpose: This file defines error checking for OpenCL
 
 //----------------------------------------------------------------------------*/
-#include "../include/errors.h"
+#include "../include/quibble.h"
 
 void qb_check(bool value, char *err_string){
     if (value){

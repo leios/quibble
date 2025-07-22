@@ -4,7 +4,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_args.h"
+#include "../include/quibble.h"
 
 void qb_find_type_arg(char *arg, char **type, char **variable){
     int len = strlen(arg);
@@ -389,7 +389,7 @@ char *qb_create_prologue(char *config, char *name,
                          quibble_arg *qargs, int num_args,
                          quibble_kwarg *qkwargs, int num_kwargs){
 
-    char *temp = (char *)calloc(MAX_PROLOGUE_SIZE, sizeof(char));
+    char *temp = (char *)calloc(QB_MAX_PROLOGUE_SIZE, sizeof(char));
 
     int num_config_args = qb_find_number_of_args(config);
 

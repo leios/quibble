@@ -4,8 +4,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_program.h"
-#include "../include/config.h"
+#include "../include/quibble.h"
 
 bool qb_is_poem(char *poem, int offset){
     char substr[7] = "__poem";
@@ -103,7 +102,7 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
     if (qp.poem_list[poem_index].body == NULL){
         do_expansion = false;
     }
-    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    char *tmp_body = (char *)calloc(QB_MAX_META_SIZE, sizeof(char));
     char *body = qp.poem_list[poem_index].body;
 
     strcat(tmp_body, "__kernel void ");

@@ -5,7 +5,7 @@ Purpose: This file is meant to define most of what is needed for
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/images.h"
+#include "../include/quibble.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_PSD

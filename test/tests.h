@@ -1,7 +1,7 @@
 #ifndef QUIBBLE_TESTS
 #define QUIBBLE_TESTS
 
-#include "../include/config.h"  
+#include "../include/quibble.h"  
 
 void quibble_io_tests(void);
 void quibble_image_tests(int platform, int device);

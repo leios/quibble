@@ -1,4 +1,4 @@
-#include "../include/string_manip.h"
+#include "../include/quibble.h"
 
 char *qb_expand_path(char *path, char *base_path){
     if (path == NULL){

@@ -4,8 +4,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_program.h"
-#include "../include/config.h"
+#include "../include/quibble.h"
 
 bool qb_is_stanza(char *stanza, int offset){
     char substr[9] = "__stanza";
@@ -152,7 +151,7 @@ char *qb_expand_stanza(quibble_program qp,
         qp.stanza_list[idx].args, qp.stanza_list[idx].num_args,
         qp.stanza_list[idx].kwargs, qp.stanza_list[idx].num_kwargs);
 
-    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    char *tmp_body = (char *)calloc(QB_MAX_META_SIZE, sizeof(char));
     strcat(tmp_body, tmp_prologue);
     strcat(tmp_body, qp.stanza_list[idx].prologue);
 

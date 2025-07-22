@@ -14,4 +14,20 @@ if [ "$ans" = "n" ]; \
     else echo "removing /usr/local/lib/libquibble.so!" ;sudo rm /usr/local/lib/libquibble.so;
 fi
 
+echo "Remove /usr/local/include/quibble.h? [Y/n]"
+read ans
+
+if [ "$ans" = "n" ]; \
+    then echo "/usr/local/include/quibble.h may still be in your system!"; \
+    else echo "removing /usr/local/include/quibble.h!" ;sudo rm /usr/local/include/quibble.h;
+fi
+
+echo "Remove /usr/local/bin/qbinfo? [Y/n]"
+read ans
+
+if [ "$ans" = "n" ]; \
+    then echo "/usr/local/bin/qbinfo may still be in your system!"; \
+    else echo "removing /usr/local/bin/qbinfo!" ;sudo rm /usr/local/bin/qbinfo;
+fi
+
 echo "done!"

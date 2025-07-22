@@ -5,8 +5,7 @@
 
 //----------------------------------------------------------------------------*/
 
-#include "../include/quibble_program.h"
-#include "../include/config.h"
+#include "../include/quibble.h"
 
 bool qb_is_verse(char *verse, int offset){
     char substr[8] = "__verse";
@@ -109,7 +108,7 @@ char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
         qp.verse_list[idx].args, qp.verse_list[idx].num_args,
         qp.verse_list[idx].kwargs, qp.verse_list[idx].num_kwargs);
 
-    char *tmp_body = (char *)calloc(MAX_META_SIZE, sizeof(char));
+    char *tmp_body = (char *)calloc(QB_MAX_META_SIZE, sizeof(char));
     strcat(tmp_body, tmp_prologue);
     strcat(tmp_body, qp.verse_list[idx].body);
 

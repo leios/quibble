@@ -17,23 +17,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_library(
     quibble SHARED
-    include/macros.h
 
-    include/errors.h
+    include/quibble.h
+
     src/errors.c
-
-    include/string_manip.h
     src/string_manip.c
-
-    include/quibble_args.h
     src/quibble_args.c
-
-    include/quibble_program.h
-    include/images.h
     src/images.c
-    include/config.h
     src/config.c
-
     src/quibble_verses.c
     src/quibble_stanzas.c
     src/quibble_poems.c
@@ -42,8 +33,6 @@ add_library(
 )
 
 target_link_libraries(quibble m OpenCL::OpenCL)
-
-install(TARGETS quibble)
 
 # QBTEST
 
@@ -64,7 +53,7 @@ target_link_libraries(qbtest m -L${CMAKE_BINARY_DIR}/lib quibble OpenCL::OpenCL)
 add_executable(
     qbinfo
 
-    include/errors.h
+    include/quibble.h
     src/errors.c
 
     include/qbinfo.h
@@ -72,5 +61,9 @@ add_executable(
 )
 
 target_link_libraries(qbinfo OpenCL::OpenCL)
+
+install(TARGETS quibble)
+install(TARGETS qbinfo)
+install(FILES include/quibble.h DESTINATION /usr/local/include)
 
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/configure)
