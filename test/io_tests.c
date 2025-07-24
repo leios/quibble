@@ -356,3 +356,33 @@ void quibble_image_tests(int platform, int device){
     remove("check_noalpha");
 
 }
+
+void quibble_camera_tests(int platform, int device){
+
+    bool test_value = false;
+
+    printf("Quibble Camera tests...\n");
+
+    int width = 1920;
+    int height = 1080;
+
+    float world_size_x = 4;
+    float ppu = width / world_size_x;
+    float world_size_y = height/ppu;
+
+
+    printf("%f %f %f\n", world_size_x, world_size_y, ppu);
+    quibble_simple_camera qcam = 
+        qb_create_simple_camera(ppu, world_size_x, world_size_y, -2, -2);
+
+    // Creating simple set of quibble pixels for testing
+
+    quibble_program qp = qb_parse_program("", "");
+    qb_configure_program(&qp, platform, device);
+
+    quibble_pixels qpix = qb_create_pixel_array(qp, width, height, RGB888);
+
+    qb_free_pixels(qpix);
+    qb_free_program(qp);
+}
+

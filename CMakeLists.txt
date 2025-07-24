@@ -29,6 +29,7 @@ add_library(
     src/quibble_stanzas.c
     src/quibble_poems.c
     src/quibble_program.c
+    src/camera.c
 
 )
 

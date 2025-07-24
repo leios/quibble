@@ -267,26 +267,24 @@ void qb_replace_next_char(char *content, int index, char a, char b){
 }
 
 void qb_preprocess_content(char *content){
-    if (qb_is_inlined(content)){
-        int content_size = strlen(content);
-        // replace all spaces by new lines
-        qb_replace_char(content, content_size, ' ', '\n');
+    int content_size = strlen(content);
+    // replace all spaces by new lines
+    qb_replace_char(content, content_size, ' ', '\n');
 
-        // except for the arguments after some preprocessor options
-        // that need to be in the same line
-        qb_replace_char_if_proceeding(content, "#ifdef", '\n', ' ');
-        qb_replace_char_if_proceeding(content, "#ifndef", '\n', ' ');
+    // except for the arguments after some preprocessor options
+    // that need to be in the same line
+    qb_replace_char_if_proceeding(content, "#ifdef", '\n', ' ');
+    qb_replace_char_if_proceeding(content, "#ifndef", '\n', ' ');
 
-        // #define with two arguments will not work
-        qb_replace_char_if_proceeding(content, "#define", '\n', ' ');
+    // #define with two arguments will not work
+    qb_replace_char_if_proceeding(content, "#define", '\n', ' ');
 
-        // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, "#if", '\n', ' ');
+    // don't leave any spaces in arguments
+    qb_replace_char_if_proceeding(content, "#if", '\n', ' ');
 
-        // don't leave any spaces in arguments
-        qb_replace_char_if_proceeding(content, "#elif", '\n', ' ');
-        qb_replace_char_if_proceeding(content, "#pragma", '\n', ' ');
-    }
+    // don't leave any spaces in arguments
+    qb_replace_char_if_proceeding(content, "#elif", '\n', ' ');
+    qb_replace_char_if_proceeding(content, "#pragma", '\n', ' ');
 }
 
 bool qb_is_inlined(char *verse){

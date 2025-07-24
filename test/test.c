@@ -9,13 +9,13 @@ int main(int argc, char **argv){
     int device = 0;
 
     if (argc == 1){
-        fprintf(stderr, "No platform or device provided, defaulting to 0 0!");
+        fprintf(stderr, "No platform or device provided, defaulting to 0 0!\n");
     }
     else if (argc == 2){
-        fprintf(stderr, "Too few arguments provided. Defaulting to 0 0!");
+        fprintf(stderr, "Too few arguments provided. Defaulting to 0 0!\n");
     }
     else if (argc > 3){
-        fprintf(stderr, "Too many arguments provided. Defaulting to 0 0!");
+        fprintf(stderr, "Too many arguments provided. Defaulting to 0 0!\n");
     }
     else {
         platform = strtol(argv[1], NULL, 10);
@@ -28,6 +28,7 @@ int main(int argc, char **argv){
     quibble_arg_parsing_tests();
     quibble_program_tests(platform, device);
     quibble_image_tests(platform, device);
+    quibble_camera_tests(platform, device);
 
     printf("Testing done!\n");
 
