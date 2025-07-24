@@ -370,19 +370,46 @@ void quibble_camera_tests(int platform, int device){
     float ppu = width / world_size_x;
     float world_size_y = height/ppu;
 
-
-    printf("%f %f %f\n", world_size_x, world_size_y, ppu);
     quibble_simple_camera qcam = 
         qb_create_simple_camera(ppu, world_size_x, world_size_y, -2, -2);
 
     // Creating simple set of quibble pixels for testing
-
     quibble_program qp = qb_parse_program("", "");
     qb_configure_program(&qp, platform, device);
 
     quibble_pixels qpix = qb_create_pixel_array(qp, width, height, RGB888);
 
+    test_value = qb_pixels_cam_consistent(qpix, qcam);
+
+    qb_check(test_value, "qb_pixels_cam_consistent");
+
     qb_free_pixels(qpix);
     qb_free_program(qp);
+
+    quibble_simple_camera qcam_2 =
+        qb_create_simple_camera(1, 2, 2, 0, 0);
+
+    test_value = (
+        qb_find_bin(-0.5, -0.5, qcam_2) == 0 &&
+        qb_find_bin(0.5, -0.5, qcam_2) == 1 &&
+        qb_find_bin(-0.5, 0.5, qcam_2) == 2 &&
+        qb_find_bin(0.5, 0.5, qcam_2) == 3 &&
+        qb_find_bin(-1, -1, qcam_2) == 0 &&
+        qb_find_bin(0, 0, qcam_2) == 3 &&
+        qb_find_bin(0.999999,0.999999, qcam_2) == 3
+    );
+
+    qb_check(test_value, "qb_find_bin simple");
+
+    quibble_simple_camera qcam_3 = 
+        qb_create_simple_camera(1, 0, 4, -10, 1);
+
+    test_value = (
+        qb_find_camera_width(qcam_3) == 1 &&
+        qb_find_camera_height(qcam_3) == 4 &&
+        qb_find_bin(-10, 5, qcam_2) == 3
+    );
+
+    qb_check(test_value, "Aux camera tests");
 }
 

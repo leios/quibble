@@ -315,7 +315,7 @@ int qb_find_camera_height(quibble_simple_camera qcam);
 
 bool qb_pixels_cam_consistent(quibble_pixels qpix, quibble_simple_camera qcam);
 
-int find_bin(float x, float y, quibble_simple_camera qcam);
+int qb_find_bin(float x, float y, quibble_simple_camera qcam);
 
 /*----------------------------------------------------------------------------//
     CONFIG
