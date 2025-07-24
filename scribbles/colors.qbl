@@ -1,5 +1,5 @@
-#ifndef QUIBBLE_COLORS
-#define QUIBBLE_COLORS
+#ifndef QUIBBLE_COLORS_QBL
+#define QUIBBLE_COLORS_QBL
 
 typedef struct {
     unsigned char red;

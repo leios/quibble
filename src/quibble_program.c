@@ -41,6 +41,7 @@ quibble_program qb_parse_program_file(char *filename){
     char *path = qb_find_path(filename);
     quibble_program qp = qb_parse_program(buffer, path);
     free(path);
+    free(buffer);
 
     return qp;
 }
@@ -94,6 +95,17 @@ quibble_program qb_parse_program(char *program, char *path){
         qp.poem_list = NULL;
     }
 
+    bool qbinlined = qb_is_inlined(program);
+    char *buffer;
+    if (qbinlined){
+        buffer = qb_copy(&program[22]);
+        qb_preprocess_content(buffer);
+        filesize -= 22;
+    }
+    else {
+        buffer = qb_copy(program);
+    }
+
     if (num_includes > 0 ||
         num_verses > 0   ||
         num_stanzas > 0  ||
@@ -121,14 +133,6 @@ quibble_program qb_parse_program(char *program, char *path){
 
         int index = 0;
         int everything_else_index = 0;
-
-        bool qbinlined = qb_is_inlined(program);
-        char *buffer = program;
-        if (qbinlined){
-            index += 22;
-            buffer = qb_copy(buffer);
-            qb_preprocess_content(buffer);
-        }
 
         int include_match_count = 0;
         int verse_match_count = 0;
@@ -328,9 +332,8 @@ quibble_program qb_parse_program(char *program, char *path){
         free(tmp_poem);
     }
     else {
-        qp.everything_else = program;
+        qp.everything_else = buffer;
     }
-
 
     if (num_includes <= 0){
         qb_build_program(&qp);
@@ -339,7 +342,6 @@ quibble_program qb_parse_program(char *program, char *path){
     else {
         quibble_program tmp_qp =
             qb_combine_program_array(other_programs, num_includes);
-
 
         quibble_program final_qp = qb_combine_programs(tmp_qp, qp);
 

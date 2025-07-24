@@ -91,6 +91,10 @@ quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
                                            int width,
                                            int height,
                                            int color_type){
+    if (!qp.configured){
+        fprintf(stderr, "Cannot create quibble pixels because program has not been configured!\nPlease configure it first with:\n    qp_configure_program(&qp, int platform, int device).\nThe platform and device can be found with the associated `qbinfo` command.\n");
+        exit(1);
+    }
     quibble_pixels qps;
     qps.height = height;
     qps.width = width;
