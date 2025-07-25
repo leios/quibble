@@ -14,4 +14,39 @@ typedef struct {
     unsigned char blue;
 } quibble_color_rgb888;
 
+unsigned char qb_color_clamp(float value,
+                             float min_value,
+                             float max_value){
+    if (value < min_value){
+        return 0;
+    }
+    else if (value > max_value){
+        return 255;
+    }
+    else{
+        return floor(255*((value - min_value)/(max_value - min_value)));
+    }
+}
+
+quibble_color_rgba8888 qb_color_rgba8888(float red,
+                                         float green,
+                                         float blue,
+                                         float alpha){
+    quibble_color_rgba8888 qp;
+    qp.red = qb_color_clamp(red, 0, 1);
+    qp.green = qb_color_clamp(green, 0, 1);
+    qp.blue = qb_color_clamp(blue, 0, 1);
+    qp.alpha = qb_color_clamp(alpha, 0, 1);
+    return qp;
+}
+
+quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue){
+    quibble_color_rgb888 qp;
+    qp.red = qb_color_clamp(red, 0, 1);
+    qp.green = qb_color_clamp(green, 0, 1);
+    qp.blue = qb_color_clamp(blue, 0, 1);
+    return qp;
+}
+
+
 #endif

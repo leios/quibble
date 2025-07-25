@@ -1,0 +1,16 @@
+#ifndef QUIBBLE_SIMPLE_SHADER_QBL
+#define QUIBBLE_SIMPLE_SHADER_QBL
+
+@include "QB/output.qbl"
+
+quibble_point_2D qb_find_point_location(int idx, quibble_simple_camera qcam){
+    int width = qb_find_camera_width(qcam);
+
+    quibble_point_2D pt;
+    pt.y = floor((float)idx / width)+0.5;
+    pt.x = (idx % width) + 0.5;
+
+    return pt;
+}
+
+#endif

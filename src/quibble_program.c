@@ -396,6 +396,7 @@ quibble_poem qb_find_poem(quibble_program qp, char *poem_name){
 }
 
 quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
+
     quibble_program qp;
 
     qp.configured = false;
@@ -405,6 +406,7 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
     qp.num_verses = qp_1.num_verses + qp_2.num_verses;
     qp.num_stanzas = qp_1.num_stanzas + qp_2.num_stanzas;
     qp.num_poems = qp_1.num_poems + qp_2.num_poems;
+
 
     if (qp.num_verses > 0){
         qp.verse_list =
@@ -440,7 +442,7 @@ quibble_program qb_combine_programs(quibble_program qp_1, quibble_program qp_2){
     for (int i = 0; i < qp_1.num_stanzas; ++i){
         qp.stanza_list[i] = qp_1.stanza_list[i];
     }
-    for (int i = 0; i < qp_2.num_verses; ++i){
+    for (int i = 0; i < qp_2.num_stanzas; ++i){
         qp.stanza_list[i+qp_1.num_stanzas] = qp_2.stanza_list[i];
     }
 

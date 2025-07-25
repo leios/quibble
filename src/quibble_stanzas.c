@@ -165,15 +165,15 @@ char *qb_expand_stanza(quibble_program qp,
     int verse_name_end;
     int config_end;
     int verse_length;
-    char *vcall_string = "@VCALL ";
+    char *vcall_string = "@VCALL";
     while (index < max_size){
         if (body[index] == vcall_string[vcall_match_count]){
             vcall_match_count++;
-            if (vcall_match_count == 7){
-                tmp_index -= 6;
-                memset(tmp_body+tmp_index, 0, 7);
+            if (vcall_match_count == 6){
+                tmp_index -= 5;
+                memset(tmp_body+tmp_index, 0, 6);
 
-                verse_name_start = index;
+                verse_name_start = index+1;
                 verse_name_end = qb_find_next_char(body, verse_name_start, '(');
                 char *verse_name = qb_strip_spaces(body, verse_name_start,
                                              verse_name_end - 1);
