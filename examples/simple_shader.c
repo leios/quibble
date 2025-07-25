@@ -23,6 +23,7 @@ int main(void){
                 (pt.x - qcam.world_position_x) / qcam.world_size_x,
                 0, 1
             );
+
             qcolor.blue = qb_color_clamp(
                 (pt.y - qcam.world_position_y) / qcam.world_size_y,
                 0, 1
@@ -74,7 +75,6 @@ int main(void){
     //         3. Choosing the number of arguments to set
     //         4. Setting each arg with the poem's argument (with type info)
     //                as well as the data in C we want associated with that arg 
-    printf("yo yo\n");
     qb_set_args(&qp, "simple_shader", 2,
                 "quibble_pixels_rgba8888 qps", qpix,
                 "quibble_simple_camera qcam", &qcam);
