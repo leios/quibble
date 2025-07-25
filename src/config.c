@@ -54,6 +54,10 @@ size_t qb_find_type_size(char *type){
         return sizeof(quibble_color_rgb888);
     }
 
+    if (strcmp(type, "quibble_simple_camera") == 0){
+        return sizeof(quibble_simple_camera);
+    }
+
     if (strcmp(type, "long double") == 0){
         return sizeof(long double);
     }

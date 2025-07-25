@@ -151,15 +151,15 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
         int stanza_body_start;
         int stanza_body_end;
 
-        char *vcall_string = "@VCALL ";
-        char *scall_string = "@SCALL ";
+        char *vcall_string = "@VCALL";
+        char *scall_string = "@SCALL";
         while (index < max_size){
             if (body[index] == vcall_string[vcall_match_count]){
                 vcall_match_count++;
-                if (vcall_match_count == 7){
+                if (vcall_match_count == 6){
 
-                    tmp_index -= 6;
-                    memset(tmp_body+tmp_index, 0, strlen(tmp_body));
+                    tmp_index -= 5;
+                    memset(tmp_body+tmp_index, 0, 6);
 
                     meta_name_start = index + 1;
                     meta_name_end = qb_find_next_char(body, meta_name_start, '(');
@@ -200,9 +200,9 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
 
             if (body[index] == scall_string[scall_match_count]){
                 scall_match_count++;
-                if (scall_match_count == 7){
-                    tmp_index -= 6;
-                    memset(tmp_body+tmp_index, 0, 7);
+                if (scall_match_count == 6){
+                    tmp_index -= 5;
+                    memset(tmp_body+tmp_index, 0, 6);
 
                     meta_name_start = index + 1;
                     meta_name_end = qb_find_next_char(body, meta_name_start, '(');

@@ -1,0 +1,19 @@
+#ifndef QUIBBLE_POINTS_QBL
+#define QUIBBLE_POINTS_QBL
+
+typedef struct {
+    float x;
+} quibble_point_1D;
+
+typedef struct {
+    float x;
+    float y;
+} quibble_point_2D;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+} quibble_point_3D;
+
+#endif

@@ -1,0 +1,33 @@
+#ifndef QUIBBLE_OUTPUT_QBL
+#define QUIBBLE_OUTPUT_QBL
+
+@include "QB/colors.qbl"
+@include "QB/points.qbl"
+@include "QB/simple_camera.qbl"
+
+void histogram_output_rgba8888(quibble_point_2D pt,
+                               quibble_color_rgba8888 color,
+                               quibble_simple_camera qcam,
+                               __global quibble_color_rgba8888 *_qpix_output){
+    int bin = qb_find_bin(pt.x, pt.y, qcam);
+    if (bin > 0){
+        _qpix_output[bin].red = color.red;
+        _qpix_output[bin].green = color.green;
+        _qpix_output[bin].blue = color.blue;
+        _qpix_output[bin].alpha = color.alpha;
+    }
+}
+
+void histogram_output_rgb888(quibble_point_2D pt,
+                             quibble_color_rgb888 color,
+                             quibble_simple_camera qcam,
+                             __global quibble_color_rgb888 *_qpix_output){
+    int bin = qb_find_bin(pt.x, pt.y, qcam);
+    if (bin > 0){
+        _qpix_output[bin].red = color.red;
+        _qpix_output[bin].green = color.green;
+        _qpix_output[bin].blue = color.blue;
+    }
+}
+
+#endif
