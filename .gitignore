@@ -65,3 +65,13 @@ quibble
 qbinfo
 qbtest
 install_manifest.txt
+
+*.png
+*.jpg
+*.jpeg
+*.bmp
+
+*.PNG
+*.JPG
+*.JPEG
+*.BMP

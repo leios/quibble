@@ -30,4 +30,15 @@ void histogram_output_rgb888(quibble_point_2D pt,
     }
 }
 
+quibble_point_2D qb_find_point_location(int idx, quibble_simple_camera qcam){
+    int width = qb_find_camera_width(qcam);
+    int height = qb_find_camera_height(qcam);
+
+    quibble_point_2D pt;
+    pt.y = ((floor((float)(idx / width))+0.5)/height)*qcam.world_size_y + qcam.world_position_y;
+    pt.x = (((float)(idx % width) + 0.5)/width)*qcam.world_size_x + qcam.world_position_x;
+
+    return pt;
+}
+
 #endif
