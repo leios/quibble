@@ -1,0 +1,52 @@
+#ifndef CHAOS_QBL
+#define CHAOS_QBL
+@include "QB/points.qbl"
+@include "QB/colors.qbl"
+
+unsigned int pcg(unsigned long x){
+    unsigned long count = (x >> 59);
+    x ^= x >> (5 + count);
+    x *= 12605985483714917081;
+    return x ^ (x >> 43);
+}
+
+quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
+    quibble_point_2D pt;
+    pt.x = 0.5*(pt_1.x + pt_2.x);
+    pt.y = 0.5*(pt_1.y + pt_2.y);
+    return pt;
+}
+
+__stanza sierpinski_chaos(int num_iterations,
+                          quibble_point_2D pt, quibble_color_rgba8888 clr,
+                          quibble_point_2D a, quibble_color_rgba8888 c_a,
+                          quibble_point_2D b, quibble_color_rgba8888 c_b,
+                          quibble_point_2D c, quibble_color_rgba8888 c_c){
+    unsigned long rng = pcg(_idx);
+    unsigned short chosen_fx;
+   
+    for (int _i = 0; _i < num_iterations; ++_i){
+        rng = pcg(rng);
+        unsigned long chosen_fx = rng % 3;
+
+        switch (chosen_fx){
+            case 0:
+                pt = halfway(pt, a);
+                clr = c_a;
+                break;
+            case 1:
+                pt = halfway(pt, b);
+                clr = c_b;
+                break;
+            case 2:
+                pt = halfway(pt, c);
+                clr = c_c;
+                break;
+            default:
+                break;
+        }
+        __split_stanza();
+    }
+
+}
+#endif

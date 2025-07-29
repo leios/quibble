@@ -398,6 +398,7 @@ char *qb_create_prologue(char *config, char *name,
         for (int i = 0; i < num_args; ++i){
             if (qargs[i].type != NULL){
                 strcat(temp, qargs[i].type);
+                strcat(temp, " ");
             }
             strcat(temp, qargs[i].variable);
             strcat(temp, " = ");
