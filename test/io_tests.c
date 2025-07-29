@@ -407,7 +407,7 @@ void quibble_camera_tests(int platform, int device){
     test_value = (
         qb_find_camera_width(qcam_3) == 1 &&
         qb_find_camera_height(qcam_3) == 4 &&
-        qb_find_bin(-10, 5, qcam_2) == 3
+        qb_find_bin(-10, 0.1, qcam_3) == 1
     );
 
     qb_check(test_value, "Aux camera tests");
