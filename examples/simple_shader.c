@@ -13,7 +13,7 @@ int main(void){
     // Step 1: Define program.
     //         This is done with QBINLINE, but can also be a separate file.
     char *program = QBINLINE(
-        @include "QB/simple_shader.qbl"
+        @include "QB/output.qbl"
         __poem simple_shader(quibble_pixels_rgba8888 qps,
                              quibble_simple_camera qcam){
             quibble_point_2D pt = qb_find_point_location(_idx, qcam);
