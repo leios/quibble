@@ -41,7 +41,7 @@ int qb_find_bin(float x, float y, quibble_simple_camera qcam){
         y_bin = floor(height * ((y - qcam.world_position_y)/qcam.world_size_y));
     }
 
-    if (y_bin < 0 || y_bin > width){
+    if (y_bin < 0 || y_bin > height){
         return -1;
     }
 
