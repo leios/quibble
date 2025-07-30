@@ -19,18 +19,17 @@ int main(void){
             quibble_color_rgba8888 qcolor = qb_color_rgba8888(0,0,0,1);
             histogram_output_rgba8888(pt, qcolor, qcam, qps);
 
-            qcolor = qb_color_rgba8888(1, 0, 1, 1);
-
+            qcolor = qb_color_rgba8888(1,0,1,1);
             quibble_point_2D pt_1 = qb_point_2D(0, 0.5);
             quibble_point_2D pt_2 = qb_point_2D(-1, -0.5);
             quibble_point_2D pt_3 = qb_point_2D(1, -0.5);
 
-            @SCALL sierpinski_chaos(1000, pt, qcolor,
+            @SCALL sierpinski_chaos(100, qcam,
                                     pt_1, qcolor,
                                     pt_2, qcolor,
                                     pt_3, qcolor){
                 if (_i > 10){
-                    histogram_output_rgba8888(pt, clr, qcam, qps);
+                    histogram_output_rgba8888(_pt, _clr, cam, qps);
                 }
 
             }
@@ -39,7 +38,7 @@ int main(void){
 
     quibble_program qp = qb_parse_program(program, "");
     qb_print_program(qp);
-    qb_configure_program(&qp, 1, 0);
+    qb_configure_program(&qp, 0, 0);
 
     int width = 1920;
     int height = 1080;

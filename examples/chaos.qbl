@@ -3,7 +3,7 @@
 @include "QB/points.qbl"
 @include "QB/colors.qbl"
 
-unsigned int pcg(unsigned long x){
+unsigned long pcg(unsigned long x){
     unsigned long count = (x >> 59);
     x ^= x >> (5 + count);
     x *= 12605985483714917081;
@@ -17,30 +17,46 @@ quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
     return pt;
 }
 
-__stanza sierpinski_chaos(int num_iterations,
-                          quibble_point_2D pt, quibble_color_rgba8888 clr,
+__stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
                           quibble_point_2D a, quibble_color_rgba8888 c_a,
                           quibble_point_2D b, quibble_color_rgba8888 c_b,
                           quibble_point_2D c, quibble_color_rgba8888 c_c){
+
     unsigned long rng = pcg(_idx);
-    unsigned short chosen_fx;
+
+    float x = ((float)rng/ULONG_MAX)*cam.world_size_x+cam.world_position_x;
+
+    rng = pcg(rng);
+
+    float y = ((float)rng/ULONG_MAX)*cam.world_size_y+cam.world_position_y;
+
+    rng = pcg(rng);
+
+
+    quibble_point_2D _pt = qb_point_2D(x, y);
+    quibble_color_rgba8888 _clr = qb_color_rgba8888(0,0,0,0);
+
+    histogram_output_rgba8888(_pt, qb_color_rgba8888(1,1,1,1), cam, qps);
+
+    unsigned long chosen_fx;
    
     for (int _i = 0; _i < num_iterations; ++_i){
         rng = pcg(rng);
-        unsigned long chosen_fx = rng % 3;
+
+        chosen_fx = rng%3;
 
         switch (chosen_fx){
             case 0:
-                pt = halfway(pt, a);
-                clr = c_a;
+                _pt = halfway(_pt, a);
+                _clr = c_a;
                 break;
             case 1:
-                pt = halfway(pt, b);
-                clr = c_b;
+                _pt = halfway(_pt, b);
+                _clr = c_b;
                 break;
             case 2:
-                pt = halfway(pt, c);
-                clr = c_c;
+                _pt = halfway(_pt, c);
+                _clr = c_c;
                 break;
             default:
                 break;
