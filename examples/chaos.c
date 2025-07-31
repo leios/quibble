@@ -18,6 +18,7 @@ int main(void){
             quibble_point_2D pt = qb_find_point_location(_idx, qcam);
             quibble_color_rgba8888 qcolor = qb_color_rgba8888(0,0,0,1);
             histogram_output_rgba8888(pt, qcolor, qcam, qps);
+            barrier(CLK_GLOBAL_MEM_FENCE);
 
             qcolor = qb_color_rgba8888(1,0,1,1);
             quibble_point_2D pt_1 = qb_point_2D(0, 0.5);
@@ -38,7 +39,7 @@ int main(void){
 
     quibble_program qp = qb_parse_program(program, "");
     qb_print_program(qp);
-    qb_configure_program(&qp, 0, 0);
+    qb_configure_program(&qp, 1, 0);
 
     int width = 1920;
     int height = 1080;
