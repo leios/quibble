@@ -298,6 +298,21 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
                                    "__global quibble_color_rgb888 *");
                 curr_entry += 3;
             }
+            else if (final_args[curr_entry].type != NULL &&
+                     strcmp(final_args[curr_entry].type,
+                            "quibble_pixels_prgb888") == 0){
+                qb_parse_pixel_arg(&final_args[curr_entry],
+                                   "__global quibble_pcolor_rgb888 *");
+                curr_entry += 3;
+            }
+            else if (final_args[curr_entry].type != NULL &&
+                     strcmp(final_args[curr_entry].type,
+                            "quibble_pixels_prgb888") == 0){
+                qb_parse_pixel_arg(&final_args[curr_entry],
+                                   "__global quibble_pcolor_rgb888 *");
+                curr_entry += 3;
+            }
+
 
             // Check to make sure entry is unique
             for (int j = 1; j <= curr_entry; ++j){

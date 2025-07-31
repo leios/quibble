@@ -297,7 +297,9 @@ void qb_set_args_variadic(quibble_program *qp, char *poem, int n, va_list args){
         char *variable;
         qb_find_type_arg(curr_arg_str, &type, &variable);
         if (strcmp(type, "quibble_pixels_rgba8888") == 0 ||
-            strcmp(type, "quibble_pixels_rgb888") == 0){
+            strcmp(type, "quibble_pixels_prgba8888") == 0 ||
+            strcmp(type, "quibble_pixels_rgb888") == 0 ||
+            strcmp(type, "quibble_pixels_prgb888") == 0){
             quibble_pixels curr_data = va_arg(args, quibble_pixels);
             qb_set_pixel_args(qp, poem, curr_data, variable);
         }

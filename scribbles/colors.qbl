@@ -14,6 +14,21 @@ typedef struct {
     unsigned char blue;
 } quibble_color_rgb888;
 
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char priority;
+} quibble_pcolor_rgb888;
+
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+    unsigned char priority;
+} quibble_pcolor_rgba8888;
+
 unsigned char qb_color_clamp(float value,
                              float min_value,
                              float max_value){
@@ -48,5 +63,30 @@ quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue){
     return qp;
 }
 
+quibble_pcolor_rgba8888 qb_pcolor_rgba8888(float red,
+                                           float green,
+                                           float blue,
+                                           float alpha,
+                                           float priority){
+    quibble_pcolor_rgba8888 qp;
+    qp.red = qb_color_clamp(red, 0, 1);
+    qp.green = qb_color_clamp(green, 0, 1);
+    qp.blue = qb_color_clamp(blue, 0, 1);
+    qp.alpha = qb_color_clamp(alpha, 0, 1);
+    qp.priority = qb_color_clamp(priority, 0, 1);
+    return qp;
+}
+
+quibble_pcolor_rgb888 qb_pcolor_rgb888(float red,
+                                       float green,
+                                       float blue,
+                                       float priority){
+    quibble_pcolor_rgb888 qp;
+    qp.red = qb_color_clamp(red, 0, 1);
+    qp.green = qb_color_clamp(green, 0, 1);
+    qp.blue = qb_color_clamp(blue, 0, 1);
+    qp.priority = qb_color_clamp(priority, 0, 1);
+    return qp;
+}
 
 #endif
