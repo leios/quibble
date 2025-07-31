@@ -165,6 +165,8 @@ quibble_pixels qb_create_blank_pixel_array(quibble_program qp,
                        NULL,
                        &err);
 
+    cl_check(err);
+
     qps.host_data = NULL;
 
     return qps;

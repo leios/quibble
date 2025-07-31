@@ -307,9 +307,9 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
             }
             else if (final_args[curr_entry].type != NULL &&
                      strcmp(final_args[curr_entry].type,
-                            "quibble_pixels_prgb888") == 0){
+                            "quibble_pixels_prgba8888") == 0){
                 qb_parse_pixel_arg(&final_args[curr_entry],
-                                   "__global quibble_pcolor_rgb888 *");
+                                   "__global quibble_pcolor_rgba8888 *");
                 curr_entry += 3;
             }
 
