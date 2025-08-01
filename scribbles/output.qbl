@@ -40,6 +40,7 @@ void histogram_output_prgba8888(quibble_point_2D pt,
         _qpix_output[bin].green = color.green;
         _qpix_output[bin].blue = color.blue;
         _qpix_output[bin].alpha = color.alpha;
+        _qpix_output[bin].priority = color.priority;
     }
 }
 
@@ -52,6 +53,7 @@ void histogram_output_prgb888(quibble_point_2D pt,
         _qpix_output[bin].red = color.red;
         _qpix_output[bin].green = color.green;
         _qpix_output[bin].blue = color.blue;
+        _qpix_output[bin].priority = color.priority;
     }
 }
 
