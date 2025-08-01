@@ -152,6 +152,34 @@ void quibble_io_tests(void){
     free(path);
 }
 
+bool qb_color_compare_prgba8888(quibble_pcolor_rgba8888 qc_1,
+                                quibble_pcolor_rgba8888 qc_2){
+    if (qc_1.red == qc_2.red &&
+        qc_1.green == qc_2.green &&
+        qc_1.blue == qc_2.blue &&
+        qc_1.alpha == qc_2.alpha &&
+        qc_1.priority == qc_2.priority){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool qb_color_compare_prgb888(quibble_pcolor_rgb888 qc_1,
+                              quibble_pcolor_rgb888 qc_2){
+    if (qc_1.red == qc_2.red &&
+        qc_1.green == qc_2.green &&
+        qc_1.blue == qc_2.blue &&
+        qc_1.priority == qc_2.priority){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+
 bool qb_color_compare_rgba8888(quibble_color_rgba8888 qc_1,
                                quibble_color_rgba8888 qc_2){
     if (qc_1.red == qc_2.red &&
@@ -186,6 +214,8 @@ void quibble_image_tests(int platform, int device){
 
     quibble_color_rgba8888 blank_rgba8888 = qb_zero_color_rgba8888();
     quibble_color_rgb888 blank_rgb888 = qb_zero_color_rgb888();
+    quibble_pcolor_rgb888 blank_prgb888 = qb_zero_pcolor_rgb888();
+    quibble_pcolor_rgba8888 blank_prgba8888 = qb_zero_pcolor_rgba8888();
 
     test_value = (
         blank_rgba8888.red == 0 &&
@@ -202,10 +232,30 @@ void quibble_image_tests(int platform, int device){
     );
     qb_check(test_value, "qb_zero_color_rgb888");
 
+    test_value = (
+        blank_prgba8888.red == 0 &&
+        blank_prgba8888.blue == 0 &&
+        blank_prgba8888.green == 0 &&
+        blank_prgba8888.alpha == 0 &&
+        blank_prgba8888.priority == 0
+    );
+    qb_check(test_value, "qb_zero_pcolor_rgba8888");
+
+    test_value = (
+        blank_prgb888.red == 0 &&
+        blank_prgb888.blue == 0 &&
+        blank_prgb888.green == 0 &&
+        blank_prgb888.priority == 0
+    );
+    qb_check(test_value, "qb_zero_pcolor_rgb888");
 
     quibble_color_rgba8888 test_color_rgba8888 =
         qb_color_rgba8888(1, 0.5, 0, 0.125);
     quibble_color_rgb888 test_color_rgb888 = qb_color_rgb888(1, 0.5, 0);
+
+    quibble_pcolor_rgba8888 test_pcolor_rgba8888 =
+        qb_pcolor_rgba8888(1, 0.5, 0, 0.125, 0.5);
+    quibble_pcolor_rgb888 test_pcolor_rgb888 = qb_pcolor_rgb888(1, 0.5, 0, 0.5);
 
     test_value = (
         test_color_rgba8888.blue == 0 &&
@@ -219,6 +269,20 @@ void quibble_image_tests(int platform, int device){
     );
     qb_check(test_value, "qb_color_rgb888");
 
+    test_value = (
+        test_pcolor_rgba8888.blue == 0 &&
+        test_pcolor_rgba8888.red == 255 &&
+        test_pcolor_rgb888.priority == 127
+    );
+    qb_check(test_value, "qb_pcolor_rgba8888");
+
+    test_value = (
+        test_pcolor_rgb888.blue == 0 &&
+        test_pcolor_rgb888.red == 255 &&
+        test_pcolor_rgb888.priority == 127
+    );
+    qb_check(test_value, "qb_pcolor_rgb888");
+
     char *program_string = QBINLINE(
         @include "QB/colors.qbl"
         __poem check(quibble_pixels_rgba8888 qps, quibble_color_rgba8888 test_color){
@@ -227,6 +291,16 @@ void quibble_image_tests(int platform, int device){
                 qps[_idx].green = test_color.green;
                 qps[_idx].blue = test_color.blue;
                 qps[_idx].alpha = test_color.alpha;
+            }
+        }
+
+        __poem check_2(quibble_pixels_prgba8888 qps, quibble_pcolor_rgba8888 test_color){
+            if (_idx == 0){
+                qps[_idx].red = test_color.red;
+                qps[_idx].green = test_color.green;
+                qps[_idx].blue = test_color.blue;
+                qps[_idx].alpha = test_color.alpha;
+                qps[_idx].priority = test_color.priority;
             }
         }
     );
@@ -241,6 +315,10 @@ void quibble_image_tests(int platform, int device){
         qb_create_pixel_array(qp,width,height,RGBA8888);
     quibble_pixels qps_rgb888 = qb_create_pixel_array(qp,width,height,RGB888);
 
+    quibble_pixels qps_prgba8888 =
+        qb_create_pixel_array(qp,width,height,PRGBA8888);
+    quibble_pixels qps_prgb888 = qb_create_pixel_array(qp,width,height,PRGB888);
+
     qb_set_args(&qp, "check", 2,
                 "quibble_pixels_rgba8888 qps", qps_rgba8888,
                 "quibble_color_rgba8888 test_color", &test_color_rgba8888);
@@ -249,22 +327,44 @@ void quibble_image_tests(int platform, int device){
 
     qb_pixels_device_to_host(qps_rgba8888);
 
+    qb_set_args(&qp, "check_2", 2,
+                "quibble_pixels_prgba8888 qps", qps_prgba8888,
+                "quibble_pcolor_rgba8888 test_color", &test_pcolor_rgba8888);
+
+    qb_run(qp, "check_2", 2, 2);
+
+    qb_pixels_device_to_host(qps_prgba8888);
+
     quibble_color_rgba8888 *qps_rgba8888_color_array =
         (quibble_color_rgba8888 *)qps_rgba8888.host_data;
 
     quibble_color_rgb888 *qps_rgb888_color_array =
         (quibble_color_rgb888 *)qps_rgb888.host_data;
+
+    quibble_pcolor_rgba8888 *qps_rgba8888_pcolor_array =
+        (quibble_pcolor_rgba8888 *)qps_prgba8888.host_data;
+
+    quibble_pcolor_rgb888 *qps_rgb888_pcolor_array =
+        (quibble_pcolor_rgb888 *)qps_prgb888.host_data;
+
     qps_rgb888_color_array[0] = test_color_rgb888;
+    qps_rgb888_pcolor_array[0] = test_pcolor_rgb888;
 
     test_value = (
         qb_color_compare_rgba8888(qps_rgba8888_color_array[0],
                                   test_color_rgba8888) &&
         qb_color_compare_rgba8888(qps_rgba8888_color_array[1],
                                   blank_rgba8888) &&
+        qb_color_compare_prgba8888(qps_rgba8888_pcolor_array[0],
+                                  test_pcolor_rgba8888) &&
+        qb_color_compare_prgba8888(qps_rgba8888_pcolor_array[1],
+                                  blank_prgba8888) &&
         qps_rgba8888.height == 1 &&
         qps_rgba8888.width == 2 &&
         qps_rgba8888.color_type == RGBA8888 &&
         qb_color_compare_rgb888(qps_rgb888_color_array[0], test_color_rgb888) &&
+        qb_color_compare_prgb888(qps_rgb888_pcolor_array[0],
+                                 test_pcolor_rgb888) &&
         qps_rgb888.color_type == RGB888
     );
     qb_check(test_value, "qb_create_pixel_array");
@@ -275,7 +375,9 @@ void quibble_image_tests(int platform, int device){
     // Checked by hand in gimp...
     // probably should have a better way to do it though
     qb_write_png_file("check_alpha.png", qps_rgba8888);
+    qb_write_png_file("check_palpha.png", qps_prgba8888);
     qb_write_file("check_noalpha.png", qps_rgb888);
+    qb_write_file("check_nopalpha.png", qps_prgb888);
     qb_write_file("check_noalpha.jpg", qps_rgb888);
     qb_write_file("check_noalpha.bmp", qps_rgb888);
     qb_write_file("check_noalpha", qps_rgb888);
@@ -289,6 +391,15 @@ void quibble_image_tests(int platform, int device){
     quibble_color_rgba8888 *qps_from_file_rgba8888_colors =
         (quibble_color_rgba8888 *)qps_from_file_rgba8888.host_data;
 
+    quibble_pixels qps_from_file_prgba8888 =
+        qb_create_pixel_array_from_file("check_palpha.png",
+                                         qp,
+                                         width,
+                                         height,
+                                         PRGBA8888);
+    quibble_pcolor_rgba8888 *qps_from_file_prgba8888_colors =
+        (quibble_pcolor_rgba8888 *)qps_from_file_prgba8888.host_data;
+
     quibble_pixels qps_from_file_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.png",
                                         qp,
@@ -297,6 +408,16 @@ void quibble_image_tests(int platform, int device){
                                         RGB888);
     quibble_color_rgb888 *qps_from_file_rgb888_colors =
         (quibble_color_rgb888 *)qps_from_file_rgb888.host_data;
+
+    quibble_pixels qps_from_file_prgb888 =
+        qb_create_pixel_array_from_file("check_nopalpha.png",
+                                        qp,
+                                        width,
+                                        height,
+                                        PRGB888);
+    quibble_pcolor_rgb888 *qps_from_file_prgb888_colors =
+        (quibble_pcolor_rgb888 *)qps_from_file_prgb888.host_data;
+
 
     quibble_pixels qps_from_jpg_rgb888 =
         qb_create_pixel_array_from_file("check_noalpha.jpg",
@@ -328,8 +449,12 @@ void quibble_image_tests(int platform, int device){
     test_value = (
         qb_color_compare_rgba8888(qps_rgba8888_color_array[0],
                                   qps_from_file_rgba8888_colors[0]) ||
+        qb_color_compare_prgba8888(qps_rgba8888_pcolor_array[0],
+                                   qps_from_file_prgba8888_colors[0]) ||
         qb_color_compare_rgb888(qps_rgb888_color_array[0],
                                 qps_from_file_rgb888_colors[0]) ||
+        qb_color_compare_prgb888(qps_rgb888_pcolor_array[0],
+                                 qps_from_file_prgb888_colors[0]) ||
         qb_color_compare_rgb888(qps_rgb888_color_array[0],
                                 qps_from_bmp_rgb888_colors[0]) ||
         qb_color_compare_rgb888(qps_rgb888_color_array[0],
@@ -340,9 +465,13 @@ void quibble_image_tests(int platform, int device){
     qb_check(test_value, "Reading and Writing to file");
 
     qb_free_pixels(qps_rgba8888);
+    qb_free_pixels(qps_prgba8888);
     qb_free_pixels(qps_rgb888);
+    qb_free_pixels(qps_prgb888);
     qb_free_pixels(qps_from_file_rgba8888);
+    qb_free_pixels(qps_from_file_prgba8888);
     qb_free_pixels(qps_from_file_rgb888);
+    qb_free_pixels(qps_from_file_prgb888);
     qb_free_pixels(qps_from_bmp_rgb888);
     qb_free_pixels(qps_from_jpg_rgb888);
     qb_free_pixels(qps_from_none_rgb888);
@@ -350,7 +479,9 @@ void quibble_image_tests(int platform, int device){
     qb_free_program(qp);
 
     remove("check_alpha.png");
+    remove("check_palpha.png");
     remove("check_noalpha.png");
+    remove("check_nopalpha.png");
     remove("check_noalpha.jpg");
     remove("check_noalpha.bmp");
     remove("check_noalpha");

@@ -1,0 +1,95 @@
+#ifndef CHAOS_QBL
+#define CHAOS_QBL
+@include "QB/points.qbl"
+@include "QB/colors.qbl"
+
+// Original: https://www.pcg-random.org/download.html#minimal-c-implementation
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+
+typedef struct{
+    unsigned long state;
+    unsigned long multiplier;
+    unsigned long increment;
+} quibble_pcg_state;
+
+unsigned int pcg32(quibble_pcg_state *qstate){
+    unsigned long oldstate = qstate->state;
+
+    // Advance internal state
+    qstate->state = oldstate * 6364136223846793005ULL + (qstate->increment|1);
+
+    // Calculate output function (XSH RR), uses old state for max ILP
+    unsigned int xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    unsigned int rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+quibble_pcg_state pcg32_init(unsigned long initstate){
+    quibble_pcg_state qstate;
+
+    qstate.multiplier = 6364136223846793005u;
+    qstate.increment  = 1442695040888963407u;
+    qstate.state = 0U;
+    pcg32(&qstate);
+    qstate.state += initstate;
+    pcg32(&qstate);
+
+    return qstate;
+}
+
+float fpcg32(quibble_pcg_state *qstate){
+    return (float)(pcg32(qstate)%1000000)/1000000;
+}
+
+quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
+    quibble_point_2D pt;
+    pt.x = 0.5*(pt_1.x + pt_2.x);
+    pt.y = 0.5*(pt_1.y + pt_2.y);
+    return pt;
+}
+
+quibble_point_2D rotate(quibble_point_2D pt, float theta){
+    return qb_point_2D((pt.x*cos(theta) - pt.y*sin(theta)),
+                       (pt.x*sin(theta) + pt.y*cos(theta)));
+}
+
+__stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
+                          quibble_point_2D a, quibble_pcolor_rgba8888 c_a,
+                          quibble_point_2D b, quibble_pcolor_rgba8888 c_b,
+                          quibble_point_2D c, quibble_pcolor_rgba8888 c_c){
+    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+
+    float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
+
+    float x = fpcg32(&qstate)*cam.world_size_x+cam.world_position_x;
+
+    quibble_point_2D _pt = qb_point_2D(x, y);
+    quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
+
+    unsigned short chosen_fx;
+   
+    for (int _i = 0; _i < num_iterations; ++_i){
+        chosen_fx = pcg32(&qstate)%3;
+
+        switch (chosen_fx){
+            case 0:
+                _pt = halfway(_pt, a);
+                _clr = c_a;
+                break;
+            case 1:
+                _pt = halfway(_pt, b);
+                _clr = c_b;
+                break;
+            case 2:
+                _pt = halfway(_pt, c);
+                _clr = c_c;
+                break;
+            default:
+                break;
+        }
+        __split_stanza();
+    }
+
+}
+#endif

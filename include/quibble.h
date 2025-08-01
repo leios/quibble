@@ -22,6 +22,9 @@
 #define QBT_RESET   "\x1b[0m"
 
 // Color Types
+#define PRGBA8888 2
+#define PRGB888 1
+
 #define RGBA8888 4
 #define RGB888 3
 
@@ -116,6 +119,21 @@ typedef struct {
     unsigned char green;
     unsigned char blue;
 } quibble_color_rgb888;
+
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char priority;
+} quibble_pcolor_rgb888;
+
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+    unsigned char priority;
+} quibble_pcolor_rgba8888;
 
 typedef struct {
     void *host_data;
@@ -263,11 +281,25 @@ unsigned char qb_color_clamp(float value,
 quibble_color_rgba8888 qb_zero_color_rgba8888(void);
 quibble_color_rgb888 qb_zero_color_rgb888(void);
 
+quibble_pcolor_rgba8888 qb_zero_pcolor_rgba8888(void);
+quibble_pcolor_rgb888 qb_zero_pcolor_rgb888(void);
+
 quibble_color_rgba8888 qb_color_rgba8888(float red,
                                          float green,
                                          float blue,
                                          float alpha);
 quibble_color_rgb888 qb_color_rgb888(float red, float green, float blue);
+
+quibble_pcolor_rgba8888 qb_pcolor_rgba8888(float red,
+                                           float green,
+                                           float blue,
+                                           float alpha,
+                                           float priority);
+
+quibble_pcolor_rgb888 qb_pcolor_rgb888(float red,
+                                       float green,
+                                       float blue,
+                                       float priority);
 
 quibble_pixels qb_create_pixel_array(quibble_program qp,
                                      int width,
@@ -285,6 +317,8 @@ void qb_pixels_device_to_host(quibble_pixels qps);
 void qb_pixels_host_to_device(quibble_pixels qps);
 
 // File Formats
+
+unsigned char *qb_deprioritize_array(quibble_pixels qps);
 
 char *qb_find_file_extension(char* filename);
 
