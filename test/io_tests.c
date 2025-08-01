@@ -465,9 +465,13 @@ void quibble_image_tests(int platform, int device){
     qb_check(test_value, "Reading and Writing to file");
 
     qb_free_pixels(qps_rgba8888);
+    qb_free_pixels(qps_prgba8888);
     qb_free_pixels(qps_rgb888);
+    qb_free_pixels(qps_prgb888);
     qb_free_pixels(qps_from_file_rgba8888);
+    qb_free_pixels(qps_from_file_prgba8888);
     qb_free_pixels(qps_from_file_rgb888);
+    qb_free_pixels(qps_from_file_prgb888);
     qb_free_pixels(qps_from_bmp_rgb888);
     qb_free_pixels(qps_from_jpg_rgb888);
     qb_free_pixels(qps_from_none_rgb888);

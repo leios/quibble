@@ -292,8 +292,8 @@ unsigned char *qb_read_file(char *filename,
             output[i*(color_size+1)+color_size] = 0;
         }
 
-        return output;
         free(data);
+        return output;
     }
     else{
         int color_size = qb_get_color_size(color_type);
@@ -341,6 +341,7 @@ void qb_write_file(char *filename, quibble_pixels qps){
 
 unsigned char *qb_deprioritize_array(quibble_pixels qps){
     int color_size = qb_get_color_size(qps.color_type) - 1;
+
     unsigned char *output =
         (unsigned char *)malloc(sizeof(unsigned char) *
                                 color_size * 
@@ -365,6 +366,7 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
         output = qb_deprioritize_array(qps);
+        color_size--;
     }
 
     stbi_write_png(filename,
@@ -373,6 +375,7 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
                    color_size,
                    output,
                    qps.width*qb_get_color_size(qps.color_type));
+
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
         free(output);
