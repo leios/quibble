@@ -385,7 +385,6 @@ void qb_deprioritize_array(quibble_pixels *qps){
 }
 
 void qb_write_png_file(char *filename, quibble_pixels qps){
-    unsigned char *output = qps.host_data;
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
@@ -400,14 +399,9 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
                    qps.output_array,
                    qps.width*color_size);
 
-
-    if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        free(output);
-    }
 }
 
 void qb_write_bmp_file(char *filename, quibble_pixels qps){
-    unsigned char *output = qps.host_data;
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
@@ -420,14 +414,9 @@ void qb_write_bmp_file(char *filename, quibble_pixels qps){
                    qps.height,
                    color_size,
                    qps.output_array);
-
-    if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        free(output);
-    }
 }
 
 void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
-    unsigned char *output = qps.host_data;
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
@@ -441,9 +430,5 @@ void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
                    color_size,
                    qps.output_array,
                    quality);
-
-    if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        free(output);
-    }
 }
 
