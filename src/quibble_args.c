@@ -166,13 +166,18 @@ int qb_find_number_of_args(char *config){
         free(value);
         return ret;
     }
-    while (next_comma > 0){
+    while (next_comma > 0 && i < config_size){
 
         if (next_comma > i){
             ++num_entries;
             i = next_comma+1;
         }
         next_comma = qb_find_next_char(config, i, ',');
+    }
+
+    // dealing with commas in kwargs
+    if (i > config_size){
+        --num_entries;
     }
 
     int num_pixels = qb_find_limited_occurrences("quibble_pixels", config_size, config);
@@ -274,7 +279,7 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
         while (i < config_size){
             next_comma = qb_find_next_char(config, i, ',');
 
-            if (next_comma < 0){
+            if (next_comma < 0 || next_comma > config_size){
                 next_comma = config_size;
             }
             qb_parse_arg(&final_args[curr_entry],
