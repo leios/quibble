@@ -195,10 +195,6 @@ int qb_find_number_of_kwargs(char *config){
         pipe_loc = qb_find_next_char(config, i, '|');
         i += pipe_loc + 1;
     }
-    if (qb_find_next_char(config, i, ',') > 0){
-        fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
-        exit(1);
-    }
     if (qb_find_next_char(config, i, '=') > 0 &&
         qb_find_next_char(config, i, ';') < 0){
         fprintf(stderr, "Equal (=) found without terminating semicolon!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
