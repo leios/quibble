@@ -191,7 +191,7 @@ quibble_pixels qb_create_pixel_array(quibble_program qp,
             (unsigned char *)calloc(color_size*qps.width*qps.height,
                                     sizeof(unsigned char));
 
-        qb_deprioritize_array(&qps);
+        qb_deprioritize_array(qps);
     }
     else {
         qps.output_array = (unsigned char*)qps.host_data;
@@ -217,7 +217,7 @@ quibble_pixels qb_create_pixel_array_from_file(char *filename,
             (unsigned char *)calloc(color_size*qps.width*qps.height,
                                     sizeof(unsigned char));
  
-        qb_deprioritize_array(&qps);
+        qb_deprioritize_array(qps);
     }
     else {
         qps.output_array = (unsigned char*)qps.host_data;
@@ -370,15 +370,15 @@ void qb_write_file(char *filename, quibble_pixels qps){
     }
 }
 
-void qb_deprioritize_array(quibble_pixels *qps){
-    int color_size = qb_get_color_size(qps->color_type) - 1;
+void qb_deprioritize_array(quibble_pixels qps){
+    int color_size = qb_get_color_size(qps.color_type) - 1;
 
-    unsigned char *host_data = (unsigned char *)qps->host_data;
+    unsigned char *host_data = (unsigned char *)qps.host_data;
 
-    for (int i = 0; i < qps->width * qps->height; ++i){
+    for (int i = 0; i < qps.width * qps.height; ++i){
         // sets rgb(a) channels
         for (int j = 0; j < color_size; ++j){
-            qps->output_array[i*color_size+j] = host_data[i*(color_size+1) + j];
+            qps.output_array[i*color_size+j] = host_data[i*(color_size+1) + j];
         }
     }
 
@@ -388,7 +388,7 @@ void qb_write_png_file(char *filename, quibble_pixels qps){
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        qb_deprioritize_array(&qps);
+        qb_deprioritize_array(qps);
         color_size--;
     }
 
@@ -405,7 +405,7 @@ void qb_write_bmp_file(char *filename, quibble_pixels qps){
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        qb_deprioritize_array(&qps);
+        qb_deprioritize_array(qps);
         color_size--;
     }
 
@@ -420,7 +420,7 @@ void qb_write_jpg_file(char *filename, quibble_pixels qps, int quality){
     int color_size = qb_get_color_size(qps.color_type);
 
     if (qps.color_type == PRGBA8888 || qps.color_type == PRGB888){
-        qb_deprioritize_array(&qps);
+        qb_deprioritize_array(qps);
         color_size--;
     }
 

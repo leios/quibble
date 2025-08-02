@@ -320,7 +320,7 @@ void qb_pixels_host_to_device(quibble_pixels qps);
 
 // File Formats
 
-void qb_deprioritize_array(quibble_pixels *qps);
+void qb_deprioritize_array(quibble_pixels qps);
 
 char *qb_find_file_extension(char* filename);
 
