@@ -92,4 +92,63 @@ __stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
     }
 
 }
+
+__stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam, 
+                         quibble_pcolor_rgba8888 clr |
+                         quibble_point_2D location = qb_point_2D(0,0);
+                         float rotation = 0;
+                         float scale_x = 1;
+                         float scale_y  = 1;){
+
+    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+
+    float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
+
+    float x = fpcg32(&qstate)*cam.world_size_x+cam.world_position_x;
+
+    quibble_point_2D _pt = qb_point_2D(x, y);
+    quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
+
+    quibble_point_2D vertex_1 =
+        qb_point_2D(scale_x*cos(rotation) - scale_y*sin(rotation) + location.x,                     scale_x*sin(rotation) + scale_y*cos(rotation) + location.y);
+
+    quibble_point_2D vertex_2 =
+        qb_point_2D(scale_x*cos(rotation) + scale_y*sin(rotation) + location.x,
+                    scale_x*sin(rotation) - scale_y*cos(rotation) + location.y);
+
+    quibble_point_2D vertex_3 =
+        qb_point_2D(-scale_x*cos(rotation)+scale_y*sin(rotation)+location.x,
+                    -scale_x*sin(rotation)-scale_y*cos(rotation)+location.y);
+
+    quibble_point_2D vertex_4 =
+        qb_point_2D(-scale_x*cos(rotation)-scale_y*sin(rotation)+location.x,
+                    -scale_x*sin(rotation)+scale_y*cos(rotation)+location.y);
+
+    unsigned short chosen_fx;
+   
+    for (int _i = 0; _i < num_iterations; ++_i){
+        chosen_fx = pcg32(&qstate)%4;
+
+        switch (chosen_fx){
+            case 0:
+                _pt = halfway(_pt, vertex_1);
+                break;
+            case 1:
+                _pt = halfway(_pt, vertex_2);
+                break;
+            case 2:
+                _pt = halfway(_pt, vertex_3);
+                break;
+            case 3:
+                _pt = halfway(_pt, vertex_4);
+                break;
+            default:
+                break;
+        }
+        _clr = clr;
+        __split_stanza();
+    }
+
+}
+
 #endif
