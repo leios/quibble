@@ -11,27 +11,7 @@
 
 int main(void){
 
-    char *program = QBINLINE(
-        @include "QB/chaos.qbl"
-        @include "QB/output.qbl"
-        __poem square_shader(quibble_pixels_prgba8888 qps,
-                             quibble_simple_camera qcam){
-            quibble_point_2D pt = qb_find_point_location(_idx, qcam);
-            quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(0,0,0,1,0.1);
-            histogram_output_prgba8888(pt, qcolor, qcam, qps);
-
-            qcolor = qb_pcolor_rgba8888(1,0,1,1,1);
-
-            @SCALL rectangle_chaos(100, qcam, qcolor){
-                if (_i > 10){
-                    histogram_output_prgba8888(_pt, _clr, cam, qps);
-                }
-
-            }
-        }
-    );
-
-    quibble_program qp = qb_parse_program(program, "");
+    quibble_program qp = qb_parse_program_file("swirled.qbl");
     qb_print_program(qp);
     qb_configure_program(&qp, 0, 0);
 
