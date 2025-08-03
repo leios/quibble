@@ -166,13 +166,18 @@ int qb_find_number_of_args(char *config){
         free(value);
         return ret;
     }
-    while (next_comma > 0){
+    while (next_comma > 0 && i < config_size){
 
         if (next_comma > i){
             ++num_entries;
             i = next_comma+1;
         }
         next_comma = qb_find_next_char(config, i, ',');
+    }
+
+    // dealing with commas in kwargs
+    if (i > config_size){
+        --num_entries;
     }
 
     int num_pixels = qb_find_limited_occurrences("quibble_pixels", config_size, config);
@@ -194,10 +199,6 @@ int qb_find_number_of_kwargs(char *config){
     if (qb_find_next_char(config, i, '|') > 0){
         pipe_loc = qb_find_next_char(config, i, '|');
         i += pipe_loc + 1;
-    }
-    if (qb_find_next_char(config, i, ',') > 0){
-        fprintf(stderr, "Comma (,) used instead of semicolon (;)!\nEach quibble kwarg is a self-contained C expression and must end with a `;`!\n");
-        exit(1);
     }
     if (qb_find_next_char(config, i, '=') > 0 &&
         qb_find_next_char(config, i, ';') < 0){
@@ -278,7 +279,7 @@ quibble_arg *qb_parse_args(char *config, int num_entries){
         while (i < config_size){
             next_comma = qb_find_next_char(config, i, ',');
 
-            if (next_comma < 0){
+            if (next_comma < 0 || next_comma > config_size){
                 next_comma = config_size;
             }
             qb_parse_arg(&final_args[curr_entry],
@@ -440,7 +441,7 @@ char *qb_create_prologue(char *config, char *name,
             for (int j  = 0; j < num_config_kwargs; ++j){
                 if (strcmp(temp_kwargs[j].variable,
                        qkwargs[i].variable) == 0){
-                    value = temp_kwargs[i].value;
+                    value = temp_kwargs[j].value;
                 }
             }
 
@@ -453,6 +454,7 @@ char *qb_create_prologue(char *config, char *name,
             strcat(temp, value);
             strcat(temp, ";\n");
         }
+
         qb_free_kwarg_array(temp_kwargs, num_config_kwargs);
     }
     else {
