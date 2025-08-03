@@ -441,7 +441,7 @@ char *qb_create_prologue(char *config, char *name,
             for (int j  = 0; j < num_config_kwargs; ++j){
                 if (strcmp(temp_kwargs[j].variable,
                        qkwargs[i].variable) == 0){
-                    value = temp_kwargs[i].value;
+                    value = temp_kwargs[j].value;
                 }
             }
 
@@ -454,6 +454,7 @@ char *qb_create_prologue(char *config, char *name,
             strcat(temp, value);
             strcat(temp, ";\n");
         }
+
         qb_free_kwarg_array(temp_kwargs, num_config_kwargs);
     }
     else {

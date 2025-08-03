@@ -98,7 +98,7 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
                          quibble_point_2D location = qb_point_2D(0,0);
                          float rotation = 0;
                          float scale_x = 1;
-                         float scale_y  = 1;){
+                         float scale_y = 1;){
 
     quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
 

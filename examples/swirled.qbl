@@ -33,19 +33,26 @@ __verse swirl(quibble_point_2D pt,
 
 __poem square_shader(quibble_pixels_prgba8888 qps,
                      quibble_simple_camera qcam){
+
+    // Drawing a black background first
     quibble_point_2D pt = qb_find_point_location(_idx, qcam);
     quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(0,0,0,1,0.1);
-    quibble_pcolor_rgba8888 v1_color = qb_pcolor_rgba8888(1,0.25,0.25,1,1);
-    quibble_pcolor_rgba8888 v2_color = qb_pcolor_rgba8888(0.25,1,0.25,1,1);
-    quibble_pcolor_rgba8888 v3_color = qb_pcolor_rgba8888(0.25,0.25,1,1,1);
-    quibble_pcolor_rgba8888 v4_color = qb_pcolor_rgba8888(1,0.25,1,1,1);
     histogram_output_prgba8888(pt, qcolor, qcam, qps);
 
+    // These colors have a different priority so that different threads
+    // don't overlap each other at the boundaries.
+    quibble_pcolor_rgba8888 v1_color = qb_pcolor_rgba8888(1,0.25,0.25,1,0.5);
+    quibble_pcolor_rgba8888 v2_color = qb_pcolor_rgba8888(0.25,1,0.25,1,0.6);
+    quibble_pcolor_rgba8888 v3_color = qb_pcolor_rgba8888(0.25,0.25,1,1,0.7);
+    quibble_pcolor_rgba8888 v4_color = qb_pcolor_rgba8888(1,0.25,1,1,0.8);
+
+    // Setting default color for square
+    // This will be ignored because we are creating a custom verse
     qcolor = qb_pcolor_rgba8888(1,0,1,1,1);
 
-    @SCALL rectangle_chaos(100, qcam, qcolor | scale_x = 0.5; scale_y = 0.5;){
+    @SCALL rectangle_chaos(100, qcam, qcolor |
+                           scale_x = 0.5; scale_y = 0.5;){
         @VCALL swirl(_pt, v1_color, v2_color, v3_color, v4_color);
-
     }
 }
 
