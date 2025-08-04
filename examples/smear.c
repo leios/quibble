@@ -15,6 +15,7 @@ void create_filename(char *buffer, int i){
 int main(void){
 
     quibble_program qp = qb_parse_program_file("smear.qbl");
+    qb_print_program(qp);
     qb_configure_program(&qp, 0, 0);
 
     qb_print_program(qp);

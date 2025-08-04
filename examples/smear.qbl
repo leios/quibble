@@ -3,11 +3,12 @@
 
 __verse smear(quibble_point_2D pt,
               quibble_point_2D position,
-              quibble_point_2D velocity){
+              quibble_point_2D velocity | 
+              int num_ignore = 20;){
 
-    float theta = atan(pt.y/pt.x)
+    float theta = atan(pt.y/pt.x);
     if (pt.y < 0){
-        theta += 2*pi
+        theta += 2*M_PI;
     }
 
     // Moving back to origin for a simpler transform
@@ -18,7 +19,7 @@ __verse smear(quibble_point_2D pt,
     pt.x *= sqrt(pt.x*pt.x + pt.y*pt.y);
 
     // Rotating according to velocity direction
-    pt = rotate(pt);
+    pt = rotate(pt, theta);
 
     // Moving back to correct position
     pt.x += position.x;
@@ -42,8 +43,8 @@ __poem smear_shader(quibble_pixels_prgba8888 qps,
     qcolor = qb_pcolor_rgba8888(1,1,1,1,1);
 
     @SCALL circle_chaos(100, qcam, qcolor |
-                        position = position; radius = 0.5){
-        @VCALL swirl(_pt, position, velocity);
+                        position = position; radius = 0.5;){
+        @VCALL smear(_pt, position, velocity);
     }
 }
 
