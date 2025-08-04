@@ -17,6 +17,8 @@ int main(void){
     quibble_program qp = qb_parse_program_file("smear.qbl");
     qb_configure_program(&qp, 0, 0);
 
+    qb_print_program(qp);
+
     int width = 1920;
     int height = 1080;
     quibble_pixels qpix = 

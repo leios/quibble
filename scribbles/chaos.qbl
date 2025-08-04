@@ -49,6 +49,15 @@ quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
     return pt;
 }
 
+quibble_point_2D rotate(quibble_point_2D pt, angle){
+    quibble_point_2D output;
+
+    output.x = pt.x*cos(angle) - pt.y*sin(angle);
+    output.y = pt.x*sin(angle) + pt.y*cos(angle);
+
+    return output;
+}
+
 quibble_point_2D rotate(quibble_point_2D pt, float theta){
     return qb_point_2D((pt.x*cos(theta) - pt.y*sin(theta)),
                        (pt.x*sin(theta) + pt.y*cos(theta)));
