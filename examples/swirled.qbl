@@ -51,7 +51,7 @@ __poem square_shader(quibble_pixels_prgba8888 qps,
     qcolor = qb_pcolor_rgba8888(1,0,1,1,1);
 
     @SCALL rectangle_chaos(100, qcam, qcolor |
-                           scale_x = 0.5; scale_y = 0.5;){
+                           scale_x = 0.6; scale_y = 0.6;){
         @VCALL swirl(_pt, v1_color, v2_color, v3_color, v4_color);
     }
 }
