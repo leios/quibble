@@ -43,7 +43,7 @@ int main(void){
 
     char filename[15] = {0};
     for (int i = 0; i < 1; ++i){
-        qb_set_args(&qp, "smear_shader", 2,
+        qb_set_args(&qp, "smear_shader", 4,
                     "quibble_pixels_prgba8888 qps", qpix,
                     "quibble_simple_camera qcam", &qcam,
                     "quibble_point_2D position", &position,
@@ -55,6 +55,7 @@ int main(void){
 
         create_filename(filename, i);
         qb_write_png_file(filename, qpix);
+        printf("%s\n", filename);
     }
 
     qb_free_program(qp);

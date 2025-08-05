@@ -46,6 +46,18 @@ size_t qb_find_type_size(char *type){
         return 4;
     }
 
+    if (strcmp(type, "quibble_point_1D") == 0){
+        return sizeof(quibble_point_1D);
+    }
+
+    if (strcmp(type, "quibble_point_2D") == 0){
+        return sizeof(quibble_point_2D);
+    }
+
+    if (strcmp(type, "quibble_point_3D") == 0){
+        return sizeof(quibble_point_3D);
+    }
+
     if (strcmp(type, "quibble_pcolor_rgba8888") == 0){
         return sizeof(quibble_pcolor_rgba8888);
     }
