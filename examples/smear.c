@@ -38,7 +38,7 @@ int main(void){
                                                          world_position_x,
                                                          world_position_y);
 
-    quibble_point_2D position = qb_point_2D(0,0);
+    quibble_point_2D location = qb_point_2D(0,0);
     quibble_point_2D velocity = qb_point_2D(0,0);
 
     char filename[15] = {0};
@@ -46,7 +46,7 @@ int main(void){
         qb_set_args(&qp, "smear_shader", 4,
                     "quibble_pixels_prgba8888 qps", qpix,
                     "quibble_simple_camera qcam", &qcam,
-                    "quibble_point_2D position", &position,
+                    "quibble_point_2D location", &location,
                     "quibble_point_2D velocity", &velocity);
 
         qb_run(qp, "smear_shader", width*height, 256);

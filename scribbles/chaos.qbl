@@ -156,9 +156,16 @@ __verse constant_disk(quibble_point_2D pt |
                       quibble_point_2D location = qb_point_2D(0,0);
                       bool function_index = 0;){
 
+
+    if (_idx == 0){
+        printf("%f %f %f %f %f\n", pt.x, pt.y, location.x, location.y, radius);
+    }
     pt.x = (pt.x-location.x)/radius;
     pt.y = (pt.y-location.y)/radius;
     float r2 = pt.x*pt.x + pt.y*pt.y;
+    if (_idx == 0){
+        printf("%f %f %f %f\n", pt.x, pt.y, location.x, location.y);
+    }
 
     float theta = M_PI;
     if (r2 < 0.0001){
@@ -179,6 +186,7 @@ __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
                       quibble_pcolor_rgba8888 clr |
                       quibble_point_2D location = qb_point_2D(0,0);
                       float radius = 1;){
+
     quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
 
     float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
@@ -188,6 +196,9 @@ __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
     quibble_point_2D _pt = qb_point_2D(x, y);
     quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
 
+    if (_idx == 0){
+        printf("%f %f %f %f %f\n", _pt.x, _pt.y, location.x, location.y, radius);
+    }
     unsigned short chosen_fx;
    
     for (int _i = 0; _i < num_iterations; ++_i){
