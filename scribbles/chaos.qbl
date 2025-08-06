@@ -156,30 +156,25 @@ __verse constant_disk(quibble_point_2D pt |
                       quibble_point_2D location = qb_point_2D(0,0);
                       bool function_index = 0;){
 
-
-    if (_idx == 0){
-        printf("%f %f %f %f %f\n", pt.x, pt.y, location.x, location.y, radius);
-    }
     pt.x = (pt.x-location.x)/radius;
     pt.y = (pt.y-location.y)/radius;
+
     float r2 = pt.x*pt.x + pt.y*pt.y;
-    if (_idx == 0){
-        printf("%f %f %f %f\n", pt.x, pt.y, location.x, location.y);
-    }
 
     float theta = M_PI;
-    if (r2 < 0.0001){
-        theta = atan(pt.y/pt.x);
+    if (r2 > FLT_EPSILON){
+        theta = atan2(pt.y,pt.x);
         if (pt.y < 0){
             theta += 2*M_PI;
         }
+
+        float new_theta = (r2+function_index)*M_PI;
+
+        float new_r2 = sqrt(theta/(2*M_PI));
+
+        _pt.x = radius*new_r2*cos(new_theta)+location.x;
+        _pt.y = radius*new_r2*sin(new_theta)+location.y;
     }
-
-    float new_theta = (r2+function_index)*M_PI;
-    float new_r2 = sqrt(theta/(2*M_PI));
-
-    _pt.x = radius*new_r2*cos(new_theta)+location.x;
-    _pt.y = radius*new_r2*sin(new_theta)+location.y;
 }
 
 __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
@@ -196,9 +191,6 @@ __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
     quibble_point_2D _pt = qb_point_2D(x, y);
     quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
 
-    if (_idx == 0){
-        printf("%f %f %f %f %f\n", _pt.x, _pt.y, location.x, location.y, radius);
-    }
     unsigned short chosen_fx;
    
     for (int _i = 0; _i < num_iterations; ++_i){

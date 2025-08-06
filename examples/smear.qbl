@@ -44,7 +44,7 @@ __poem smear_shader(quibble_pixels_prgba8888 qps,
 
     qcolor = qb_pcolor_rgba8888(1,1,1,1,1);
 
-    @SCALL circle_chaos(2, qcam, qcolor |
+    @SCALL circle_chaos(100, qcam, qcolor |
                         location = location; radius = 0.1;){
         @VCALL smear(_pt, location, velocity);
     }
