@@ -292,9 +292,7 @@ void qb_preprocess_content(char *verse);
     POINTS
 //----------------------------------------------------------------------------*/
 quibble_point_1D qb_point_1D(float x);
-
 quibble_point_2D qb_point_2D(float x, float y);
-
 quibble_point_3D qb_point_3D(float x, float y, float z);
 
 /*----------------------------------------------------------------------------//
