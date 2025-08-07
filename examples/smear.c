@@ -9,7 +9,11 @@
 #include "quibble.h"
 
 void create_filename(char *buffer, int i){
-    sprintf(buffer, "check%d%d%d%d.png", i%10000, i%1000, i%100, i%10);
+    sprintf(buffer, "check%d%d%d%d.png",
+            i%10000 - i%1000,
+            i%1000 - i%100,
+            i%100 - i%10,
+            i%10);
 }
 
 int main(void){
@@ -41,11 +45,31 @@ int main(void){
     quibble_point_2D location = qb_point_2D(0,0);
     quibble_point_2D velocity = qb_point_2D(0,0);
 
+    int num_frames = 5;
+    float half_frame = num_frames*0.5;
     char filename[15] = {0};
-    for (int i = 0; i < 1; ++i){
-        qb_set_args(&qp, "smear_shader", 4,
-                    "quibble_pixels_prgba8888 qps", qpix,
-                    "quibble_simple_camera qcam", &qcam,
+    
+    qb_set_args(&qp, "smear_shader", 4,
+                "quibble_pixels_prgba8888 qps", qpix,
+                "quibble_simple_camera qcam", &qcam,
+                "quibble_point_2D location", &location,
+                "quibble_point_2D velocity", &velocity);
+
+    for (int i = 0; i < num_frames + 1; ++i){
+
+        location = qb_point_2D(-0.5 + (float)i/num_frames,
+                               -0.5 + (float)i/num_frames);
+
+        if (i < half_frame){
+            velocity = qb_point_2D(2 * (float) i / half_frame,
+                                   2 * (float) i / half_frame);
+        }
+        else{
+            velocity = qb_point_2D(2.0 - 2.0 * (i-half_frame) / (half_frame),
+                                   2.0 - 2.0 * (i-half_frame) / (half_frame));
+        }
+
+        qb_set_args(&qp, "smear_shader", 2,
                     "quibble_point_2D location", &location,
                     "quibble_point_2D velocity", &velocity);
 

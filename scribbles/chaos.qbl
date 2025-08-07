@@ -49,11 +49,6 @@ quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
     return pt;
 }
 
-quibble_point_2D rotate(quibble_point_2D pt, float theta){
-    return qb_point_2D((pt.x*cos(theta) - pt.y*sin(theta)),
-                       (pt.x*sin(theta) + pt.y*cos(theta)));
-}
-
 __stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
                           quibble_point_2D a, quibble_pcolor_rgba8888 c_a,
                           quibble_point_2D b, quibble_pcolor_rgba8888 c_b,
