@@ -136,6 +136,21 @@ typedef struct {
 } quibble_pcolor_rgba8888;
 
 typedef struct {
+    float x;
+} quibble_point_1D;
+
+typedef struct {
+    float x;
+    float y;
+} quibble_point_2D;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+} quibble_point_3D;
+
+typedef struct {
     void *host_data;
     int color_type;
     int height;
@@ -273,6 +288,12 @@ int qb_find_limited_occurrences(char *query, int limit, char *body);
 // QBINLINE
 bool qb_is_inlined(char *verse);
 void qb_preprocess_content(char *verse);
+/*----------------------------------------------------------------------------//
+    POINTS
+//----------------------------------------------------------------------------*/
+quibble_point_1D qb_point_1D(float x);
+quibble_point_2D qb_point_2D(float x, float y);
+quibble_point_3D qb_point_3D(float x, float y, float z);
 
 /*----------------------------------------------------------------------------//
     IMAGES

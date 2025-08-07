@@ -57,6 +57,32 @@ void histogram_output_prgb888(quibble_point_2D pt,
     }
 }
 
+void histogram_overwrite_prgba8888(quibble_point_2D pt,
+                                   quibble_pcolor_rgba8888 color,
+                                   quibble_simple_camera qcam,
+                                  __global quibble_pcolor_rgba8888 *_qpix_output){
+    int bin = qb_find_bin(pt.x, pt.y, qcam);
+    if (bin > 0){
+        _qpix_output[bin].red = color.red;
+        _qpix_output[bin].green = color.green;
+        _qpix_output[bin].blue = color.blue;
+        _qpix_output[bin].alpha = color.alpha;
+        _qpix_output[bin].priority = color.priority;
+    }
+}
+
+void histogram_overwrite_prgb888(quibble_point_2D pt,
+                                 quibble_pcolor_rgb888 color,
+                                 quibble_simple_camera qcam,
+                                __global quibble_pcolor_rgb888 *_qpix_output){
+    int bin = qb_find_bin(pt.x, pt.y, qcam);
+    if (bin > 0){
+        _qpix_output[bin].red = color.red;
+        _qpix_output[bin].green = color.green;
+        _qpix_output[bin].blue = color.blue;
+        _qpix_output[bin].priority = color.priority;
+    }
+}
 
 quibble_point_2D qb_find_point_location(int idx, quibble_simple_camera qcam){
     int width = qb_find_camera_width(qcam);

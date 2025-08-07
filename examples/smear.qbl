@@ -1,0 +1,55 @@
+@include "QB/chaos.qbl"
+@include "QB/output.qbl"
+
+quibble_point_2D rotate(quibble_point_2D pt, float theta){
+    return qb_point_2D(pt.x*cos(theta) - pt.y*sin(theta),
+                       pt.x*sin(theta) + pt.y*cos(theta));
+}
+
+__verse smear(quibble_point_2D pt,
+              quibble_point_2D location,
+              quibble_point_2D velocity | 
+              int num_ignore = 20;){
+
+    float theta = atan2(velocity.y,velocity.x);
+    if (pt.y < 0){
+        theta += 2*M_PI;
+    }
+
+    // Moving back to origin for a simpler transform
+    pt.x -= location.x;
+    pt.y -= location.y;
+
+    // Scaling along x by the speed (magnitude of velocity)
+    pt.x *= 1 + sqrt(velocity.x*velocity.x + velocity.y*velocity.y);
+
+    // Rotating according to velocity direction
+    pt = rotate(pt, theta);
+
+    // Moving back to correct location
+    pt.x += location.x;
+    pt.y += location.y;
+
+    if (_i > num_ignore){
+        histogram_output_prgba8888(pt, _clr, cam, qps);
+    }
+}
+
+__poem smear_shader(quibble_pixels_prgba8888 qps,
+                    quibble_simple_camera qcam,
+                    quibble_point_2D location,
+                    quibble_point_2D velocity){
+
+    // Drawing a black background first
+    quibble_point_2D pt = qb_find_point_location(_idx, qcam);
+    quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(0,0,0,1,0.1);
+    histogram_overwrite_prgba8888(pt, qcolor, qcam, qps);
+
+    qcolor = qb_pcolor_rgba8888(1,1,1,1,1);
+
+    @SCALL circle_chaos(100, qcam, qcolor |
+                        location = location; radius = 0.1;){
+        @VCALL smear(_pt, location, velocity);
+    }
+}
+

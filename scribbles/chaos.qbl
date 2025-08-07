@@ -49,11 +49,6 @@ quibble_point_2D halfway(quibble_point_2D pt_1, quibble_point_2D pt_2){
     return pt;
 }
 
-quibble_point_2D rotate(quibble_point_2D pt, float theta){
-    return qb_point_2D((pt.x*cos(theta) - pt.y*sin(theta)),
-                       (pt.x*sin(theta) + pt.y*cos(theta)));
-}
-
 __stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
                           quibble_point_2D a, quibble_pcolor_rgba8888 c_a,
                           quibble_point_2D b, quibble_pcolor_rgba8888 c_b,
@@ -150,5 +145,73 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
     }
 
 }
+
+__verse constant_disk(quibble_point_2D pt |
+                      float radius = 1;
+                      quibble_point_2D location = qb_point_2D(0,0);
+                      bool function_index = 0;){
+
+    pt.x = (pt.x-location.x)/radius;
+    pt.y = (pt.y-location.y)/radius;
+
+    float r2 = pt.x*pt.x + pt.y*pt.y;
+
+    float theta = M_PI;
+    if (r2 > FLT_EPSILON){
+        theta = atan2(pt.y,pt.x);
+        if (pt.y < 0){
+            theta += 2*M_PI;
+        }
+
+        float new_theta = (r2+function_index)*M_PI;
+
+        float new_r2 = sqrt(theta/(2*M_PI));
+
+        _pt.x = radius*new_r2*cos(new_theta)+location.x;
+        _pt.y = radius*new_r2*sin(new_theta)+location.y;
+    }
+}
+
+__stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
+                      quibble_pcolor_rgba8888 clr |
+                      quibble_point_2D location = qb_point_2D(0,0);
+                      float radius = 1;){
+
+    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+
+    float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
+
+    float x = fpcg32(&qstate)*cam.world_size_x+cam.world_position_x;
+
+    quibble_point_2D _pt = qb_point_2D(x, y);
+    quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
+
+    unsigned short chosen_fx;
+   
+    for (int _i = 0; _i < num_iterations; ++_i){
+        chosen_fx = pcg32(&qstate)%2;
+
+        switch (chosen_fx){
+            case 0:
+                @VCALL constant_disk(_pt |
+                                     radius = radius;
+                                     location = location;
+                                     function_index = 0;);
+                break;
+            case 1:
+                @VCALL constant_disk(_pt |
+                                     radius = radius;
+                                     location = location;
+                                     function_index = 1;);
+                break;
+            default:
+                break;
+        }
+        _clr = clr;
+        __split_stanza();
+    }
+
+}
+
 
 #endif

@@ -23,6 +23,7 @@ add_library(
     src/errors.c
     src/string_manip.c
     src/quibble_args.c
+    src/points.c
     src/images.c
     src/config.c
     src/quibble_verses.c

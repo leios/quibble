@@ -412,14 +412,16 @@ char *qb_create_prologue(char *config, char *name,
     if (num_config_args == num_args){
         quibble_arg *temp_args = qb_parse_args(config, num_args);
         for (int i = 0; i < num_args; ++i){
-            if (qargs[i].type != NULL){
-                strcat(temp, qargs[i].type);
-                strcat(temp, " ");
+            if (strcmp(qargs[i].variable, temp_args[i].variable) != 0){
+                if (qargs[i].type != NULL){
+                    strcat(temp, qargs[i].type);
+                    strcat(temp, " ");
+                }
+                strcat(temp, qargs[i].variable);
+                strcat(temp, " = ");
+                strcat(temp, temp_args[i].variable);
+                strcat(temp, ";\n");
             }
-            strcat(temp, qargs[i].variable);
-            strcat(temp, " = ");
-            strcat(temp, temp_args[i].variable);
-            strcat(temp, ";\n");
         }
         qb_free_arg_array(temp_args, num_args);
     }
@@ -445,14 +447,16 @@ char *qb_create_prologue(char *config, char *name,
                 }
             }
 
-            if (qkwargs[i].type != NULL){
-                strcat(temp, qkwargs[i].type);
-                strcat(temp, " ");
+            if (strcmp(qkwargs[i].variable, value) != 0){
+                if (qkwargs[i].type != NULL){
+                    strcat(temp, qkwargs[i].type);
+                    strcat(temp, " ");
+                }
+                strcat(temp, qkwargs[i].variable);
+                strcat(temp, " = ");
+                strcat(temp, value);
+                strcat(temp, ";\n");
             }
-            strcat(temp, qkwargs[i].variable);
-            strcat(temp, " = ");
-            strcat(temp, value);
-            strcat(temp, ";\n");
         }
 
         qb_free_kwarg_array(temp_kwargs, num_config_kwargs);
