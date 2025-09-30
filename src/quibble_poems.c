@@ -19,9 +19,14 @@ bool qb_is_poem(char *poem, int offset){
 
 bool qb_find_keyword_in_poems(quibble_program qp, char *keyword){
     int found_index = -1;
-    for (int i = 0; i < qp.num_poems; ++i){
-        found_index = qb_find_next_string(qp.poem_list[i].body, 0, keyword);
+    int curr_poem = 0;
+    while (found_index < 0 && curr_poem < qp.num_poems){
+        found_index = qb_find_next_string(qp.poem_list[curr_poem].body,
+                                          0,
+                                          keyword);
+        curr_poem++;
     }
+
     if (found_index >= 0){
         return true;
     }
