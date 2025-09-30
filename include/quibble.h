@@ -226,6 +226,7 @@ void qb_print_verse(quibble_verse qv);
 void qb_print_stanza(quibble_stanza qs);
 void qb_print_poem(quibble_poem qp);
 void qb_print_program(quibble_program qp);
+void qb_output_program_to_file(quibble_program qp, char *filename);
 void print_cl_info(quibble_program qp);
 
 

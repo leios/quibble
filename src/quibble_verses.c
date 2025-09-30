@@ -20,8 +20,12 @@ bool qb_is_verse(char *verse, int offset){
 
 bool qb_find_keyword_in_verses(quibble_program qp, char *keyword){
     int found_index = -1;
-    for (int i = 0; i < qp.num_verses; ++i){
-        found_index = qb_find_next_string(qp.verse_list[i].body, 0, keyword);
+    int curr_verse = 0;
+    while (found_index < 0 && curr_verse < qp.num_verses){
+        found_index = qb_find_next_string(qp.verse_list[curr_verse].body,
+                                          0,
+                                          keyword);
+        curr_verse++;
     }
     if (found_index >= 0){
         return true;

@@ -53,7 +53,7 @@ __stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
                           quibble_point_2D a, quibble_pcolor_rgba8888 c_a,
                           quibble_point_2D b, quibble_pcolor_rgba8888 c_b,
                           quibble_point_2D c, quibble_pcolor_rgba8888 c_c){
-    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+    quibble_pcg_state qstate = pcg32_init(_idx);
 
     float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
 
@@ -95,7 +95,7 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
                          float scale_x = 1;
                          float scale_y = 1;){
 
-    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+    quibble_pcg_state qstate = pcg32_init(_idx);
 
     float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
 
@@ -177,7 +177,7 @@ __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
                       quibble_point_2D location = qb_point_2D(0,0);
                       float radius = 1;){
 
-    quibble_pcg_state qstate = pcg32_init(qps_width*qps_height - _idx);
+    quibble_pcg_state qstate = pcg32_init(_idx);
 
     float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
 

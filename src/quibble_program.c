@@ -601,3 +601,25 @@ void qb_print_program(quibble_program qp){
         print_cl_info(qp);
     }
 }
+
+void qb_output_program_to_file(quibble_program qp, char *filename){
+
+    FILE* file_ptr;
+
+    file_ptr = fopen(filename, "w");
+
+    if (file_ptr == NULL){
+        fprintf(stderr, "Could not open file: %s!\n", filename);
+        exit(1);
+    }
+    else{
+        fprintf(file_ptr,"Quibble Program:\nBody\n%s\nEverything Else:\n%s\n\n",
+                qp.body, qp.everything_else);
+    }
+
+    printf("Program written to %s!\n", filename);
+
+    fflush(file_ptr);
+    fclose(file_ptr);
+
+}

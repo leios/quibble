@@ -19,14 +19,16 @@ bool qb_is_stanza(char *stanza, int offset){
 
 bool qb_find_keyword_in_stanzas(quibble_program qp, char *keyword){
     int found_index = -1;
+    int curr_stanza = 0;
 
-    for (int i = 0; i < qp.num_stanzas; ++i){
-        found_index = qb_find_next_string(qp.stanza_list[i].prologue,
+    while (found_index < 0 && curr_stanza < qp.num_stanzas){
+        found_index = qb_find_next_string(qp.stanza_list[curr_stanza].prologue,
                                           0,
                                           keyword);
-        found_index = qb_find_next_string(qp.stanza_list[i].epilogue,
+        found_index = qb_find_next_string(qp.stanza_list[curr_stanza].epilogue,
                                           0,
                                           keyword);
+        curr_stanza++;
     }
     if (found_index >= 0){
         return true;
