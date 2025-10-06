@@ -405,6 +405,11 @@ char *qb_create_prologue(char *config, char *name,
                          quibble_arg *qargs, int num_args,
                          quibble_kwarg *qkwargs, int num_kwargs){
 
+    if (strlen(config) == 0){
+        char *final_output = (char *)calloc(1, sizeof(char));
+        return final_output;
+    }
+
     char *temp = (char *)calloc(QB_MAX_PROLOGUE_SIZE, sizeof(char));
 
     int num_config_args = qb_find_number_of_args(config);

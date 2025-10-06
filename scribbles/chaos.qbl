@@ -105,7 +105,8 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
     quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
 
     quibble_point_2D vertex_1 =
-        qb_point_2D(scale_x*cos(rotation) - scale_y*sin(rotation) + location.x,                     scale_x*sin(rotation) + scale_y*cos(rotation) + location.y);
+        qb_point_2D(scale_x*cos(rotation) - scale_y*sin(rotation) + location.x,
+                    scale_x*sin(rotation) + scale_y*cos(rotation) + location.y);
 
     quibble_point_2D vertex_2 =
         qb_point_2D(scale_x*cos(rotation) + scale_y*sin(rotation) + location.x,
@@ -146,10 +147,10 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
 
 }
 
-__verse constant_disk(quibble_point_2D pt |
-                      float radius = 1;
-                      quibble_point_2D location = qb_point_2D(0,0);
-                      bool function_index = 0;){
+quibble_point_2D constant_disk_fx(quibble_point_2D pt,
+                                  float radius,
+                                  quibble_point_2D location,
+                                  bool function_index){
 
     pt.x = (pt.x-location.x)/radius;
     pt.y = (pt.y-location.y)/radius;
@@ -167,15 +168,17 @@ __verse constant_disk(quibble_point_2D pt |
 
         float new_r2 = sqrt(theta/(2*M_PI));
 
-        _pt.x = radius*new_r2*cos(new_theta)+location.x;
-        _pt.y = radius*new_r2*sin(new_theta)+location.y;
+        pt.x = radius*new_r2*cos(new_theta)+location.x;
+        pt.y = radius*new_r2*sin(new_theta)+location.y;
     }
+
+    return pt;
 }
 
-__verse naive_disk(quibble_point_2D pt |
-                   float radius = 1;
-                   quibble_point_2D location = qb_point_2D(0,0);
-                   bool function_index = 0;){
+quibble_point_2D naive_disk_fx(quibble_point_2D pt,
+                               float radius,
+                               quibble_point_2D location, 
+                               bool function_index){
 
     pt.x = (pt.x-location.x)/radius;
     pt.y = (pt.y-location.y)/radius;
@@ -193,9 +196,11 @@ __verse naive_disk(quibble_point_2D pt |
 
         float new_r2 = theta/(2*M_PI);
 
-        _pt.x = radius*new_r2*cos(new_theta)+location.x;
-        _pt.y = radius*new_r2*sin(new_theta)+location.y;
+        pt.x = radius*new_r2*cos(new_theta)+location.x;
+        pt.y = radius*new_r2*sin(new_theta)+location.y;
     }
+
+    return pt;
 }
 
 
@@ -222,30 +227,18 @@ __stanza circle_chaos(int num_iterations, quibble_simple_camera cam,
         switch (chosen_fx){
             case 0:
                 if (naive_disk) {
-                    @VCALL naive_disk(_pt |
-                                      radius = radius;
-                                      location = location;
-                                      function_index = 0;);
+                    _pt = naive_disk_fx(_pt, radius, location, 0);
                 }
                 else {
-                    @VCALL constant_disk(_pt |
-                                         radius = radius;
-                                         location = location;
-                                         function_index = 0;);
+                    _pt = constant_disk_fx(_pt, radius, location, 0);
                 }
                 break;
             case 1:
                 if (naive_disk) {
-                    @VCALL naive_disk(_pt |
-                                      radius = radius;
-                                      location = location;
-                                      function_index = 1;);
+                    _pt = naive_disk_fx(_pt, radius, location, 1);
                 }
                 else {
-                    @VCALL constant_disk(_pt |
-                                         radius = radius;
-                                         location = location;
-                                         function_index = 1;);
+                    _pt = constant_disk_fx(_pt, radius, location, 1);
                 }
                 break;
             default:
