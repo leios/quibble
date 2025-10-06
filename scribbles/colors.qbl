@@ -29,6 +29,10 @@ typedef struct {
     unsigned char priority;
 } quibble_pcolor_rgba8888;
 
+float qb_as_float(unsigned char value){
+    return (float)value/255;
+}
+
 unsigned char qb_color_clamp(float value,
                              float min_value,
                              float max_value){

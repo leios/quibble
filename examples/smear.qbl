@@ -40,15 +40,10 @@ __poem smear_shader(quibble_pixels_prgba8888 qps,
                     quibble_point_2D location,
                     quibble_point_2D velocity){
 
-    // Drawing a black background first
-    quibble_point_2D pt = qb_find_point_location(_idx, qcam);
-    quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(0,0,0,1,0.1);
-    histogram_overwrite_prgba8888(pt, qcolor, qcam, qps);
+    quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(1,1,1,1,1);
 
-    qcolor = qb_pcolor_rgba8888(1,1,1,1,1);
-
-    @SCALL circle_chaos(100, qcam, qcolor |
-                        location = location; radius = 0.1;){
+    @SCALL circle_chaos(50, qcam, qcolor |
+                        location = location; radius = 0.2;){
         @VCALL smear(_pt, location, velocity);
     }
 }
