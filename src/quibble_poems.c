@@ -167,35 +167,39 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                     memset(tmp_body+tmp_index, 0, 6);
 
                     meta_name_start = index + 1;
-                    meta_name_end = qb_find_next_char(body, meta_name_start, '(');
+                    meta_name_end = qb_find_next_char(body, meta_name_start, '(') - 1;
                     char *verse_name = qb_strip_spaces(body, meta_name_start,
-                                                 meta_name_end - 1);
+                                                 meta_name_end);
                     config_end = qb_find_matching_char(body, max_size,
-                        meta_name_end, '(',')')-1;
+                        meta_name_end+1, '(',')')-1;
 
-                    if (config_end > meta_name_end+1){
-                        char *config = (char *)calloc(config_end-meta_name_end+2,
+                    char *verse = NULL;
+                    char *config = NULL;
+                    if (config_end - (meta_name_end+2) >= 0){
+                        config = (char *)calloc(config_end-meta_name_end+2,
                                                       sizeof(char));
-                        for (int i = 0; i < config_end-meta_name_end; ++i){
-                            config[i] = body[meta_name_end+1+i];
+                        for (int i = 0; i < config_end-meta_name_end-1; ++i){
+                            config[i] = body[meta_name_end+2+i];
                         }
-                        char *verse = qb_expand_verse(qp, verse_name, config);
-                        meta_length = strlen(verse);
-                        for (int i = 0; i < meta_length; ++i){
-                            tmp_body[tmp_index + i] = verse[i];
-                        }
-                        tmp_index += meta_length;
-                        index = config_end + 2;
-                        if (body[index] == ';'){
-                            index++;
-                        }
-                        free(verse);
-                        free(config);
+                        verse = qb_expand_verse(qp, verse_name, config);
                     }
                     else{
-                        fprintf(stderr, "Verse %s called incorrectly!\n", verse_name);
-                        exit(1);
+                        verse = qb_expand_verse(qp, verse_name, "");
                     }
+                    meta_length = strlen(verse);
+                    for (int i = 0; i < meta_length; ++i){
+                        tmp_body[tmp_index + i] = verse[i];
+                    }
+                    tmp_index += meta_length;
+                    index = config_end + 2;
+                    if (body[index] == ';'){
+                        index++;
+                    }
+                    if (config_end - (meta_name_end+2) >= 0){
+                        free(config);
+                    }
+
+                    free(verse);
                     free(verse_name);
                 }
             }
@@ -210,22 +214,22 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                     memset(tmp_body+tmp_index, 0, 6);
 
                     meta_name_start = index + 1;
-                    meta_name_end = qb_find_next_char(body, meta_name_start, '(');
+                    meta_name_end = qb_find_next_char(body, meta_name_start, '(') - 1;
                     char *stanza_name = qb_strip_spaces(body, meta_name_start,
-                                                  meta_name_end - 1);
+                                                  meta_name_end);
                     config_end = qb_find_matching_char(body, max_size,
-                        meta_name_end, '(',')')-1;
+                        meta_name_end+1, '(',')')-1;
 
-                    stanza_body_start = qb_find_next_char(body, config_end, '{')+1;
+                    stanza_body_start = qb_find_next_char(body, config_end, '{') + 1;
                     stanza_body_end = qb_find_matching_char(body, max_size,
                     stanza_body_start-1, '{','}');
-                    if (config_end > meta_name_end+1 &&
+                    if (config_end - (meta_name_end + 2) >= 0 &&
                         stanza_body_end > stanza_body_start){
-                    char *config = (char *)calloc(config_end-meta_name_end+2,
+                        char *config = (char *)calloc(config_end-meta_name_end+2,
                                                       sizeof(char));
     
-                        for (int i = 0; i < config_end-meta_name_end; ++i){
-                            config[i] = body[meta_name_end+1+i];
+                        for (int i = 0; i < config_end-meta_name_end-1; ++i){
+                            config[i] = body[meta_name_end+2+i];
                         }
                         char *stanza_body = (char *)calloc(stanza_body_end -
                             stanza_body_start+2, sizeof(char));
@@ -246,6 +250,28 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
                         free(config);
                         free(stanza_body);
                     }
+                    else if (config_end - (meta_name_end + 2) < 0 &&
+                             stanza_body_end > stanza_body_start){
+
+                        char *stanza_body = (char *)calloc(stanza_body_end -
+                            stanza_body_start+2, sizeof(char));
+                        for (int i = 0;
+                             i < stanza_body_end - stanza_body_start;
+                             ++i){
+                            stanza_body[i] = body[stanza_body_start+i];
+                        }
+                        char *stanza = qb_expand_stanza(qp, stanza_name, "",
+                                                        stanza_body);
+                        meta_length = strlen(stanza);
+                        for (int i = 0; i < meta_length; ++i){
+                            tmp_body[tmp_index + i] = stanza[i];
+                        }
+                        tmp_index += meta_length;
+                        index = stanza_body_end + 1;
+                        free(stanza);
+                        free(stanza_body);
+
+                    }
                     else{
                         fprintf(stderr, "Stanza %s called incorrectly!\n",
                                 stanza_name);
@@ -257,7 +283,6 @@ char *qb_expand_poem(quibble_program qp, int poem_index){
             else if (scall_match_count != 0){
                 scall_match_count = 0;
             }
-
 
             tmp_body[tmp_index] = body[index];
             ++index;

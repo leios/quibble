@@ -108,8 +108,7 @@ char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
     if (qp.verse_list[idx].body == NULL){
         return NULL;
     }
-    char *tmp_prologue = qb_create_prologue(config, verse_name,
-        qp.verse_list[idx].args, qp.verse_list[idx].num_args,
+    char *tmp_prologue = qb_create_prologue(config, verse_name, qp.verse_list[idx].args, qp.verse_list[idx].num_args,
         qp.verse_list[idx].kwargs, qp.verse_list[idx].num_kwargs);
 
     char *tmp_body = (char *)calloc(QB_MAX_META_SIZE, sizeof(char));
@@ -128,7 +127,7 @@ char *qb_expand_verse(quibble_program qp, char* verse_name, char *config){
 
     final_body[len+2] = '}';
     final_body[len+3] = '\n';
-    
+
     free(tmp_body);
     free(tmp_prologue);
     return final_body;

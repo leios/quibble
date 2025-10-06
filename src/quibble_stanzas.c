@@ -175,35 +175,39 @@ char *qb_expand_stanza_extra(quibble_program qp,
                 memset(stanza_extra+tmp_index, 0, 6);
 
                 verse_name_start = index+1;
-                verse_name_end = qb_find_next_char(body, verse_name_start, '(');
+                verse_name_end = qb_find_next_char(body, verse_name_start, '(') - 1;
                 char *verse_name = qb_strip_spaces(body, verse_name_start,
-                                             verse_name_end - 1);
+                                             verse_name_end);
                 config_end = qb_find_matching_char(body, max_size,
                     verse_name_end, '(',')')-1;
 
-                if (config_end > verse_name_end+1){
-                    char *config = (char *)calloc(config_end-verse_name_end+2,
+                char *verse = NULL;
+                char *config = NULL;
+                if (config_end - (verse_name_end+2) >= 0){
+                    config = (char *)calloc(config_end-verse_name_end+2,
                                                   sizeof(char));
-                    for (int i = 0; i < config_end-verse_name_end; ++i){
-                        config[i] = body[verse_name_end+1+i];
+                    for (int i = 0; i < config_end-verse_name_end-1; ++i){
+                        config[i] = body[verse_name_end+2+i];
                     }
-                    char *verse = qb_expand_verse(qp, verse_name, config);
-                    verse_length = strlen(verse);
-                    for (int i = 0; i < verse_length; ++i){
-                        stanza_extra[tmp_index + i] = verse[i];
-                    }
-                    index = config_end+2;
-                    if (body[index] == ';'){
-                        index++;
-                    }
-                    tmp_index += verse_length;
-                    free(config);
-                    free(verse);
+                    verse = qb_expand_verse(qp, verse_name, config);
                 }
                 else{
-                    fprintf(stderr, "Verse %s called incorrectly!\n", verse_name);
-                    exit(1);
+                    verse = qb_expand_verse(qp, verse_name, "");
                 }
+                verse_length = strlen(verse);
+                for (int i = 0; i < verse_length; ++i){
+                    stanza_extra[tmp_index + i] = verse[i];
+                }
+                index = config_end+2;
+                if (body[index] == ';'){
+                    index++;
+                }
+                tmp_index += verse_length;
+                if (config_end - (verse_name_end+2) >= 0){
+                    free(config);
+                }
+
+                free(verse);
                 free(verse_name);
             }
         }
@@ -258,35 +262,42 @@ char *qb_expand_stanza(quibble_program qp,
                 memset(tmp_body+tmp_index, 0, 6);
 
                 verse_name_start = index+1;
-                verse_name_end = qb_find_next_char(body, verse_name_start, '(');
+                verse_name_end = qb_find_next_char(body, verse_name_start, '(') - 1;
                 char *verse_name = qb_strip_spaces(body, verse_name_start,
-                                             verse_name_end - 1);
+                                             verse_name_end);
                 config_end = qb_find_matching_char(body, max_size,
-                    verse_name_end, '(',')')-1;
+                    verse_name_end+1, '(',')')-1;
 
-                if (config_end > verse_name_end+1){
-                    char *config = (char *)calloc(config_end-verse_name_end+2,
+                char *verse = NULL;
+                char *config = NULL;
+                if (config_end - (verse_name_end+2) >= 0){
+                    config = (char *)calloc(config_end-verse_name_end+2,
                                                   sizeof(char));
-                    for (int i = 0; i < config_end-verse_name_end; ++i){
-                        config[i] = body[verse_name_end+1+i];
+                    for (int i = 0; i < config_end-verse_name_end-1; ++i){
+                        config[i] = body[verse_name_end+2+i];
                     }
-                    char *verse = qb_expand_verse(qp, verse_name, config);
-                    verse_length = strlen(verse);
-                    for (int i = 0; i < verse_length; ++i){
-                        tmp_body[tmp_index + i] = verse[i];
-                    }
-                    index = config_end+2;
-                    if (body[index] == ';'){
-                        index++;
-                    }
-                    tmp_index += verse_length;
-                    free(config);
-                    free(verse);
+
+                    verse = qb_expand_verse(qp, verse_name, config);
                 }
                 else{
-                    fprintf(stderr, "Verse %s called incorrectly!\n", verse_name);
-                    exit(1);
+                    verse = qb_expand_verse(qp, verse_name, "");
                 }
+
+                verse_length = strlen(verse);
+                for (int i = 0; i < verse_length; ++i){
+                    tmp_body[tmp_index + i] = verse[i];
+                }
+                index = config_end+2;
+                if (body[index] == ';'){
+                    index++;
+                }
+                tmp_index += verse_length;
+
+                if (config_end - (verse_name_end+2) > 0){
+                    free(config);
+                }
+
+                free(verse);
                 free(verse_name);
             }
         }
