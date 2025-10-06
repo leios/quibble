@@ -105,7 +105,8 @@ __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam,
     quibble_pcolor_rgba8888 _clr = qb_pcolor_rgba8888(0,0,0,0,0);
 
     quibble_point_2D vertex_1 =
-        qb_point_2D(scale_x*cos(rotation) - scale_y*sin(rotation) + location.x,                     scale_x*sin(rotation) + scale_y*cos(rotation) + location.y);
+        qb_point_2D(scale_x*cos(rotation) - scale_y*sin(rotation) + location.x,
+                    scale_x*sin(rotation) + scale_y*cos(rotation) + location.y);
 
     quibble_point_2D vertex_2 =
         qb_point_2D(scale_x*cos(rotation) + scale_y*sin(rotation) + location.x,
