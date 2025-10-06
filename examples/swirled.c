@@ -12,7 +12,7 @@
 int main(void){
 
     quibble_program qp = qb_parse_program_file("swirled.qbl");
-    qb_configure_program(&qp, 0, 0);
+    qb_configure_program(&qp, 1, 0);
 
     int width = 1920;
     int height = 1080;

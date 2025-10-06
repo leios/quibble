@@ -35,13 +35,91 @@ void histogram_output_prgba8888(quibble_point_2D pt,
                                 quibble_simple_camera qcam,
                                __global quibble_pcolor_rgba8888 *_qpix_output){
     int bin = qb_find_bin(pt.x, pt.y, qcam);
-    if (bin > 0 && color.priority > _qpix_output[bin].priority){
-        _qpix_output[bin].red = color.red;
-        _qpix_output[bin].green = color.green;
-        _qpix_output[bin].blue = color.blue;
-        _qpix_output[bin].alpha = color.alpha;
-        _qpix_output[bin].priority = color.priority;
+    if (bin > 0){
+        if (color.priority > _qpix_output[bin].priority && color.alpha == 255
+            || _qpix_output[bin].alpha == 0){
+            _qpix_output[bin].red = color.red;
+            _qpix_output[bin].green = color.green;
+            _qpix_output[bin].blue = color.blue;
+            _qpix_output[bin].alpha = color.alpha;
+            _qpix_output[bin].priority = color.priority;
+        }
+        else if (color.priority > _qpix_output[bin].priority &&
+                 color.alpha < 255 && color.alpha > 0){
+
+            float bg_red = qb_as_float(_qpix_output[bin].red);
+            float bg_green = qb_as_float(_qpix_output[bin].green);
+            float bg_blue = qb_as_float(_qpix_output[bin].blue);
+            float bg_alpha = qb_as_float(_qpix_output[bin].alpha);
+
+            float fg_red = qb_as_float(color.red);
+            float fg_green = qb_as_float(color.green);
+            float fg_blue = qb_as_float(color.blue);
+            float fg_alpha = qb_as_float(color.alpha);
+
+            float new_alpha =
+                fg_alpha + bg_alpha * (1-fg_alpha);
+
+            _qpix_output[bin].red = qb_color_clamp(
+                (fg_red * fg_alpha + bg_red * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].green = qb_color_clamp(
+                (fg_green * fg_alpha + bg_green * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].blue = qb_color_clamp(
+                (fg_blue * fg_alpha + bg_blue * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].alpha = qb_color_clamp(new_alpha, 0, 1);
+            _qpix_output[bin].priority = color.priority;
+        }
+        else if (color.priority < _qpix_output[bin].priority &&
+                 _qpix_output[bin].alpha < 255 && _qpix_output[bin].alpha > 0){
+
+            float fg_red = qb_as_float(_qpix_output[bin].red);
+            float fg_green = qb_as_float(_qpix_output[bin].green);
+            float fg_blue = qb_as_float(_qpix_output[bin].blue);
+            float fg_alpha = qb_as_float(_qpix_output[bin].alpha);
+
+            float bg_red = qb_as_float(color.red);
+            float bg_green = qb_as_float(color.green);
+            float bg_blue = qb_as_float(color.blue);
+            float bg_alpha = qb_as_float(color.alpha);
+
+            float new_alpha =
+                fg_alpha + bg_alpha * (1-fg_alpha);
+
+            _qpix_output[bin].red = qb_color_clamp(
+                (fg_red * fg_alpha + bg_red * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].green = qb_color_clamp(
+                (fg_green * fg_alpha + bg_green * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].blue = qb_color_clamp(
+                (fg_blue * fg_alpha + bg_blue * bg_alpha * (1 - fg_alpha)) /
+                new_alpha,
+                0, 1
+            );
+
+            _qpix_output[bin].alpha = qb_color_clamp(new_alpha, 0, 1);
+
+        }
     }
+
 }
 
 void histogram_output_prgb888(quibble_point_2D pt,
@@ -93,6 +171,13 @@ quibble_point_2D qb_find_point_location(int idx, quibble_simple_camera qcam){
     pt.x = (((float)(idx % width) + 0.5)/width)*qcam.world_size_x + qcam.world_position_x;
 
     return pt;
+}
+
+__poem clear_bg(quibble_pixels_prgba8888 qps,
+                quibble_simple_camera qcam){
+    quibble_point_2D pt = qb_find_point_location(_idx, qcam);
+    quibble_pcolor_rgba8888 qcolor = qb_pcolor_rgba8888(0,0,0,1,0);
+    histogram_overwrite_prgba8888(pt, qcolor, qcam, qps);
 }
 
 #endif

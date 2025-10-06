@@ -1,6 +1,7 @@
 #include "../include/quibble.h"
 
 char *qb_expand_path(char *path, char *base_path){
+
     if (path == NULL){
         return NULL;
     }
@@ -50,7 +51,7 @@ char *qb_find_path(char *filename){
             found_slash = true;
         }
     }
-    if(idx >= 0){
+    if(idx > 0){
         return qb_strip_spaces(filename, 0, idx);
     }
     else {

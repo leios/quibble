@@ -10,19 +10,18 @@
 
 void create_filename(char *buffer, int i){
     sprintf(buffer, "check%d%d%d%d.png",
-            i%10000 - i%1000,
-            i%1000 - i%100,
-            i%100 - i%10,
+            (i%10000 - i%1000)/1000,
+            (i%1000 - i%100)/100,
+            (i%100 - i%10)/10,
             i%10);
 }
 
 int main(void){
 
     quibble_program qp = qb_parse_program_file("smear.qbl");
-    qb_print_program(qp);
-    qb_configure_program(&qp, 0, 0);
+    qb_output_program_to_file(qp, "program.txt");
+    qb_configure_program(&qp, 1, 0);
 
-    qb_print_program(qp);
 
     int width = 1920;
     int height = 1080;
@@ -45,7 +44,7 @@ int main(void){
     quibble_point_2D location = qb_point_2D(0,0);
     quibble_point_2D velocity = qb_point_2D(0,0);
 
-    int num_frames = 5;
+    int num_frames = 10;
     float half_frame = num_frames*0.5;
     char filename[15] = {0};
     
@@ -54,6 +53,10 @@ int main(void){
                 "quibble_simple_camera qcam", &qcam,
                 "quibble_point_2D location", &location,
                 "quibble_point_2D velocity", &velocity);
+
+    qb_set_args(&qp, "clear_bg", 2,
+                "quibble_pixels_prgba8888 qps", qpix,
+                "quibble_simple_camera qcam", &qcam);
 
     for (int i = 0; i < num_frames + 1; ++i){
 
@@ -73,6 +76,7 @@ int main(void){
                     "quibble_point_2D location", &location,
                     "quibble_point_2D velocity", &velocity);
 
+        qb_run(qp, "clear_bg", width*height, 256);
         qb_run(qp, "smear_shader", width*height, 256);
 
         qb_pixels_device_to_host(qpix);
