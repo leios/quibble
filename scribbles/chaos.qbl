@@ -156,6 +156,8 @@ quibble_point_2D constant_disk_fx(quibble_point_2D pt,
     pt.y = (pt.y-location.y)/radius;
 
     float r2 = pt.x*pt.x + pt.y*pt.y;
+    float new_theta;
+    float new_r2;
 
     float theta = M_PI;
     if (r2 > FLT_EPSILON){
@@ -164,9 +166,9 @@ quibble_point_2D constant_disk_fx(quibble_point_2D pt,
             theta += 2*M_PI;
         }
 
-        float new_theta = (r2+function_index)*M_PI;
+        new_theta = (r2+function_index)*M_PI;
 
-        float new_r2 = sqrt(theta/(2*M_PI));
+        new_r2 = sqrt(theta/(2*M_PI));
 
         pt.x = radius*new_r2*cos(new_theta)+location.x;
         pt.y = radius*new_r2*sin(new_theta)+location.y;
