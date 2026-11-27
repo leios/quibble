@@ -88,6 +88,60 @@ __stanza sierpinski_chaos(int num_iterations, quibble_simple_camera cam,
 
 }
 
+quibble_point_2D triangle_fill(quibble_point_2D pt,
+                               quibble_point_2D a,
+                               quibble_point_2D b,
+                               quibble_point_2D c){
+
+    quibble_point_2D midpoint = pt;
+    midpoint.x = (a.x + b.x + c.x)/3;
+    midpoint.y = (a.y + b.y + c.y)/3;
+
+    pt.x = midpoint.x - (pt.x - midpoint.x) * 0.5;
+    pt.y = midpoint.y - (pt.y - midpoint.y) * 0.5;
+
+    return pt;
+}
+
+__stanza triangle_chaos(int num_iterations, quibble_simple_camera cam,
+                        quibble_point_2D a,
+                        quibble_point_2D b,
+                        quibble_point_2D c){
+
+    quibble_pcg_state qstate = pcg32_init(_idx);
+
+    float y = fpcg32(&qstate)*cam.world_size_y+cam.world_position_y;
+    float x = fpcg32(&qstate)*cam.world_size_x+cam.world_position_x;
+
+    quibble_point_2D _pt = qb_point_2D(x, y);
+
+    unsigned short chosen_fx;
+
+    for (int _i = 0; _i < num_iterations; ++_i){
+        chosen_fx = pcg32(&qstate)%4;
+
+        switch (chosen_fx){
+            case 0:
+                _pt = halfway(_pt, a);
+                break;
+            case 1:
+                _pt = halfway(_pt, b);
+                break;
+            case 2:
+                _pt = halfway(_pt, c);
+                break;
+            case 3:
+                _pt = triangle_fill(_pt, a, b, c);
+                break;
+            default:
+                break;
+        }
+        __split_stanza();
+    }
+
+}
+
+
 __stanza rectangle_chaos(int num_iterations, quibble_simple_camera cam, 
                          quibble_pcolor_rgba8888 clr |
                          quibble_point_2D location = qb_point_2D(0,0);
